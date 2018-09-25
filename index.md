@@ -12,11 +12,13 @@ Thanks for your visit ^.^
 
 **Computer Vision**
 
-[Feature Detection In OpenCV](./another-page.html).
+[Project 3D Reconstruction](./Project_3D_Reconstruction.html)
+
+[Feature Detection In OpenCV](./Feature_Detection_In_OpenCV.html)
 
 **Other subjects**
 
-[Trifles](./trifles.html).
+[Trifles](./trifles.html)
 
 ## I want to tell you
 
@@ -51,6 +53,26 @@ for (int i = 0; i <= forever; i++) {
 | English      | TOEFL(87), GRE(140+170+2.5)|
 | Korean       | TOPIK(level 4)             |
 | French       | A2                         |
+
+### Previous projects
+
+2013.03~2017.03
+Projects include:
+1. 3D Reconstruction System Project. (2015.03 ~ Now)
+Given a set of images and a rough model (for example, a human’s head, or a geometry). The target is to reconstruct the scene with adequate precision.
+a) IMU and vision fusion in order to obtain the pose of camera frames and point clouds of the scene.
+b) According to obtained point clouds to reconstruct mesh surface and repair it with a rough model as reference.
+c) Then, generate skeleton of target model and use this skeleton to guide refinement of mesh vertexes in order to minimize the distance of reconstructed mesh and reference mesh.
+d) Test the scheme and finish my master thesis in this subject
+2. Relighting After Reconstruction Project. (2014.07-2015.06)
+a) Design a system to relight an object through adjust the light parameters and embed it into a new scene
+b) And automatically calculate the light direction and other parameters when given an image and the 3D model of the scene in that image
+c) Problem: the result is not accurate enough, in the following days I will try to improve it
+3. Server Log Data Visualization Project. (2013.03-2014.06)
+Given many server log data and make them visible.
+a) Research to analysis the data to recover some useful rules and show them in graphics
+b) Try to catch new types of terminals, predict new product specification
+c) Problem: data is so large that it takes a long time to show the result. Because of some reasons, this project has been put on hold.
 
 #### Personal Infomation
 

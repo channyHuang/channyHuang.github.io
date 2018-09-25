@@ -7,17 +7,17 @@
     <link rel="stylesheet" href="/assets/css/style.css?v=fcf6d51b895409c1d2686a9525980776b8cf6725">
 
 <!-- Begin Jekyll SEO tag v2.5.0 -->
-<title>Where to get help | channy’s page</title>
+<title>Project - 3D Reconstruction | channy’s page</title>
 <meta name="generator" content="Jekyll v3.7.4" />
-<meta property="og:title" content="Where to get help" />
+<meta property="og:title" content="Project - 3D Reconstruction" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others." />
 <meta property="og:description" content="Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others." />
-<link rel="canonical" href="http://localhost:4000/docs/SUPPORT.html" />
-<meta property="og:url" content="http://localhost:4000/docs/SUPPORT.html" />
+<link rel="canonical" href="http://localhost:4000/Project_3D_Reconstruction.html" />
+<meta property="og:url" content="http://localhost:4000/Project_3D_Reconstruction.html" />
 <meta property="og:site_name" content="channy’s page" />
 <script type="application/ld+json">
-{"description":"Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.","@type":"WebPage","url":"http://localhost:4000/docs/SUPPORT.html","headline":"Where to get help","@context":"http://schema.org"}</script>
+{"description":"Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.","@type":"WebPage","url":"http://localhost:4000/Project_3D_Reconstruction.html","headline":"Project - 3D Reconstruction","@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
   </head>
@@ -41,20 +41,24 @@
 
     <div class="container">
       <section id="main_content">
-        <h2 id="where-to-get-help">Where to get help</h2>
+        <h1 id="project---3d-reconstruction">Project - 3D Reconstruction</h1>
 
-<p>If you think you’ve found a bug in The Hacker Theme, please <a href="https://github.com/pages-themes/hacker/issues">check the existing issues</a>, and if no one has reported the problem, <a href="https://github.com/pages-themes/hacker/issues/new">open a new issue</a>.</p>
+<p>Here is a little introduction about one of my previous projects – 3D reconstruction.</p>
 
-<p>If you have a general question about the theme, how to implement it, or how to customize it for your site  you have two options:</p>
+<h2 id="basic-data-flow">Basic Data Flow</h2>
 
-<ol>
-  <li>
-    <p><a href="https://github.com/contact?form%5Bsubject%5D=GitHub%20Pages%20theme%20pages-themes/hacker">Contact GitHub Support</a>, or</p>
-  </li>
-  <li>
-    <p>Ask your question of the Jekyll community on <a href="https://talk.jekyllrb.com/">talk.jekyllrb.com</a></p>
-  </li>
-</ol>
+<script src="mermaid.full.min.js"></script>
+
+<div class="mermaid">
+st=&gt;start: Start
+opInput=&gt;operation: Input images/vedio
+opDetect=&gt;operation: Feature detect and match
+opCompute=&gt;operation: Compute params of camera
+opFace=&gt;operation: Reconstruct mesh model
+opFix=&gt;operation: Fix model using DB
+e=&gt;end
+st-&gt;opInput-&gt;opDetect-&gt;opCompute-&gt;opFace-&gt;opFix-&gt;e
+</div>
 
       </section>
     </div>
