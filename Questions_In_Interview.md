@@ -10,20 +10,62 @@ layout: default
 ## C Plus
 
 1. STL库，vector迭代器，map的实现
-	![Octocat](./assets/image/iterator.png)
+
+	![Iterator](https://raw.githubusercontent.com/qanny/qanny.github.io/master/assets/images/iterator.png)
+	
+	list: 内部维护一个list指针，双向
+	
+	map: 平𧗾二叉树（红黑树），二分查找
+	
+	unordered_map: hash_map,需要定义hash_value和==
+	
+	迭代器失效：remove/delete
+	
+	vector内存分配：当第一次申请的空间L不够时，第二次申请会申请2L的空间并把原来的数据copy过去
+
 1. const, static
 
+	const int n; 
+	
+	const char* p; -> 指针内容不可变
+	
+	char* const p; -> 指针不可变
+	
+	f(const char* p)
+	
+	const char* f()
+	
+	f() const -> 常成员函数
+
+1. new, malloc
+	
+	分配大小
+	
+	初始化
+	
+	内存管理
+
 1. 多态、继承
+
 	多态(虚函数) -> 一个接口，多种状态，运行时确定调用的函数地址
+	
 	重载 -> 多个同名不同参数的函数
 
+1. 指针、引用
+
 1. 多线程同步方法
+
 	临界区
+	
 	事件
+	
 	信号量
+	
 	互斥量
 
 1. 智能指针
+
+	计数器记录指针的引用对象个数
 
 1. 进程间的通信
 
@@ -36,6 +78,31 @@ layout: default
 	shared memory
 	
 	socket
+
+1. 实现STL中的string
+
+	```c++
+	char * strcpy(char * strDest,const char * strSrc) {
+		assert((strDest!=NULL) && (strSrc !=NULL));
+		char * strDestCopy=strDest;
+		while ((*strDest++=*strSrc++)!='\0'); 
+		return strDestCopy;
+	}
+	```
+	
+## Algorithm
+1. 单向二叉树（父节点->子节点），查找两节点的公共祖先
+	```c++
+	inLeftOrRight(Node *parent, Node *child)
+	```
+
+1. 判断单向链表是否有环
+
+	两个指针，一个每次递增一步，一个每次递增两步
+	
+## Big Data
+
+1. 大数中找最大的100个数
 	
 ## Android
 1. 进程和线程的区别（貌似是Android中经典的经典问题）
