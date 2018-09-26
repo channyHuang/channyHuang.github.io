@@ -100,9 +100,38 @@ int main( int argc, char** argv ) {
 	return 0;
 }
 ```
+Then we will begin from: `FastFeatureDetector::create()`
 
-Then we will begin from:
+>actually, it is: (feature2d/src/fast.cpp)
+
+```c++
+Ptr<FastFeatureDetector> FastFeatureDetector::create( int threshold, bool nonmaxSuppression, int type ) {
+    return makePtr<FastFeatureDetector_Impl>(threshold, nonmaxSuppression, type);
+}
 ```
-FastFeatureDetector::create()
+After create ptr, then we enter detect function of `FastFeatureDetector_Impl`:
+```c++
+void detect( InputArray _image, std::vector<KeyPoint>& keypoints, InputArray _mask ) {
+	Mat mask = _mask.getMat(), grayImage;
+	UMat ugrayImage;
+	_InputArray gray = _image;
+	if( _image.type() != CV_8U )
+	{
+		_OutputArray ogray = _image.isUMat() ? _OutputArray(ugrayImage) : _OutputArray(grayImage);
+		cvtColor( _image, ogray, COLOR_BGR2GRAY );
+		gray = ogray;
+	}
+	FAST( gray, keypoints, threshold, nonmaxSuppression, type );
+	KeyPointsFilter::runByPixelsMask( keypoints, mask );
+}
 ```
+First, we need to convert input image to gray image.
+
+Then, follow the kernel function _FAST_, actually in _FAST_t_:
+
+```c++
+template<int patternSize>
+void FAST_t(InputArray _img, std::vector<KeyPoint>& keypoints, int threshold, bool nonmax_suppression)
+```
+
 [back](./)

@@ -4,7 +4,7 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/assets/css/style.css?v=fcf6d51b895409c1d2686a9525980776b8cf6725">
+    <link rel="stylesheet" href="/assets/css/style.css?v=59aa46018cddf55950ae6c6f9d5d6df29ff67251">
 
 <!-- Begin Jekyll SEO tag v2.5.0 -->
 <title>Feature Detection In OpenCV | channy’s page</title>
@@ -138,10 +138,39 @@
 	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div></div>
+<p>Then we will begin from: <code class="highlighter-rouge">FastFeatureDetector::create()</code></p>
 
-<p>Then we will begin from:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>FastFeatureDetector::create()
+<blockquote>
+  <p>actually, it is: (feature2d/src/fast.cpp)</p>
+</blockquote>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Ptr</span><span class="o">&lt;</span><span class="n">FastFeatureDetector</span><span class="o">&gt;</span> <span class="n">FastFeatureDetector</span><span class="o">::</span><span class="n">create</span><span class="p">(</span> <span class="kt">int</span> <span class="n">threshold</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">nonmaxSuppression</span><span class="p">,</span> <span class="kt">int</span> <span class="n">type</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">makePtr</span><span class="o">&lt;</span><span class="n">FastFeatureDetector_Impl</span><span class="o">&gt;</span><span class="p">(</span><span class="n">threshold</span><span class="p">,</span> <span class="n">nonmaxSuppression</span><span class="p">,</span> <span class="n">type</span><span class="p">);</span>
+<span class="p">}</span>
 </code></pre></div></div>
+<p>After create ptr, then we enter detect function of <code class="highlighter-rouge">FastFeatureDetector_Impl</code>:</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">detect</span><span class="p">(</span> <span class="n">InputArray</span> <span class="n">_image</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">KeyPoint</span><span class="o">&gt;&amp;</span> <span class="n">keypoints</span><span class="p">,</span> <span class="n">InputArray</span> <span class="n">_mask</span> <span class="p">)</span> <span class="p">{</span>
+	<span class="n">Mat</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">_mask</span><span class="p">.</span><span class="n">getMat</span><span class="p">(),</span> <span class="n">grayImage</span><span class="p">;</span>
+	<span class="n">UMat</span> <span class="n">ugrayImage</span><span class="p">;</span>
+	<span class="n">_InputArray</span> <span class="n">gray</span> <span class="o">=</span> <span class="n">_image</span><span class="p">;</span>
+	<span class="k">if</span><span class="p">(</span> <span class="n">_image</span><span class="p">.</span><span class="n">type</span><span class="p">()</span> <span class="o">!=</span> <span class="n">CV_8U</span> <span class="p">)</span>
+	<span class="p">{</span>
+		<span class="n">_OutputArray</span> <span class="n">ogray</span> <span class="o">=</span> <span class="n">_image</span><span class="p">.</span><span class="n">isUMat</span><span class="p">()</span> <span class="o">?</span> <span class="n">_OutputArray</span><span class="p">(</span><span class="n">ugrayImage</span><span class="p">)</span> <span class="o">:</span> <span class="n">_OutputArray</span><span class="p">(</span><span class="n">grayImage</span><span class="p">);</span>
+		<span class="n">cvtColor</span><span class="p">(</span> <span class="n">_image</span><span class="p">,</span> <span class="n">ogray</span><span class="p">,</span> <span class="n">COLOR_BGR2GRAY</span> <span class="p">);</span>
+		<span class="n">gray</span> <span class="o">=</span> <span class="n">ogray</span><span class="p">;</span>
+	<span class="p">}</span>
+	<span class="n">FAST</span><span class="p">(</span> <span class="n">gray</span><span class="p">,</span> <span class="n">keypoints</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">nonmaxSuppression</span><span class="p">,</span> <span class="n">type</span> <span class="p">);</span>
+	<span class="n">KeyPointsFilter</span><span class="o">::</span><span class="n">runByPixelsMask</span><span class="p">(</span> <span class="n">keypoints</span><span class="p">,</span> <span class="n">mask</span> <span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>First, we need to convert input image to gray image.</p>
+
+<p>Then, follow the kernel function <em>FAST</em>, actually in <em>FAST_t</em>:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">template</span><span class="o">&lt;</span><span class="kt">int</span> <span class="n">patternSize</span><span class="o">&gt;</span>
+<span class="kt">void</span> <span class="n">FAST_t</span><span class="p">(</span><span class="n">InputArray</span> <span class="n">_img</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">KeyPoint</span><span class="o">&gt;&amp;</span> <span class="n">keypoints</span><span class="p">,</span> <span class="kt">int</span> <span class="n">threshold</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">nonmax_suppression</span><span class="p">)</span>
+</code></pre></div></div>
+
 <p><a href="./">back</a></p>
 
       </section>
