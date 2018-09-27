@@ -12,7 +12,7 @@ layout: default
 
 **Computer Vision**
 
->By the way, there won't be any theory in these notes, because I think that theory can be learned from books and others' blogs. There are so many blogs that have a deep description in algorithms, including the formulation, deduction, paper, thesis, etc. I won't write these in my artical unless I have a different opinions or new ideas.
+>By the way, there won't be any theory in these notes, because I think that theory can be learned from books and others' blogs. There are so many blogs that have a deep description in algorithms, including the formulation, deduction, paper, thesis, etc. I won't write these in my articles unless I have different opinions or new ideas.
 
 [Project 3D Reconstruction](./Project_3D_Reconstruction.html)
 
@@ -22,7 +22,7 @@ layout: default
 
 [Compute Camera Params and Point Cloud](./Compute_Camera_Params_and_Point_Cloud.html)
 
-[Difficulty In Reconstruction](./Difficulity_In_Reconstruction.html)
+[Project Relighting](./Project_Relighting.html)
 
 **Other subjects**
 

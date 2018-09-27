@@ -4,7 +4,7 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/assets/css/style.css?v=ba6a25aed391a5200578c539cdc9b6cb99e1828c">
+    <link rel="stylesheet" href="/assets/css/style.css?v=1b0aae57df3176981ebd448f73d104e2e82d29cd">
 
 <!-- Begin Jekyll SEO tag v2.5.0 -->
 <title>Project - 3D Reconstruction | channy’s page</title>
@@ -47,10 +47,8 @@
 
 <h2 id="basic-data-flow">Basic Data Flow</h2>
 
-<script src="mermaid.full.min.js"></script>
-
-<div class="mermaid">
-st=&gt;start: Start
+<p>So sorry that flow can not be shown -.-</p>
+<pre><code class="language-flow">st=&gt;start: Start
 opInput=&gt;operation: Input images/vedio
 opDetect=&gt;operation: Feature detect and match
 opCompute=&gt;operation: Compute params of camera
@@ -58,7 +56,51 @@ opFace=&gt;operation: Reconstruct mesh model
 opFix=&gt;operation: Fix model using DB
 e=&gt;end
 st-&gt;opInput-&gt;opDetect-&gt;opCompute-&gt;opFace-&gt;opFix-&gt;e
-</div>
+</code></pre>
+
+<p>Well, First step, Feature detecting and matching. (<em><a href="./Feature_Detection_In_OpenCV.html">Feature Detection In OpenCV</a> &amp; 
+<a href="./Feature_Matching_In_OpenCV.html">Feature Matching In OpenCV</a></em>)</p>
+
+<p>There are many kinds of features, SIFT, SURF, FAST, ORB, BRISK, Freak, Harri, BOW…</p>
+
+<p>Compared these features, we can find that in most cases, SIFT is best because it contains scale, can detect more features than others, of cause, it is not fast enough.</p>
+
+<p>In this project, we combine two features: <code class="highlighter-rouge">SIFT</code> and <code class="highlighter-rouge">Freak</code>.</p>
+
+<ul class="task-list">
+  <li class="task-list-item">
+    <p><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Difficulty 1: <strong>What if the input images has few features?</strong></p>
+
+    <p>Of cause we can add some texture objects in scene if possible. But if it is hard, than we can add something else, for example, detect lines or other shapes in input images according to what scene to be inputed. Building reconstruction is based on line detection. This project tries to reconstruct foot, so there is no lines.</p>
+  </li>
+</ul>
+
+<p>Minimize the error of reprojection, BA algorithm, solve nonlinear least squares problem.</p>
+
+<ul>
+  <li>
+    <p>[] Difficulty 2: <strong>What if the point cloud is sparse?</strong></p>
+
+    <p>In order to build a dense point cloud, most researchers will refer to PMVS/CMVS. This is an open source library to generate a dense point cloud. But I don’t know why so many people believe it is a 3D reconstruction library. Actually, the input of PMVS/CMVS is sparse point cloud, it is just change it to dense cloud but not contains the whole flow of 3D reconstruction.</p>
+  </li>
+</ul>
+
+<p>From point cloud to mesh model, use possion reconstruction.</p>
+
+<ul>
+  <li>[] Difficulty 3: <strong>How to improve precision?</strong></li>
+</ul>
+
+<p>We have a small database of foot. At the last step in this project, we use models in database to fix the reconstruction model.</p>
+
+<h2 id="some-reference">Some reference:</h2>
+<blockquote>
+  <p><a href="http://ccwu.me/vsfm/">VisualSFM</a></p>
+</blockquote>
+
+<blockquote>
+  <p><a href="http://www.di.ens.fr/pmvs/">PMVS/CMVS</a></p>
+</blockquote>
 
 <p><a href="./">back</a></p>
 
