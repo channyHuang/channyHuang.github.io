@@ -4,4 +4,4 @@ layout: default
 
 # Project Relighting
 
-As previous articles, 
+will finish it soon...
