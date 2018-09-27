@@ -136,6 +136,18 @@ layout: default
 	突然间后悔了。。。
 	
 	格式，解析，语言支持，可读性，速度
+	
+1. 内存回收机制，内存泄漏
+
+	> 非static类中的static变量
+	
+	> Handle
+	
+	> 单例
+	
+	> 资源未关闭，File, BroadcastReceiver...
+
+工具：LeakCanary
 
 ## Others
 
