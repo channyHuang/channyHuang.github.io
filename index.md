@@ -26,7 +26,9 @@ layout: default
 
 **Other subjects**
 
-[Questions In Interview](./Questions_In_Interview)
+[Questions In Interview](./Questions_In_Interview.html)
+
+[Android_Crack](./Android_Crack.html)
 
 [Trifles](./Trifles.html)
 

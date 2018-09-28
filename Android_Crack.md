@@ -15,17 +15,17 @@ Android逆向
 step 1:
 androidKiller反编译，得smali文件
 
-![AndroidKiller](https://raw.githubusercontent.com/qanny/qanny.github.io/master/assets/images/iterator.png))
+![AndroidKiller](https://github.com/qanny/qanny.github.io/blob/master/assets/images/androidKiller.png)
 
 step 2:
 查找关键字
 
-![AndroidKeyword](https://raw.githubusercontent.com/qanny/qanny.github.io/master/assets/images/iterator.png))
+![AndroidKeyword](https://github.com/qanny/qanny.github.io/blob/master/assets/images/androidKeyword.png)
 
 step 3:
 修改跳转条件
 
-![AndroidCondition](https://raw.githubusercontent.com/qanny/qanny.github.io/master/assets/images/iterator.png))
+![AndroidCondition](https://github.com/qanny/qanny.github.io/blob/master/assets/images/androidCondition.png)
 
 不顺利的情况下：
 用的apktool 3.0
