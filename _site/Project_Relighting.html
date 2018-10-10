@@ -4,7 +4,7 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/assets/css/style.css?v=457684cdeba9311bca3123b42f6593ea7081f5dc">
+    <link rel="stylesheet" href="/assets/css/style.css?v=d1028d1a7338af130ae895016921afee31d6ae83">
 
 <!-- Begin Jekyll SEO tag v2.5.0 -->
 <title>Project Relighting | channy’s page</title>
@@ -44,6 +44,73 @@
         <h1 id="project-relighting">Project Relighting</h1>
 
 <p>will finish it soon…</p>
+
+<h3 id="some-libraries-or-algorithms-used-in-this-project">Some libraries or algorithms used in this project</h3>
+
+<p>Photometric Ambient Occlusion</p>
+
+<p>http://www.cs.cornell.edu/projects/photoao/</p>
+
+<p>計算圖像的環境光散射（AO）</p>
+
+<p>Stereo Matching with Nonparametric Smoothness Priors in Feature Space
+http://pages.cs.wisc.edu/~lizhang/projects/mvstereo/cvpr2009/</p>
+
+<p>把每個像素視為向量，圖像匹配轉化為匹配點云。通過最小化由連續性和光滑性組成的能量函數計算深度圖。</p>
+
+<p>输入：图像（&gt;=2张），摄像机参数，相机对（匹配对）， mindepth and maxdepth，输入图像名称，其它Optical的参数</p>
+
+<p>输出：對應的深度圖</p>
+
+<p>腳型數據的測試效果并不好。</p>
+
+<p>Visual Hall to model</p>
+
+<p>http://vision.gel.ulaval.ca/~visualhull/</p>
+
+<p>输入多张图像轮廓和对应的摄像机参数，给定包围盒，把其中的体素反投影在图像上判断其是否在Model里面，从而实现三维重建。也可以输入图像，利用自动分割求轮廓。</p>
+
+<p>http://www.dip.ee.uct.ac.za/~kforbes/DoubleMirror/DoubleMirror.html</p>
+
+<p>两面镜子成一定角度摆放（已知摄像机参数），利用镜面成像拍摄一幅图像得到物体多个角度的视图，visual hall判断是否投影在图像上。</p>
+
+<p>Photometric Stereo</p>
+
+<p>源码：http://pages.cs.wisc.edu/~csverma/CS766_09/Stereo/stereo.html</p>
+
+<p>数据：http://www.cs.cornell.edu/courses/cs6644/2014fa/assignments/assignment1.html</p>
+
+<p>扩展：assignment2… ; project1, project2, project4…</p>
+
+<p>扩展阅读：http://grail.cs.washington.edu/projects/sam/</p>
+
+<p>用上述方法重建效果不理想</p>
+
+<p>只有图像和光源信息的dataset：http://gl.ict.usc.edu/Data/LightStage/</p>
+
+<p>输入：铬球（chrome ball）1,…,n，mask，图像1,…,n（不同光源同一场景）</p>
+
+<p>目标：估计深度和法向量</p>
+
+<p>假设条件：朗伯体</p>
+
+<p>估计光源方向</p>
+
+<p>利用chrome ball亮点估计光源的方向。</p>
+
+<p>[Px,Py]为亮点坐标，[Cx,Cy]为球心，R为散射方向[0,0,1]</p>
+
+<p>计算法向量</p>
+
+<p>N为法向量，L光源方向。</p>
+
+<p>最小二乘法解线性方程组</p>
+
+<p>生成深度图</p>
+
+<p>Photometric Stereo 2</p>
+
+<p>http://ubee.enseeiht.fr/photometricstereo/</p>
 
       </section>
     </div>

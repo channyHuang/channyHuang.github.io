@@ -40,6 +40,8 @@ layout: default
 
 [Questions In Interview](./Questions_In_Interview.html)
 
+[Model_Code_Of_InputOutput](./Model_Code_Of_InputOutput)
+
 [Trifles](./Trifles.html)
 
 ## I want to tell you

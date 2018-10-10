@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/assets/css/style.css?v=d1028d1a7338af130ae895016921afee31d6ae83">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>channy’s page | Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.</title>
+<meta name="generator" content="Jekyll v3.7.4" />
+<meta property="og:title" content="channy’s page" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others." />
+<meta property="og:description" content="Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others." />
+<link rel="canonical" href="http://localhost:4000/Model_Code_Of_InputOutput.html" />
+<meta property="og:url" content="http://localhost:4000/Model_Code_Of_InputOutput.html" />
+<meta property="og:site_name" content="channy’s page" />
+<script type="application/ld+json">
+{"description":"Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.","@type":"WebPage","url":"http://localhost:4000/Model_Code_Of_InputOutput.html","headline":"channy’s page","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>channy's page</h1>
+        <h2>Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.</h2>
+
+        <section id="downloads">
+          
+            <a href="http://github.com/qanny/qanny.github.io/zipball/gh-pages" class="btn">Download as .zip</a>
+            <a href="http://github.com/qanny/qanny.github.io/tarball/gh-pages" class="btn">Download as .tar.gz</a>
+          
+          <a href="http://github.com/qanny/qanny.github.io" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <p>//Author: channy</p>
+
+<p>//Create Date: 2018-10-10 10:45:11</p>
+
+<p>//Description: 之前做项目时保存的小小模板笔记</p>
+
+<h1 id="model_code_of_inputoutput">Model_Code_Of_InputOutput</h1>
+
+<h2 id="并行">并行</h2>
+
+<h3 id="for循环并行化的几种声明形式">for循环并行化的几种声明形式</h3>
+
+<p>（尽管OpenMP可以方便地对for循环进行并行化，但并不是所有的for循环都可以进行并行化。以下几种情况不能进行并行化：</p>
+
+<ol>
+  <li>
+    <p>for循环中的循环变量必须是有符号整形。例如，for (unsigned int i = 0; i &lt; 10; ++i){}会编译不通过；</p>
+  </li>
+  <li>
+    <p>for循环中比较操作符必须是&lt;, &lt;=, &gt;, &gt;=。例如for (int i = 0; i ！= 10; ++i){}会编译不通过；</p>
+  </li>
+  <li>
+    <p>for循环中的第三个表达式，必须是整数的加减，并且加减的值必须是一个循环不变量。例如for (int i = 0; i != 10; i = i + 1){}会编译不通过；感觉只能++i; i++; –i; 或i–；</p>
+  </li>
+  <li>
+    <p>如果for循环中的比较操作为&lt;或&lt;=，那么循环变量只能增加；反之亦然。例如for (int i = 0; i != 10; –i)会编译不通过；</p>
+  </li>
+  <li>
+    <p>循环必须是单入口、单出口，也就是说循环内部不允许能够达到循环以外的跳转语句，exit除外。异常的处理也必须在循环体内处理。例如：若循环体内的break或goto会跳转到循环体外，那么会编译不通过。
+ ）</p>
+  </li>
+</ol>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;iostream&gt;  
+#include &lt;omp.h&gt; // OpenMP编程需要包含的头文件  
+</span>  
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>  
+<span class="p">{</span>  
+<span class="c1">//for循环并行化声明形式1  
+</span><span class="cp">#pragma omp parallel   
+</span>    <span class="p">{</span>  
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"OK"</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>  
+<span class="cp">#pragma omp for   
+</span>        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>  
+        <span class="p">{</span>  
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">i</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>  
+        <span class="p">}</span>  
+    <span class="p">}</span>  
+  
+<span class="c1">//for循环并行化声明形式2  
+</span><span class="cp">#pragma omp parallel for  
+</span>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">)</span>  
+    <span class="p">{</span>  
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">j</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>  
+    <span class="p">}</span>  
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>  
+<span class="p">}</span>  
+</code></pre></div></div>
+
+<h2 id="cc">c/c++</h2>
+<h3 id="c-输入若干行">c++ 输入若干行</h3>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">while</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="c重定向输入输出">c++重定向输入输出</h3>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">std</span><span class="o">::</span><span class="n">ofstream</span> <span class="n">ofs</span><span class="p">(</span><span class="s">"factorResult.txt"</span><span class="p">);</span>
+<span class="n">streambuf</span> <span class="o">*</span><span class="n">oldbuf</span> <span class="o">=</span> <span class="n">cout</span><span class="p">.</span><span class="n">rdbuf</span><span class="p">();</span>
+<span class="n">cout</span><span class="p">.</span><span class="n">rdbuf</span><span class="p">(</span><span class="n">ofs</span><span class="p">.</span><span class="n">rdbuf</span><span class="p">());</span>
+
+<span class="n">cout</span><span class="p">.</span><span class="n">rdbuf</span><span class="p">(</span><span class="n">oldbuf</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h3 id="c-cout-格式化输出">c++ cout 格式化输出</h3>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;iostream&gt;
+#include &lt;iomanip&gt;
+</span><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+ 
+<span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">fixed</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">setprecision</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">result</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h3 id="cc-读写txt">c/c++ 读写txt</h3>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">%</span><span class="n">d</span> <span class="kt">int</span><span class="p">;</span> <span class="o">%</span><span class="n">s</span> <span class="n">string</span><span class="p">;</span> <span class="o">%</span><span class="n">f</span> <span class="kt">float</span><span class="p">;</span> <span class="o">%</span><span class="n">lf</span> <span class="kt">double</span>
+<span class="cm">/* sscanf example */</span>
+<span class="cp">#include &lt;stdio.h&gt;
+</span> 
+<span class="kt">int</span> <span class="n">main</span> <span class="p">()</span>
+<span class="p">{</span>
+  <span class="kt">char</span> <span class="n">sentence</span> <span class="p">[]</span><span class="o">=</span><span class="s">"Rudolph is 12 years old"</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">str</span> <span class="p">[</span><span class="mi">20</span><span class="p">];</span>
+  <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+ 
+  <span class="n">sscanf</span> <span class="p">(</span><span class="n">sentence</span><span class="p">,</span><span class="s">"%s %*s %d"</span><span class="p">,</span><span class="n">str</span><span class="p">,</span><span class="o">&amp;</span><span class="n">i</span><span class="p">);</span>
+  <span class="n">printf</span> <span class="p">(</span><span class="s">"%s -&gt; %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="n">str</span><span class="p">,</span><span class="n">i</span><span class="p">);</span>
+  
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">std</span><span class="o">::</span><span class="n">ofstream</span> <span class="n">ofs</span><span class="p">(</span><span class="s">"points.ply"</span><span class="p">);</span>
+ <span class="n">ofs</span> <span class="o">&lt;&lt;</span> <span class="s">"ply </span><span class="se">\n</span><span class="s"> format ascii 1.0 </span><span class="se">\n</span><span class="s"> element vertex "</span> <span class="o">&lt;&lt;</span> <span class="n">currentDepth</span><span class="p">.</span><span class="n">rows</span> <span class="o">*</span> <span class="n">currentDepth</span><span class="p">.</span><span class="n">cols</span> <span class="o">&lt;&lt;</span> <span class="s">" </span><span class="se">\n</span><span class="s"> property float x </span><span class="se">\n</span><span class="s"> property float y </span><span class="se">\n</span><span class="s"> property float z </span><span class="se">\n</span><span class="s"> property uchar diffuse_red </span><span class="se">\n</span><span class="s"> property uchar diffuse_green </span><span class="se">\n</span><span class="s"> property uchar diffuse_blue </span><span class="se">\n</span><span class="s"> end_header"</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+ 
+ <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">currentDepth</span><span class="p">.</span><span class="n">rows</span><span class="p">;</span> <span class="n">x</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+ <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="n">currentDepth</span><span class="p">.</span><span class="n">cols</span><span class="p">;</span> <span class="n">y</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+ <span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span> <span class="n">ptX</span> <span class="o">=</span> <span class="n">params</span><span class="p">.</span><span class="n">get3Dpoint</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">currentDepth</span><span class="p">.</span><span class="n">at</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">));</span>
+ 
+ <span class="n">ofs</span> <span class="o">&lt;&lt;</span> <span class="n">ptX</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">" "</span> <span class="o">&lt;&lt;</span> <span class="n">ptX</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">" "</span> <span class="o">&lt;&lt;</span> <span class="n">ptX</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">" "</span><span class="p">;</span>
+ <span class="n">ofs</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">currentImg</span><span class="p">.</span><span class="n">at</span><span class="o">&lt;</span><span class="n">cv</span><span class="o">::</span><span class="n">Vec3b</span><span class="o">&gt;</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="s">" "</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">currentImg</span><span class="p">.</span><span class="n">at</span><span class="o">&lt;</span><span class="n">cv</span><span class="o">::</span><span class="n">Vec3b</span><span class="o">&gt;</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="s">" "</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">currentImg</span><span class="p">.</span><span class="n">at</span><span class="o">&lt;</span><span class="n">cv</span><span class="o">::</span><span class="n">Vec3b</span><span class="o">&gt;</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+ <span class="p">}</span>
+ <span class="p">}</span>
+ 
+ <span class="n">ofs</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+<span class="kt">int</span> <span class="n">totalVertex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+ <span class="kt">char</span> <span class="n">str</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+ <span class="n">std</span><span class="o">::</span><span class="n">ifstream</span> <span class="n">ifs</span><span class="p">(</span><span class="n">modelName</span><span class="p">);</span>
+ <span class="n">ifs</span> <span class="o">&gt;&gt;</span> <span class="n">str</span><span class="p">;</span>
+ <span class="k">while</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="s">"vertex"</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span>
+ <span class="n">ifs</span> <span class="o">&gt;&gt;</span> <span class="n">str</span><span class="p">;</span>
+ <span class="p">}</span>
+ <span class="n">ifs</span> <span class="o">&gt;&gt;</span> <span class="n">totalVertex</span><span class="p">;</span>
+ <span class="k">while</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="s">"end_header"</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+ <span class="n">ifs</span> <span class="o">&gt;&gt;</span> <span class="n">str</span><span class="p">;</span>
+ <span class="p">}</span>
+ 
+ <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">strs</span><span class="p">;</span>
+ <span class="kt">int</span> <span class="n">minn</span> <span class="o">=</span> <span class="mi">99999</span><span class="p">,</span> <span class="n">maxn</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+ <span class="k">while</span> <span class="p">(</span><span class="n">totalVertex</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+ <span class="n">Eigen</span><span class="o">::</span><span class="n">Vector4d</span> <span class="n">pX</span> <span class="o">=</span> <span class="n">Eigen</span><span class="o">::</span><span class="n">Vector4d</span><span class="o">::</span><span class="n">Ones</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+ <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+ <span class="n">ifs</span> <span class="o">&gt;&gt;</span> <span class="n">pX</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+ <span class="p">}</span>
+ <span class="n">std</span><span class="o">::</span><span class="n">getline</span><span class="p">(</span><span class="n">ifs</span><span class="p">,</span> <span class="n">strs</span><span class="p">);</span>
+ <span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span> <span class="n">px</span> <span class="o">=</span> <span class="n">currentParam</span><span class="p">.</span><span class="n">getP</span><span class="p">()</span> <span class="o">*</span> <span class="n">pX</span><span class="p">;</span>
+ 
+ <span class="kt">int</span> <span class="n">y</span> <span class="o">=</span> <span class="n">px</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">px</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+ <span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="n">px</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">px</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+ <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">currentImg</span><span class="p">.</span><span class="n">rows</span> <span class="o">&amp;&amp;</span> <span class="n">y</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="n">currentImg</span><span class="p">.</span><span class="n">cols</span><span class="p">)</span> <span class="p">{</span>
+ <span class="n">depth</span><span class="p">.</span><span class="n">at</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">=</span> <span class="n">px</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+ 
+ <span class="n">minn</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">min</span><span class="p">(</span><span class="n">minn</span><span class="p">,</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">px</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">));</span>
+ <span class="n">maxn</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">max</span><span class="p">(</span><span class="n">maxn</span><span class="p">,</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">px</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">));</span>
+ <span class="p">}</span>
+ <span class="p">}</span>
+ <span class="n">ifs</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+</code></pre></div></div>
+<h3 id="split分割">split分割</h3>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#include &lt;vector&gt;
+#include &lt;string&gt;
+#include &lt;iostream&gt;
+using namespace std;
+ 
+vector&lt;string&gt; split(const string &amp;s, const string &amp;seperator){
+  vector&lt;string&gt; result;
+  typedef string::size_type string_size;
+  string_size i = 0;
+  
+  while(i != s.size()){
+    //找到字符串中首个不等于分隔符的字母；
+    int flag = 0;
+    while(i != s.size() &amp;&amp; flag == 0){
+      flag = 1;
+      for(string_size x = 0; x &lt; seperator.size(); ++x)
+     if(s[i] == seperator[x]){
+       ++i;
+      　　flag = 0;
+     　　 break;
+     }
+    }
+    
+    //找到又一个分隔符，将两个分隔符之间的字符串取出；
+    flag = 0;
+    string_size j = i;
+    while(j != s.size() &amp;&amp; flag == 0){
+      for(string_size x = 0; x &lt; seperator.size(); ++x)
+     if(s[j] == seperator[x]){
+      　　flag = 1;
+     　　 break;
+     }
+      if(flag == 0) 
+     ++j;
+    }
+    if(i != j){
+      result.push_back(s.substr(i, j-i));
+      i = j;
+    }
+  }
+  return result;
+}
+ 
+int main(){
+  string s = "a,b*c*d,e";
+  vector&lt;string&gt; v = split(s, ",*"); //可按多个字符来分隔;
+  for(vector&lt;string&gt;::size_type i = 0; i != v.size(); ++i)
+    cout &lt;&lt; v[i] &lt;&lt; " ";
+  cout &lt;&lt; endl;
+  //输出: a b c d
+}
+
+///
+void SplitString(const std::string&amp; s, std::vector&lt;std::string&gt;&amp; v, const std::string&amp; c)
+{
+  std::string::size_type pos1, pos2;
+  pos2 = s.find(c);
+  pos1 = 0;
+  while(std::string::npos != pos2)
+  {
+    v.push_back(s.substr(pos1, pos2-pos1));
+ 
+    pos1 = pos2 + c.size();
+    pos2 = s.find(c, pos1);
+  }
+  if(pos1 != s.length())
+    v.push_back(s.substr(pos1));
+}
+ 
+///
+#include &lt;string.h&gt;
+#include &lt;stdio.h&gt;
+ 
+int main(){
+  char s[] = "a,b*c,d";
+  const char *sep = ",*"; //可按多个字符来分割
+  char *p;
+  p = strtok(s, sep);
+  while(p){
+    printf("%s ", p);
+    p = strtok(NULL, sep);
+  }
+  printf("\n");
+  return 0;
+}
+//输出: a b c d
+ 
+///
+#include &lt;boost/algorithm/string.hpp&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+ 
+using namespace std;
+using namespace boost;
+ 
+void print( vector &lt;string&gt; &amp; v )
+{
+  for (size_t n = 0; n &lt; v.size(); n++)
+    cout &lt;&lt; "\"" &lt;&lt; v[ n ] &lt;&lt; "\"\n";
+  cout &lt;&lt; endl;
+}
+ 
+int main()
+{
+  string s = "a,b, c ,,e,f,";
+  vector &lt;string&gt; fields;
+ 
+  cout &lt;&lt; "Original = \"" &lt;&lt; s &lt;&lt; "\"\n\n";
+ 
+  cout &lt;&lt; "Split on \',\' only\n";
+  split( fields, s, is_any_of( "," ) );
+  print( fields );
+ 
+  cout &lt;&lt; "Split on \" ,\"\n";
+  split( fields, s, is_any_of( " ," ) );
+  print( fields );
+ 
+  cout &lt;&lt; "Split on \" ,\" and elide delimiters\n"; 
+  split( fields, s, is_any_of( " ," ), token_compress_on );
+  print( fields );
+ 
+  return 0;
+}
+</code></pre></div></div>
+
+<h2 id="matlab的输入输出">Matlab的输入输出</h2>
+<h3 id="编译c">编译c</h3>
+
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mex</span> <span class="o">***.</span><span class="n">c</span>
+</code></pre></div></div>
+
+<h3 id="读取网格模型或大型数据">读取网格模型或大型数据</h3>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">%%</span>
+<span class="k">function</span> <span class="p">[</span><span class="nb">mesh</span><span class="p">]</span> <span class="o">=</span> <span class="n">readMesh</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> 
+    <span class="k">if</span> <span class="o">~</span><span class="nb">exist</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="nb">error</span><span class="p">([</span><span class="s1">'File '</span> <span class="n">filename</span> <span class="s1">'does not exist'</span><span class="p">]);</span>
+    <span class="k">end</span>
+    
+    <span class="n">cachepath</span> <span class="o">=</span> <span class="p">[</span><span class="n">filename</span> <span class="s1">'.cache'</span><span class="p">];</span>
+    
+    <span class="k">if</span> <span class="nb">exist</span><span class="p">(</span><span class="n">cachepath</span><span class="p">)</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="nb">load</span><span class="p">(</span><span class="n">cachepath</span><span class="p">,</span> <span class="s1">'-mat'</span><span class="p">);</span>
+        <span class="nb">mesh</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="nb">mesh</span><span class="p">;</span>
+        <span class="k">if</span> <span class="mi">1</span> <span class="c1">%version</span>
+            <span class="nb">fprintf</span><span class="p">(</span><span class="s1">'[readMesh] loaded cached mesh %s successfully\n'</span><span class="p">,</span> <span class="n">filename</span><span class="p">);</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="k">else</span> 
+            <span class="nb">delete</span><span class="p">(</span><span class="n">cachepath</span><span class="p">);</span>
+            <span class="nb">clear</span> <span class="nb">mesh</span><span class="p">;</span>
+        <span class="k">end</span>
+    <span class="k">end</span>
+    
+    
+    <span class="c1">%read mesh normally</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<h3 id="添加工具箱">添加工具箱</h3>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">addpath</span><span class="p">(</span><span class="n">getpath</span><span class="p">(</span><span class="s1">'path of toolbox'</span><span class="p">))</span>
+<span class="c1">%Example:</span>
+<span class="nb">addpath</span><span class="p">(</span><span class="nb">genpath</span><span class="p">(</span><span class="s1">'D:\MATLAB\R2014b\toolbox\vision'</span><span class="p">));</span>
+</code></pre></div></div>
+
+<h3 id="matlab-写入txt">matlab 写入txt</h3>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="nb">path</span> <span class="o">=</span> <span class="s1">'E:/points.txt'</span><span class="p">;</span>
+    <span class="n">fin</span> <span class="o">=</span> <span class="nb">fopen</span><span class="p">(</span><span class="nb">path</span><span class="p">,</span> <span class="s1">'wt'</span><span class="p">);</span>
+    <span class="nb">fprintf</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="p">[</span><span class="s1">'ply \n format ascii 1.0 \n element face 0 \n property list uchar int vertex_indices \n element vertex'</span> <span class="nb">int2str</span><span class="p">(</span><span class="nb">size</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="s1">'\n property float x \n property float y \n property float z \n property uchar diffuse_red \n property uchar diffuse_green \n property uchar diffuse_blue \n end_header'</span><span class="p">]);</span>
+    <span class="k">for</span> <span class="nb">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">:</span><span class="nb">size</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="nb">fprintf</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="s1">'%f %f %f %d %d %d\n'</span><span class="p">,</span> <span class="n">pts</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">i</span><span class="p">),</span> <span class="n">pts</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">i</span><span class="p">),</span> <span class="n">pts</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="nb">i</span><span class="p">),</span> <span class="n">rgbs</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">i</span><span class="p">),</span> <span class="n">rgbs</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="nb">i</span><span class="p">),</span> <span class="n">rgbs</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="nb">i</span><span class="p">));</span>
+    <span class="k">end</span>
+    <span class="nb">fclose</span><span class="p">(</span><span class="n">fin</span><span class="p">);</span>
+<span class="nb">num2str</span><span class="p">(</span><span class="n">k1</span><span class="p">,</span><span class="s1">'%03d'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h3 id="matlab-写矩阵入txt">matlab 写矩阵入txt</h3>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">points</span> <span class="o">=</span> <span class="nb">rand</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+<span class="n">fin</span> <span class="o">=</span> <span class="nb">fopen</span><span class="p">(</span><span class="s1">'test.txt'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">);</span>
+<span class="nb">fprintf</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="s1">'%f %f %f\n'</span><span class="p">,</span> <span class="n">points</span><span class="p">(</span><span class="mi">1</span><span class="p">,:),</span> <span class="n">points</span><span class="p">(</span><span class="mi">2</span><span class="p">,:),</span> <span class="n">points</span><span class="p">(</span><span class="mi">3</span><span class="p">,:));</span>
+</code></pre></div></div>
+
+<h3 id="matlab-读取txt">matlab 读取txt</h3>
+<p>txt格式样例：</p>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">cam_pos</span>      <span class="o">=</span> <span class="p">[</span><span class="mi">91</span><span class="p">,</span> <span class="mi">465</span><span class="p">,</span> <span class="o">-</span><span class="mi">292</span><span class="p">]</span><span class="o">'</span><span class="p">;</span>
+<span class="n">cam_dir</span>      <span class="o">=</span> <span class="p">[</span><span class="mf">0.0496855</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.285692</span><span class="p">,</span> <span class="mf">0.957033</span><span class="p">]</span><span class="o">'</span><span class="p">;</span>
+<span class="n">cam_up</span>       <span class="o">=</span> <span class="p">[</span><span class="mf">0.00725319</span><span class="p">,</span> <span class="mf">0.958294</span><span class="p">,</span> <span class="mf">0.285692</span><span class="p">]</span><span class="o">'</span><span class="p">;</span>
+<span class="n">cam_lookat</span>   <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">'</span><span class="p">;</span>
+<span class="n">cam_sky</span>      <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">'</span><span class="p">;</span>
+<span class="n">cam_right</span>    <span class="o">=</span> <span class="p">[</span><span class="mf">1.32832</span><span class="p">,</span> <span class="mf">0.00964677</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0660817</span><span class="p">]</span><span class="o">'</span><span class="p">;</span>
+<span class="n">cam_fpoint</span>   <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span><span class="o">'</span><span class="p">;</span>
+<span class="n">cam_angle</span>    <span class="o">=</span> <span class="mi">90</span><span class="p">;</span>
+</code></pre></div></div>
+<p>读取和显示坐标系：</p>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">%show dtam data</span>
+<span class="k">function</span> <span class="n">showcamera</span><span class="p">()</span>
+   <span class="nb">path</span> <span class="o">=</span> <span class="s1">'E:\thirdLib\opendtam_cross_platform-master\build\Trajectory_30_seconds'</span><span class="p">;</span>
+   <span class="n">txtfiles</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">([</span><span class="nb">path</span> <span class="s1">'\*.txt'</span><span class="p">]);</span> 
+   <span class="n">filenum</span> <span class="o">=</span> <span class="nb">length</span><span class="p">(</span><span class="n">txtfiles</span><span class="p">);</span>
+   <span class="k">if</span> <span class="p">(</span><span class="n">filenum</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">)</span> 
+       <span class="n">filenum</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+   <span class="k">end</span>
+   <span class="k">for</span> <span class="nb">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">:</span><span class="n">filenum</span>
+       <span class="n">txtfile</span> <span class="o">=</span> <span class="p">[</span><span class="nb">path</span> <span class="s1">'\'</span> <span class="n">txtfiles</span><span class="p">(</span><span class="nb">i</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">];</span>
+       <span class="n">fin</span> <span class="o">=</span> <span class="nb">fopen</span><span class="p">(</span><span class="n">txtfile</span><span class="p">);</span>
+       <span class="k">while</span><span class="p">(</span><span class="n">fin</span><span class="p">)</span>
+           <span class="nb">line</span> <span class="o">=</span> <span class="nb">fgetl</span><span class="p">(</span><span class="n">fin</span><span class="p">);</span>
+           <span class="k">switch</span><span class="p">(</span><span class="nb">line</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+               <span class="k">case</span> <span class="s1">'p'</span>
+                   <span class="n">r</span> <span class="o">=</span> <span class="nb">sscanf</span><span class="p">(</span><span class="nb">line</span><span class="p">,</span> <span class="s1">'%*s = [%f, %f, %f]'</span><span class="p">);</span>
+                   <span class="n">R</span><span class="p">(:,:,</span><span class="nb">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">rodrigues</span><span class="p">(</span><span class="n">r</span><span class="p">);</span>
+               <span class="k">case</span> <span class="s1">'d'</span>
+                   <span class="n">t</span><span class="p">(:,:,</span><span class="nb">i</span><span class="p">)</span> <span class="o">=</span> <span class="nb">sscanf</span><span class="p">(</span><span class="nb">line</span><span class="p">,</span> <span class="s1">'%*s = [%f, %f, %f]'</span><span class="p">);</span>
+                   <span class="k">break</span><span class="p">;</span>
+               <span class="k">otherwise</span>
+           <span class="k">end</span>
+       <span class="k">end</span>
+       <span class="nb">fclose</span><span class="p">(</span><span class="n">fin</span><span class="p">);</span>
+   <span class="k">end</span>
+   
+   <span class="n">draw</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
+   
+<span class="k">end</span>
+ 
+<span class="k">function</span> <span class="n">draw</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+    <span class="nb">axis</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">;</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">;</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">;</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">];</span>
+    <span class="n">drawsingle</span><span class="p">(</span><span class="nb">axis</span><span class="p">);</span>
+    <span class="k">for</span> <span class="nb">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">:</span><span class="nb">size</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">naxis</span> <span class="o">=</span> <span class="p">(</span><span class="nb">axis</span> <span class="o">+</span> <span class="p">[</span><span class="n">t</span><span class="p">(:,</span> <span class="p">:,</span> <span class="nb">i</span><span class="p">)</span><span class="s1">';t(:, :, i)'</span><span class="p">;</span><span class="n">t</span><span class="p">(:,</span> <span class="p">:,</span> <span class="nb">i</span><span class="p">)</span><span class="s1">';t(:, :, i)'</span><span class="p">])</span><span class="o">*</span><span class="n">R</span><span class="p">(:,</span> <span class="p">:,</span> <span class="nb">i</span><span class="p">);</span>
+        <span class="n">drawsingle</span><span class="p">(</span><span class="n">naxis</span><span class="p">);</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+ 
+<span class="k">function</span> <span class="n">drawsingle</span><span class="p">(</span><span class="nb">axis</span><span class="p">)</span>
+    <span class="nb">hold</span> <span class="n">on</span><span class="p">;</span>
+    <span class="nb">line</span><span class="p">([</span><span class="nb">axis</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="nb">axis</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span> <span class="p">[</span><span class="nb">axis</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="nb">axis</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)],[</span><span class="nb">axis</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="nb">axis</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)],</span> <span class="s1">'Color'</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">);</span>
+    <span class="nb">view</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+    <span class="nb">line</span><span class="p">([</span><span class="nb">axis</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="nb">axis</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span> <span class="p">[</span><span class="nb">axis</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="nb">axis</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)],[</span><span class="nb">axis</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="nb">axis</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)],</span> <span class="s1">'Color'</span><span class="p">,</span> <span class="s1">'g'</span><span class="p">);</span>
+    <span class="nb">line</span><span class="p">([</span><span class="nb">axis</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="nb">axis</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span> <span class="p">[</span><span class="nb">axis</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="nb">axis</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)],[</span><span class="nb">axis</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="nb">axis</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)],</span> <span class="s1">'Color'</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">);</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+      </section>
+    </div>
+
+    
+  </body>
+</html>
