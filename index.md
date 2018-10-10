@@ -24,11 +24,19 @@ layout: default
 
 [Project Relighting](./Project_Relighting.html)
 
+**Linux**
+
+[Generate_Head_Using_Shell](./Generate_Head_Using_Shell.html)
+
+[Linux_Basic_Comment](./Linux_Basic_Comment)
+
+**Android**
+
+[Android_Crack](./Android_Crack.html)
+
 **Other subjects**
 
 [Questions In Interview](./Questions_In_Interview.html)
-
-[Android_Crack](./Android_Crack.html)
 
 [Trifles](./Trifles.html)
 
