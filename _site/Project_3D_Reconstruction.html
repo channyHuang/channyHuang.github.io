@@ -4,7 +4,7 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/assets/css/style.css?v=acc4bd17b650dbed0e56392bdf8f3aca3e54dc1d">
+    <link rel="stylesheet" href="/assets/css/style.css?v=457684cdeba9311bca3123b42f6593ea7081f5dc">
 
 <!-- Begin Jekyll SEO tag v2.5.0 -->
 <title>Project - 3D Reconstruction | channy’s page</title>
@@ -76,6 +76,63 @@ st-&gt;opInput-&gt;opDetect-&gt;opCompute-&gt;opFace-&gt;opFix-&gt;e
 </ul>
 
 <p>Minimize the error of reprojection, BA algorithm, solve nonlinear least squares problem.</p>
+
+<p>The basic method to resolve BA is Gradient descent, such as Gauss-Newton, Levenberg-Marquardt, etc. And there are many libraries to solve Least Square Method: <code class="highlighter-rouge">Ceres Solver</code></p>
+
+<p>PS: Some libraries that can solve Least Square</p>
+
+<ol>
+  <li>lmfit python package</li>
+</ol>
+
+<p>(Least-Squares Minimization with Constraints for Python)</p>
+
+<p>https://pypi.python.org/pypi/lmfit/0.6</p>
+
+<ol>
+  <li>EoFit</li>
+</ol>
+
+<p>非线性最小二乘拟合</p>
+
+<p>https://www.effectiveobjects.com/eofit-dll.html</p>
+
+<ol>
+  <li>Drej - A java regression library</li>
+</ol>
+
+<p>最小二乘回归和分类</p>
+
+<p>http://www.gregdennis.com/drej/</p>
+
+<ol>
+  <li>Least Squares Geometric Elements library</li>
+</ol>
+
+<p>最小二乘拟合</p>
+
+<p>http://www.eurometros.org/gen_report.php?category=distributions&amp;pkey=14&amp;subform=yes</p>
+
+<ol>
+  <li>MINPACK</li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://cran.r-project.org/web/packages/minpack.lm/index.html
+</code></pre></div></div>
+
+<p>以下是两个数值分析库，包含最小二乘</p>
+
+<ol>
+  <li>ALGlib</li>
+</ol>
+
+<p>http://www.alglib.net/download.php</p>
+
+<ol>
+  <li>MPFIT</li>
+</ol>
+
+<p>http://www.physics.wisc.edu/~craigm/idl/cmpfit.html</p>
 
 <ul>
   <li>

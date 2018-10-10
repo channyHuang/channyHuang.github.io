@@ -35,6 +35,51 @@ In this project, we combine two features: `SIFT` and `Freak`.
 
 Minimize the error of reprojection, BA algorithm, solve nonlinear least squares problem.
 
+The basic method to resolve BA is Gradient descent, such as Gauss-Newton, Levenberg-Marquardt, etc. And there are many libraries to solve Least Square Method: `Ceres Solver`
+
+PS: Some libraries that can solve Least Square 
+
+1.         lmfit python package
+
+(Least-Squares Minimization with Constraints for Python)
+
+https://pypi.python.org/pypi/lmfit/0.6
+
+2.         EoFit
+
+非线性最小二乘拟合
+
+https://www.effectiveobjects.com/eofit-dll.html
+
+3.         Drej - A java regression library
+
+最小二乘回归和分类
+
+http://www.gregdennis.com/drej/
+
+4.         Least Squares Geometric Elements library
+
+最小二乘拟合
+
+http://www.eurometros.org/gen_report.php?category=distributions&pkey=14&subform=yes
+
+5.         MINPACK
+
+    http://cran.r-project.org/web/packages/minpack.lm/index.html
+
+ 
+
+以下是两个数值分析库，包含最小二乘
+
+6.         ALGlib
+
+http://www.alglib.net/download.php
+
+7.         MPFIT
+
+http://www.physics.wisc.edu/~craigm/idl/cmpfit.html
+
+
 - [] Difficulty 2: **What if the point cloud is sparse?**
 
 	In order to build a dense point cloud, most researchers will refer to PMVS/CMVS. This is an open source library to generate a dense point cloud. But I don't know why so many people believe it is a 3D reconstruction library. Actually, the input of PMVS/CMVS is sparse point cloud, it is just change it to dense cloud but not contains the whole flow of 3D reconstruction.

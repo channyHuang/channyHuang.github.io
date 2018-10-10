@@ -4,7 +4,7 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/assets/css/style.css?v=acc4bd17b650dbed0e56392bdf8f3aca3e54dc1d">
+    <link rel="stylesheet" href="/assets/css/style.css?v=457684cdeba9311bca3123b42f6593ea7081f5dc">
 
 <!-- Begin Jekyll SEO tag v2.5.0 -->
 <title>channy’s page | Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.</title>
@@ -135,6 +135,48 @@ mv originFile targetFolder //move a file or folder
 	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div></div>
+
+<h2 id="environ--gid--uid--nice">environ &amp; gid &amp; uid &amp; nice</h2>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;cstdio&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;sys/resource.h&gt;
+</span>
+<span class="k">extern</span> <span class="kt">char</span> <span class="o">**</span> <span class="n">environ</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">test_env</span><span class="p">()</span> <span class="p">{</span>
+	<span class="kt">char</span> <span class="o">**</span><span class="n">env</span> <span class="o">=</span> <span class="n">environ</span><span class="p">;</span>
+	<span class="k">while</span> <span class="p">(</span><span class="o">*</span><span class="n">env</span><span class="p">)</span> <span class="p">{</span>
+		<span class="n">printf</span><span class="p">(</span><span class="s">"%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="o">*</span><span class="n">env</span><span class="o">++</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">test_id</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">uid_t</span> <span class="n">uid</span><span class="p">,</span> <span class="n">euid</span><span class="p">;</span>
+	<span class="n">gid_t</span> <span class="n">gid</span><span class="p">,</span> <span class="n">egid</span><span class="p">;</span>
+	
+	<span class="n">uid</span> <span class="o">=</span> <span class="n">getuid</span><span class="p">();</span>
+	<span class="n">euid</span> <span class="o">=</span> <span class="n">geteuid</span><span class="p">();</span>
+	<span class="n">gid</span> <span class="o">=</span> <span class="n">getgid</span><span class="p">();</span>
+	<span class="n">egid</span> <span class="o">=</span> <span class="n">getegid</span><span class="p">();</span>
+	
+	<span class="n">printf</span><span class="p">(</span><span class="s">"%d %d %d %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">uid</span><span class="p">,</span> <span class="n">euid</span><span class="p">,</span> <span class="n">gid</span><span class="p">,</span> <span class="n">egid</span><span class="p">);</span>
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="c1">//test_env();
+</span>	<span class="n">test_id</span><span class="p">();</span>
+	<span class="n">nice</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="signal">signal</h2>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code></code></pre></div></div>
 
       </section>
     </div>

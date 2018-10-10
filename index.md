@@ -34,6 +34,8 @@ layout: default
 
 [Android_Crack](./Android_Crack.html)
 
+[Android_Rebuid_Notes](./Android_Rebuid_Notes)
+
 **Other subjects**
 
 [Questions In Interview](./Questions_In_Interview.html)
