@@ -392,3 +392,269 @@ function drawsingle(axis)
     line([axis(1, 1), axis(4, 1)], [axis(1, 2), axis(4, 2)],[axis(1, 3), axis(4, 3)], 'Color', 'b');
 end
 ```
+
+## Document 文档模板
+### cmake 
+#### add dependency
+main project:
+```cmake
+cmake_minimum_required (VERSION 2.8.11)
+project (Project)
+include_directories (Project)
+add_subdirectory (Dependency)
+add_executable (Project main.cpp)
+target_link_libraries (Project Dependency)
+```
+dependency project:
+```cmake
+project (Dependency)
+add_library (Dependency SomethingToCompile.cpp)
+target_include_directories (Dependency PUBLIC .)
+or change to:
+include_directories (Project ${includedir})
+target_include_directories (Dependency PUBLIC includedir)
+```
+#### set as startup project (cmake 3.6 or later)
+```cmake
+#set as startup project
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${target})
+```
+#### errors
+could not find boost
+************************
+```cmake
+set(CMAKE_PREFIX_PATH
+ "E:/thirdLib/boost_1_56_0"
+)
+set(BOOST_DIR "E:/thirdLib/boost_1_56_0")
+set(BOOST_ROOT "E:/thirdLib/boost_1_56_0")
+set(BOOST_INCLUDEDIR "E:/thirdLib/boost_1_56_0")
+set(BOOST_LIBRARYDIR "E:/thirdLib/boost_1_56_0/lib64-msvc-12.0")
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_DEBUG ON)
+ 
+find_package(Boost 1.56 COMPONENTS serialization system filesystem thread program_options date_time regex timer chrono)
+if(NOT Boost_SERIALIZATION_LIBRARY)
+  message(FATAL_ERROR "Missing required Boost components >= v1.56, please install/upgrade Boost or configure your search paths.")
+endif()
+...
+```
+CMake Error at CMakeLists.txt:18 (find_package):
+
+  Found package configuration file:
+
+    D:/useAsE/thirdLib/opencv/build/OpenCVConfig.cmake
+
+  but it set OpenCV_FOUND to FALSE so package "OpenCV" is considered to be
+  NOT FOUND.
+
+opencv的库文件和当前cmake选择的vs不一致
+#### template
+```
+cmake_minimum_required(VERSION 3.0.0)
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ")#-O0 -g -ggdb -fpermissive
+ 
+set(target projectName)
+ 
+set(CMAKE_PREFIX_PATH 
+ "E:/thirdLib/OpenCV/opencv/build"
+ "D:/Qt/Qt5.4.1/5.4/msvc2013_64_opengl"
+ )
+set(Eigen_DIR "E:/thirdLib/eigen-3.3.2") 
+set(BOOST_INCLUDE_DIR "E:/thirdLib/boost_1_56_0")
+set(BOOST_LIBRARY_DIR "E:/thirdLib/boost_1_56_0/lib64-msvc-12.0") 
+set(PCL_INCLUDE_DIR "E:/thirdLib/PCL_1.7.2/include/pcl-1.7")
+set(PCL_LIB_DIR "E:/thirdLib/PCL_1.7.2/lib")
+set(VTK_DIR "E:/thirdLib/VTK-7.0.0.rc1")
+set(VTK_INCLUDE_DIR "E:/thirdLib/PCL_1.7.2/3rdParty/VTK/include/vtk-6.2")
+ 
+project(${target})
+find_package(CUDA REQUIRED)
+find_package(OpenCV REQUIRED)
+find_package(Qt5Core REQUIRED)
+find_package(Qt5Gui REQUIRED)
+find_package(Qt5Widgets REQUIRED)
+ 
+file (GLOB HEADERS "*.h" "*.hpp")
+file (GLOB SOURCES "*.cu" "*.c" "*.cpp")
+ 
+include_directories(${target}
+ ${CUDA_INCLUDE_DIRS}
+ ${OpenCV_INCLUDE_DIRS}
+ ${PROJECT_SOURCE_DIR}/inc
+ ${PROJECT_SOURCE_DIR}/common/inc
+ ${PCL_INCLUDE_DIR}
+ ${BOOST_INCLUDE_DIR}
+ ${Eigen_DIR}
+ )
+link_directories(
+ ${BOOST_LIBRARY_DIR}
+ ${PCL_LIB_DIR}
+ ) 
+ 
+ 
+# Dont propogate host flags into CUDA environment.
+set(CUDA_PROPAGATE_HOST_FLAGS off)
+ 
+# Generate code for 2.0 and 3.0 CUDA compute architectures (TODO: Verify this works)
+#set(CUDA_NVCC_FLAGS "-use_fast_math -gencode arch=compute_30,code=sm_30 -gencode arch=compute_20,code=sm_20" ) 
+ 
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -gencode arch=compute_30,code=sm_30; -gencode arch=compute_35,code=sm_35; -gencode arch=compute_50,code=sm_50; --use_fast_math ;--restrict; ) 
+ 
+cuda_add_executable(${target}
+ ${HEADERS}
+ ${SOURCES}
+ )
+ 
+target_link_libraries(${target}
+ ${OpenCV_LIBS}
+ Qt5::Core
+ Qt5::Widgets
+ Qt5::Gui
+ ) 
+```
+
+### latex
+写论文时用的latex模板
+
+```latex
+\documentclass[12pt, UTF8]{ctexart}
+%\documentclass[12pt, UTF8]{ctexrep}
+\usepackage{amsmath}
+\usepackage{bibentry}
+\usepackage{CJK}
+\usepackage{fancyhdr} %页眉
+\usepackage{float}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{pdfpages}
+\usepackage{subfigure}
+\usepackage{supertabular}
+\usepackage{setspace} %行距
+\usepackage[super,square]{natbib}
+\usepackage{titlesec}
+\usepackage{titletoc}
+\usepackage[colorlinks, linkcolor=blue, citecolor=green]{hyperref}
+\geometry{left=3.17 cm,right=3.17 cm,top=2.54 cm,bottom=2.54 cm}
+\title{基于xxx数据xxxx}
+\date{}
+%>60page
+
+\titleformat{\section}{\centering\Large\bfseries}{第 \arabic{section} 章}{1 em}{}
+\titlecontents{section}[0pt]{ \addvspace{2pt}\filright}{\contentspush{\thecontentslabel\ }}{}{\titlerule*[8pt]{.}\contentspage}
+
+\CTEXsetup[name={第,章},number={\arabic{section}}]{section}
+\iffalse
+\makeatletter
+\@addtoreset{equation}{section}
+\@addtoreset{figure}{section}
+\@addtoreset{table}{section}
+\makeatother
+\fi
+
+\renewcommand\listfigurename{\textbf{图目录}}
+\renewcommand\listtablename{\textbf{表目录}}
+\renewcommand\thefigure{ \thesection.\arabic{figure}}
+\renewcommand\thetable{ \thesection.\arabic{table} }
+\renewcommand\theequation{\thesection.\arabic{equation} }
+%\renewcommand{\figurename}{}
+%\renewcommand{\tablename}{}
+
+
+\LARGE
+\setlength{\baselineskip}{20pt}
+
+\begin{document}
+\pagestyle{plain}
+
+\iffalse
+\begin{titlepage}
+\maketitle
+\section*{版本控制}
+\begin{longtable}{c|c|c}
+\hline
+版本号 & 内容 & 最后修改时间 \\
+\hline
+v2.0 & 初稿，并增加实验结果 & 2016/12/18 \\
+\hline
+v3.0 & 修改模型形变过程，同时修改实验结果，主要改动5-7章的描述 & 2017/01/04 \\
+\hline
+v4.0 & 修改了部分插图，增加多组数据的实验结果及对比，及IMU部分说明 & 2017/01/05 \\
+\hline
+v5.0 & 根据反馈意见进行修改 & 2017/01/15 \\
+\hline
+\end{longtable}
+\end{titlepage}
+\fi
+
+\newpage
+\includepdf[pages=-]{faceWithName.pdf}
+
+\newpage
+\pagestyle{fancy}{
+\lhead{浙江大学硕士学位论文}
+\rhead{\rightmark }
+%\rhead{\sectionmark}
+}
+\renewcommand{\sectionmark}[1]{\markright {第 \arabic{section} 章 \quad #1}{}}
+%\renewcommand{\sectionmark}[1]{\markright {第 \arabic{section} 章}{}}
+
+\pagenumbering{roman}
+\section*{摘要}
+\rhead{摘要}
+\addcontentsline{toc}{section}{摘要}
+
+
+\textbf{Key words:} 3D reconstruction, IMU and vision combination, model repair
+
+\newpage
+\rhead{\rightmark }
+\pagenumbering{Roman}
+\tableofcontents
+
+\newpage
+\rhead{图目录}
+\listoffigures
+
+\newpage
+\rhead{表目录}
+\listoftables
+
+\newpage
+\rhead{\rightmark }
+\pagenumbering{arabic}
+\section{绪论}
+
+
+
+\section{概述}
+\subsection{环境要求}
+标配：
+操作系统：windows 7, x64 bit
+开发环境：visual studio 2013, 用x86编译运行（CGAL）
+第三方库：
+gtsam 3.2.1 (不支持boost 1.58及以上版本)
+Boost 1.56
+Qt 5.7.0
+OpenCV 3
+PCL 1.8.0
+OpenGL
+CGAL
+\section{路径设置}
+
+
+\newpage
+\begin{thebibliography}{MM}
+\addtolength{\itemsep}{-0.5em}
+%relative work (section 1)
+\bibitem{1} Shan Q, Curless B, Furukawa Y, et al. Occluding contours for multi-view stereo[C]//Computer Vision and Pattern Recognition (CVPR), 2014 IEEE Conference on. IEEE, 2014: 4002-4009.
+\end{thebibliography}
+
+\addcontentsline{toc}{section}{参考文献}
+
+\end{document}
+```
+
+

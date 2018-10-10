@@ -4,7 +4,7 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/assets/css/style.css?v=d1028d1a7338af130ae895016921afee31d6ae83">
+    <link rel="stylesheet" href="/assets/css/style.css?v=9459a293be5059f374dd414d0ba3990977c5b9d8">
 
 <!-- Begin Jekyll SEO tag v2.5.0 -->
 <title>channy’s page | Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.</title>
@@ -425,6 +425,266 @@ int main()
     <span class="nb">line</span><span class="p">([</span><span class="nb">axis</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="nb">axis</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span> <span class="p">[</span><span class="nb">axis</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="nb">axis</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)],[</span><span class="nb">axis</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="nb">axis</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)],</span> <span class="s1">'Color'</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">);</span>
 <span class="k">end</span>
 </code></pre></div></div>
+
+<h2 id="document-文档模板">Document 文档模板</h2>
+<h3 id="cmake">cmake</h3>
+<h4 id="add-dependency">add dependency</h4>
+<p>main project:</p>
+<div class="language-cmake highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cmake_minimum_required</span> <span class="p">(</span>VERSION 2.8.11<span class="p">)</span>
+<span class="nb">project</span> <span class="p">(</span>Project<span class="p">)</span>
+<span class="nb">include_directories</span> <span class="p">(</span>Project<span class="p">)</span>
+<span class="nb">add_subdirectory</span> <span class="p">(</span>Dependency<span class="p">)</span>
+<span class="nb">add_executable</span> <span class="p">(</span>Project main.cpp<span class="p">)</span>
+<span class="nb">target_link_libraries</span> <span class="p">(</span>Project Dependency<span class="p">)</span>
+</code></pre></div></div>
+<p>dependency project:</p>
+<div class="language-cmake highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">project</span> <span class="p">(</span>Dependency<span class="p">)</span>
+<span class="nb">add_library</span> <span class="p">(</span>Dependency SomethingToCompile.cpp<span class="p">)</span>
+<span class="nb">target_include_directories</span> <span class="p">(</span>Dependency PUBLIC .<span class="p">)</span>
+or change to:
+<span class="nb">include_directories</span> <span class="p">(</span>Project <span class="si">${</span><span class="nv">includedir</span><span class="si">}</span><span class="p">)</span>
+<span class="nb">target_include_directories</span> <span class="p">(</span>Dependency PUBLIC includedir<span class="p">)</span>
+</code></pre></div></div>
+<h4 id="set-as-startup-project-cmake-36-or-later">set as startup project (cmake 3.6 or later)</h4>
+<div class="language-cmake highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#set as startup project</span>
+<span class="nb">set_property</span><span class="p">(</span>DIRECTORY <span class="si">${</span><span class="nv">CMAKE_CURRENT_SOURCE_DIR</span><span class="si">}</span> PROPERTY VS_STARTUP_PROJECT <span class="si">${</span><span class="nv">target</span><span class="si">}</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="errors">errors</h4>
+<p>could not find boost
+<strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong></p>
+<div class="language-cmake highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">set</span><span class="p">(</span>CMAKE_PREFIX_PATH
+ <span class="s2">"E:/thirdLib/boost_1_56_0"</span>
+<span class="p">)</span>
+<span class="nb">set</span><span class="p">(</span>BOOST_DIR <span class="s2">"E:/thirdLib/boost_1_56_0"</span><span class="p">)</span>
+<span class="nb">set</span><span class="p">(</span>BOOST_ROOT <span class="s2">"E:/thirdLib/boost_1_56_0"</span><span class="p">)</span>
+<span class="nb">set</span><span class="p">(</span>BOOST_INCLUDEDIR <span class="s2">"E:/thirdLib/boost_1_56_0"</span><span class="p">)</span>
+<span class="nb">set</span><span class="p">(</span>BOOST_LIBRARYDIR <span class="s2">"E:/thirdLib/boost_1_56_0/lib64-msvc-12.0"</span><span class="p">)</span>
+<span class="nb">set</span><span class="p">(</span>Boost_USE_STATIC_LIBS ON<span class="p">)</span>
+<span class="nb">set</span><span class="p">(</span>Boost_DEBUG ON<span class="p">)</span>
+ 
+<span class="nb">find_package</span><span class="p">(</span>Boost 1.56 COMPONENTS serialization system filesystem thread program_options date_time regex timer chrono<span class="p">)</span>
+<span class="nb">if</span><span class="p">(</span>NOT Boost_SERIALIZATION_LIBRARY<span class="p">)</span>
+  <span class="nb">message</span><span class="p">(</span>FATAL_ERROR <span class="s2">"Missing required Boost components &gt;= v1.56, please install/upgrade Boost or configure your search paths."</span><span class="p">)</span>
+<span class="nb">endif</span><span class="p">()</span>
+...
+</code></pre></div></div>
+<p>CMake Error at CMakeLists.txt:18 (find_package):</p>
+
+<p>Found package configuration file:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>D:/useAsE/thirdLib/opencv/build/OpenCVConfig.cmake
+</code></pre></div></div>
+
+<p>but it set OpenCV_FOUND to FALSE so package “OpenCV” is considered to be
+  NOT FOUND.</p>
+
+<p>opencv的库文件和当前cmake选择的vs不一致</p>
+<h4 id="template">template</h4>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cmake_minimum_required(VERSION 3.0.0)
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ")#-O0 -g -ggdb -fpermissive
+ 
+set(target projectName)
+ 
+set(CMAKE_PREFIX_PATH 
+ "E:/thirdLib/OpenCV/opencv/build"
+ "D:/Qt/Qt5.4.1/5.4/msvc2013_64_opengl"
+ )
+set(Eigen_DIR "E:/thirdLib/eigen-3.3.2") 
+set(BOOST_INCLUDE_DIR "E:/thirdLib/boost_1_56_0")
+set(BOOST_LIBRARY_DIR "E:/thirdLib/boost_1_56_0/lib64-msvc-12.0") 
+set(PCL_INCLUDE_DIR "E:/thirdLib/PCL_1.7.2/include/pcl-1.7")
+set(PCL_LIB_DIR "E:/thirdLib/PCL_1.7.2/lib")
+set(VTK_DIR "E:/thirdLib/VTK-7.0.0.rc1")
+set(VTK_INCLUDE_DIR "E:/thirdLib/PCL_1.7.2/3rdParty/VTK/include/vtk-6.2")
+ 
+project(${target})
+find_package(CUDA REQUIRED)
+find_package(OpenCV REQUIRED)
+find_package(Qt5Core REQUIRED)
+find_package(Qt5Gui REQUIRED)
+find_package(Qt5Widgets REQUIRED)
+ 
+file (GLOB HEADERS "*.h" "*.hpp")
+file (GLOB SOURCES "*.cu" "*.c" "*.cpp")
+ 
+include_directories(${target}
+ ${CUDA_INCLUDE_DIRS}
+ ${OpenCV_INCLUDE_DIRS}
+ ${PROJECT_SOURCE_DIR}/inc
+ ${PROJECT_SOURCE_DIR}/common/inc
+ ${PCL_INCLUDE_DIR}
+ ${BOOST_INCLUDE_DIR}
+ ${Eigen_DIR}
+ )
+link_directories(
+ ${BOOST_LIBRARY_DIR}
+ ${PCL_LIB_DIR}
+ ) 
+ 
+ 
+# Dont propogate host flags into CUDA environment.
+set(CUDA_PROPAGATE_HOST_FLAGS off)
+ 
+# Generate code for 2.0 and 3.0 CUDA compute architectures (TODO: Verify this works)
+#set(CUDA_NVCC_FLAGS "-use_fast_math -gencode arch=compute_30,code=sm_30 -gencode arch=compute_20,code=sm_20" ) 
+ 
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -gencode arch=compute_30,code=sm_30; -gencode arch=compute_35,code=sm_35; -gencode arch=compute_50,code=sm_50; --use_fast_math ;--restrict; ) 
+ 
+cuda_add_executable(${target}
+ ${HEADERS}
+ ${SOURCES}
+ )
+ 
+target_link_libraries(${target}
+ ${OpenCV_LIBS}
+ Qt5::Core
+ Qt5::Widgets
+ Qt5::Gui
+ ) 
+</code></pre></div></div>
+
+<h3 id="latex">latex</h3>
+<p>写论文时用的latex模板</p>
+
+<div class="language-latex highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">\documentclass</span><span class="na">[12pt, UTF8]</span><span class="p">{</span>ctexart<span class="p">}</span>
+<span class="c">%\documentclass[12pt, UTF8]{ctexrep}</span>
+<span class="k">\usepackage</span><span class="p">{</span>amsmath<span class="p">}</span>
+<span class="k">\usepackage</span><span class="p">{</span>bibentry<span class="p">}</span>
+<span class="k">\usepackage</span><span class="p">{</span>CJK<span class="p">}</span>
+<span class="k">\usepackage</span><span class="p">{</span>fancyhdr<span class="p">}</span> <span class="c">%页眉</span>
+<span class="k">\usepackage</span><span class="p">{</span>float<span class="p">}</span>
+<span class="k">\usepackage</span><span class="p">{</span>geometry<span class="p">}</span>
+<span class="k">\usepackage</span><span class="p">{</span>graphicx<span class="p">}</span>
+<span class="k">\usepackage</span><span class="p">{</span>longtable<span class="p">}</span>
+<span class="k">\usepackage</span><span class="p">{</span>multirow<span class="p">}</span>
+<span class="k">\usepackage</span><span class="p">{</span>pdfpages<span class="p">}</span>
+<span class="k">\usepackage</span><span class="p">{</span>subfigure<span class="p">}</span>
+<span class="k">\usepackage</span><span class="p">{</span>supertabular<span class="p">}</span>
+<span class="k">\usepackage</span><span class="p">{</span>setspace<span class="p">}</span> <span class="c">%行距</span>
+<span class="k">\usepackage</span><span class="na">[super,square]</span><span class="p">{</span>natbib<span class="p">}</span>
+<span class="k">\usepackage</span><span class="p">{</span>titlesec<span class="p">}</span>
+<span class="k">\usepackage</span><span class="p">{</span>titletoc<span class="p">}</span>
+<span class="k">\usepackage</span><span class="na">[colorlinks, linkcolor=blue, citecolor=green]</span><span class="p">{</span>hyperref<span class="p">}</span>
+<span class="k">\geometry</span><span class="p">{</span>left=3.17 cm,right=3.17 cm,top=2.54 cm,bottom=2.54 cm<span class="p">}</span>
+<span class="k">\title</span><span class="p">{</span>基于xxx数据xxxx<span class="p">}</span>
+<span class="k">\date</span><span class="p">{}</span>
+<span class="c">%&gt;60page</span>
+
+<span class="k">\titleformat</span><span class="p">{</span><span class="k">\section</span><span class="p">}{</span><span class="k">\centering\Large\bfseries</span><span class="p">}{</span>第 <span class="k">\arabic</span><span class="p">{</span>section<span class="p">}</span> 章<span class="p">}{</span>1 em<span class="p">}{}</span>
+<span class="k">\titlecontents</span><span class="p">{</span>section<span class="p">}</span>[0pt]<span class="p">{</span> <span class="k">\addvspace</span><span class="p">{</span>2pt<span class="p">}</span><span class="k">\filright</span><span class="p">}{</span><span class="k">\contentspush</span><span class="p">{</span><span class="k">\thecontentslabel\ </span><span class="p">}}{}{</span><span class="k">\titlerule*</span><span class="na">[8pt]</span><span class="p">{</span>.<span class="p">}</span><span class="k">\contentspage</span><span class="p">}</span>
+
+<span class="k">\CTEXsetup</span><span class="na">[name={第,章},number={\arabic{section}}]</span><span class="p">{</span>section<span class="p">}</span>
+<span class="k">\iffalse</span>
+<span class="k">\makeatletter</span>
+<span class="k">\@</span>addtoreset<span class="p">{</span>equation<span class="p">}{</span>section<span class="p">}</span>
+<span class="k">\@</span>addtoreset<span class="p">{</span>figure<span class="p">}{</span>section<span class="p">}</span>
+<span class="k">\@</span>addtoreset<span class="p">{</span>table<span class="p">}{</span>section<span class="p">}</span>
+<span class="k">\makeatother</span>
+<span class="k">\fi</span>
+
+<span class="k">\renewcommand\listfigurename</span><span class="p">{</span><span class="k">\textbf</span><span class="p">{</span>图目录<span class="p">}}</span>
+<span class="k">\renewcommand\listtablename</span><span class="p">{</span><span class="k">\textbf</span><span class="p">{</span>表目录<span class="p">}}</span>
+<span class="k">\renewcommand\thefigure</span><span class="p">{</span> <span class="k">\thesection</span>.<span class="k">\arabic</span><span class="p">{</span>figure<span class="p">}}</span>
+<span class="k">\renewcommand\thetable</span><span class="p">{</span> <span class="k">\thesection</span>.<span class="k">\arabic</span><span class="p">{</span>table<span class="p">}</span> <span class="p">}</span>
+<span class="k">\renewcommand\theequation</span><span class="p">{</span><span class="k">\thesection</span>.<span class="k">\arabic</span><span class="p">{</span>equation<span class="p">}</span> <span class="p">}</span>
+<span class="c">%\renewcommand{\figurename}{}</span>
+<span class="c">%\renewcommand{\tablename}{}</span>
+
+
+<span class="k">\LARGE</span>
+<span class="k">\setlength</span><span class="p">{</span><span class="k">\baselineskip</span><span class="p">}{</span>20pt<span class="p">}</span>
+
+<span class="nt">\begin{document}</span>
+<span class="k">\pagestyle</span><span class="p">{</span>plain<span class="p">}</span>
+
+<span class="k">\iffalse</span>
+<span class="nt">\begin{titlepage}</span>
+<span class="k">\maketitle</span>
+<span class="k">\section*</span><span class="p">{</span>版本控制<span class="p">}</span>
+<span class="nt">\begin{longtable}</span><span class="p">{</span>c|c|c<span class="p">}</span>
+<span class="k">\hline</span>
+版本号 <span class="p">&amp;</span> 内容 <span class="p">&amp;</span> 最后修改时间 <span class="k">\\</span>
+<span class="k">\hline</span>
+v2.0 <span class="p">&amp;</span> 初稿，并增加实验结果 <span class="p">&amp;</span> 2016/12/18 <span class="k">\\</span>
+<span class="k">\hline</span>
+v3.0 <span class="p">&amp;</span> 修改模型形变过程，同时修改实验结果，主要改动5-7章的描述 <span class="p">&amp;</span> 2017/01/04 <span class="k">\\</span>
+<span class="k">\hline</span>
+v4.0 <span class="p">&amp;</span> 修改了部分插图，增加多组数据的实验结果及对比，及IMU部分说明 <span class="p">&amp;</span> 2017/01/05 <span class="k">\\</span>
+<span class="k">\hline</span>
+v5.0 <span class="p">&amp;</span> 根据反馈意见进行修改 <span class="p">&amp;</span> 2017/01/15 <span class="k">\\</span>
+<span class="k">\hline</span>
+<span class="nt">\end{longtable}</span>
+<span class="nt">\end{titlepage}</span>
+<span class="k">\fi</span>
+
+<span class="k">\newpage</span>
+<span class="k">\includepdf</span><span class="na">[pages=-]</span><span class="p">{</span>faceWithName.pdf<span class="p">}</span>
+
+<span class="k">\newpage</span>
+<span class="k">\pagestyle</span><span class="p">{</span>fancy<span class="p">}{</span>
+<span class="k">\lhead</span><span class="p">{</span>浙江大学硕士学位论文<span class="p">}</span>
+<span class="k">\rhead</span><span class="p">{</span><span class="k">\rightmark</span> <span class="p">}</span>
+<span class="c">%\rhead{\sectionmark}</span>
+<span class="p">}</span>
+<span class="k">\renewcommand</span><span class="p">{</span><span class="k">\sectionmark</span><span class="p">}</span>[1]<span class="p">{</span><span class="k">\markright</span> <span class="p">{</span>第 <span class="k">\arabic</span><span class="p">{</span>section<span class="p">}</span> 章 <span class="k">\quad</span> #1<span class="p">}{}}</span>
+<span class="c">%\renewcommand{\sectionmark}[1]{\markright {第 \arabic{section} 章}{}}</span>
+
+<span class="k">\pagenumbering</span><span class="p">{</span>roman<span class="p">}</span>
+<span class="k">\section*</span><span class="p">{</span>摘要<span class="p">}</span>
+<span class="k">\rhead</span><span class="p">{</span>摘要<span class="p">}</span>
+<span class="k">\addcontentsline</span><span class="p">{</span>toc<span class="p">}{</span>section<span class="p">}{</span>摘要<span class="p">}</span>
+
+
+<span class="k">\textbf</span><span class="p">{</span>Key words:<span class="p">}</span> 3D reconstruction, IMU and vision combination, model repair
+
+<span class="k">\newpage</span>
+<span class="k">\rhead</span><span class="p">{</span><span class="k">\rightmark</span> <span class="p">}</span>
+<span class="k">\pagenumbering</span><span class="p">{</span>Roman<span class="p">}</span>
+<span class="k">\tableofcontents</span>
+
+<span class="k">\newpage</span>
+<span class="k">\rhead</span><span class="p">{</span>图目录<span class="p">}</span>
+<span class="k">\listoffigures</span>
+
+<span class="k">\newpage</span>
+<span class="k">\rhead</span><span class="p">{</span>表目录<span class="p">}</span>
+<span class="k">\listoftables</span>
+
+<span class="k">\newpage</span>
+<span class="k">\rhead</span><span class="p">{</span><span class="k">\rightmark</span> <span class="p">}</span>
+<span class="k">\pagenumbering</span><span class="p">{</span>arabic<span class="p">}</span>
+<span class="k">\section</span><span class="p">{</span>绪论<span class="p">}</span>
+
+
+
+<span class="k">\section</span><span class="p">{</span>概述<span class="p">}</span>
+<span class="k">\subsection</span><span class="p">{</span>环境要求<span class="p">}</span>
+标配：
+操作系统：windows 7, x64 bit
+开发环境：visual studio 2013, 用x86编译运行（CGAL）
+第三方库：
+gtsam 3.2.1 (不支持boost 1.58及以上版本)
+Boost 1.56
+Qt 5.7.0
+OpenCV 3
+PCL 1.8.0
+OpenGL
+CGAL
+<span class="k">\section</span><span class="p">{</span>路径设置<span class="p">}</span>
+
+
+<span class="k">\newpage</span>
+<span class="nt">\begin{thebibliography}</span><span class="p">{</span>MM<span class="p">}</span>
+<span class="k">\addtolength</span><span class="p">{</span><span class="k">\itemsep</span><span class="p">}{</span>-0.5em<span class="p">}</span>
+<span class="c">%relative work (section 1)</span>
+<span class="k">\bibitem</span><span class="p">{</span>1<span class="p">}</span> Shan Q, Curless B, Furukawa Y, et al. Occluding contours for multi-view stereo[C]//Computer Vision and Pattern Recognition (CVPR), 2014 IEEE Conference on. IEEE, 2014: 4002-4009.
+<span class="nt">\end{thebibliography}</span>
+
+<span class="k">\addcontentsline</span><span class="p">{</span>toc<span class="p">}{</span>section<span class="p">}{</span>参考文献<span class="p">}</span>
+
+<span class="nt">\end{document}</span>
+</code></pre></div></div>
+
 
       </section>
     </div>

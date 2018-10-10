@@ -2,6 +2,8 @@
 layout: default
 ---
 
+[中文版首页请看这里](./Index_Chinese)
+
 # Catalog
 
 >This is an index to my notes. 
@@ -41,6 +43,8 @@ layout: default
 [Questions In Interview](./Questions_In_Interview.html)
 
 [Model_Code_Of_InputOutput](./Model_Code_Of_InputOutput)
+
+[Summary_Of_Coding_Errors](./Summary_Of_Coding_Errors)
 
 [Trifles](./Trifles.html)
 

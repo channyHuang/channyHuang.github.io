@@ -33,33 +33,7 @@ layout: default
 
 # ${filename}
 
-\`\`\`sh
-
-#!/bin/bash
-
-if [ \$# != 2 ]; then
-
-echo "Usage: \$0 filename path"
-
-exit 1;
-
-fi
-
-filename=\$1
-
-path=\$2
-
-file=\${filename}".md"
-
-cd \${path}
-
-if ! grep "^#!" \${file} &>/dev/null; then
-
-cat >> \${file} << EOF
-
-\EOF
-
-\`\`\`
+[back](./)
 
 EOF
 fi
