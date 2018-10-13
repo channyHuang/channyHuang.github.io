@@ -4,7 +4,7 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/assets/css/style.css?v=9459a293be5059f374dd414d0ba3990977c5b9d8">
+    <link rel="stylesheet" href="/assets/css/style.css?v=4b0a13c44ca810a7276a4dc187a28b529219736e">
 
 <!-- Begin Jekyll SEO tag v2.5.0 -->
 <title>channy’s page | Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.</title>
@@ -685,6 +685,188 @@ CGAL
 <span class="nt">\end{document}</span>
 </code></pre></div></div>
 
+<h3 id="git">git</h3>
+
+<p>$ git config –global user.name “qanny”</p>
+
+<p>$ git config –global user.email qanny@example.com</p>
+
+<p>git init
+初始化</p>
+
+<p>git add dir1</p>
+
+<p>git add f1 f2</p>
+
+<p>git add -A 
+添加所有文件</p>
+
+<p>git add .
+添加新文件和编辑过的文件不包括删除的文件</p>
+
+<p>git add -u
+添加编辑或者删除的文件不包括新添加的文件</p>
+
+<p>git add –update :/
+添加修改</p>
+
+<p>git rm
+删除文件</p>
+
+<p>git status
+查看状态</p>
+
+<p>git reset
+撤销保存还未提交的状态</p>
+
+<p>git commit -m “information about remand”
+提交修改</p>
+
+<p>git log –stat –summary
+查看历史日志</p>
+
+<p>q 
+退出当前历史记录</p>
+
+<p>cd 到文件目录下 git log –pretty=oneline 文件名
+查看某个文件的修改记录</p>
+
+<p>git show 版本号
+显示具体的修改</p>
+
+<p>git branch mybranch
+创建分支</p>
+
+<p>git checkout mybranch</p>
+
+<p>git checkout -b mybranch
+切换到分支</p>
+
+<p>创建并切换到新分支</p>
+
+<p>git clone -b <branch> <remote_repo>
+克隆某个分支</remote_repo></branch></p>
+
+<p>git clone http://github.com/*.git
+克隆整个分支</p>
+
+<p>git 克隆时默认只克隆master分支，需要转到其它分支上才能看到其它文件</p>
+
+<p>git reset *（版本号）
+回退到某个版本</p>
+
+<p>git reset –hard 
+回退到上个版本（取消本地未提交的修改）</p>
+
+<p>git checkout – main.cpp
+恢复一个文件main.cpp</p>
+
+<p>git diff <commit> <commit> 
+获取两个版本之间的变更比较</commit></commit></p>
+
+<p>如：git diff b45ba47d1b297217e3ec6a3ab0f61716a8d6ecbc c244d0bf06d56ec86aaedeefa5dcd84dd9febc60</p>
+
+<p>一般来说，通过 hash 串的前 4～6 位就可以区分，所示可以简写为：
+git diff b45b 355e</p>
+
+<p>提交时忽略特定的文件：修改.git/info/exclude</p>
+
+<p><em>.</em> 忽略所有文件</p>
+
+<p>!*.h 只保留.h文件</p>
+
+<p>!*.cpp 和.cpp文件</p>
+
+<p>!CMakeLists.txt cmake文件也要</p>
+
+<p>提交到github上：
+{
+前提准备:</p>
+<ol>
+  <li>ssh-keygen -t rsa -C “*@gmail.com”</li>
+  <li>ssh-agent -s</li>
+  <li>clip &gt; ~/.ssh/id_rsa.pub</li>
+  <li>在github上设置–SSH keys–Add SSH key–
+}</li>
+  <li>github上创建仓库，得地址
+1.5 克隆到本地：git clone git@github.com:qanny/*.git</li>
+  <li>git Bash 转到目录</li>
+  <li>生成本地git （或github上已有库，本地没有，新加）
++. git config branch.master.remote origin
++. git config branch.master.merge refs/heads/master
++. git pull
+3.5 git remote rm origin</li>
+  <li>git remote add origin https://github.com/qanny/*.git</li>
+  <li>git push -u origin master</li>
+</ol>
+
+<hr />
+
+<p>常见问题解决方法：</p>
+
+<p>git push -u origin master 时出现 Could not resolve hostname github.com</p>
+
+<p>解决方法：ssh -T git@github.com</p>
+
+<p>再次提交即可</p>
+
+<p>git push -u origin master 时出现 error:src refspec master does not match any</p>
+
+<p>目录中没有文件，空目录是不能提交上去的</p>
+
+<h3 id="others">others</h3>
+
+<hr />
+<p>管理员，在“命令行提示符”输入”bcdedit /set testsigning on”回车,然后命令行提示符会显示“操作成功完成”，就可以打开windows测试模式了。</p>
+
+<hr />
+<p>批量修改文件后缀名：example (bat文件)</p>
+
+<p>ren *.gif *.jpg</p>
+
+<p>ren <em>.</em> *.jpg</p>
+
+<hr />
+<p>replace</p>
+
+<p>正则表达式</p>
+
+<p>数字前换行：\s(?=\d+)替换成 \n</p>
+
+<hr />
+<p>控制台输出到txt:</p>
+
+<p>在cmd下运行*.exe &gt; *.txt</p>
+
+<hr />
+<p>自动关机</p>
+
+<p>at 23:30 /every:M,T,W,Th,F,S,Su shutdown -s -t 120</p>
+
+<p>at /delete</p>
+
+<hr />
+
+<p>in word 2007</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>---3个连字符生成细黑线
+___3个下划线生成粗黑线
+###3个井号生成双细线中间夹一个粗黑线
+***3个星号生成点线
+~~~3个约等号生成波浪线
+</code></pre></div></div>
+
+<hr />
+
+<p>路由
+route print 显示路由信息
+route -f 清除</p>
+
+<hr />
+
+<p>dir /s E:/data » E:/dir.txt</p>
+
+<p>把E:/data目录下所有文件列表并写入dir.txt</p>
 
       </section>
     </div>

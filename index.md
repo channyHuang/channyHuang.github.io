@@ -2,7 +2,7 @@
 layout: default
 ---
 
-[中文版首页请看这里](./Index_Chinese)
+[中文版目录请看这里](./Index_Chinese)
 
 # Catalog
 
@@ -32,6 +32,10 @@ layout: default
 
 [Linux_Basic_Comment](./Linux_Basic_Comment)
 
+**C++**
+
+[Summary_Of_Coding_Errors](./Summary_Of_Coding_Errors)
+
 **Android**
 
 [Android_Crack](./Android_Crack.html)
@@ -44,7 +48,7 @@ layout: default
 
 [Model_Code_Of_InputOutput](./Model_Code_Of_InputOutput)
 
-[Summary_Of_Coding_Errors](./Summary_Of_Coding_Errors)
+
 
 [Trifles](./Trifles.html)
 

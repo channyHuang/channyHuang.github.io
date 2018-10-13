@@ -657,4 +657,182 @@ CGAL
 \end{document}
 ```
 
+### git
 
+$ git config --global user.name "qanny"
+
+$ git config --global user.email qanny@example.com
+
+git init
+初始化
+
+git add dir1
+
+git add f1 f2
+
+git add -A 
+添加所有文件
+
+git add .
+添加新文件和编辑过的文件不包括删除的文件
+
+git add -u
+添加编辑或者删除的文件不包括新添加的文件
+
+git add --update :/
+添加修改
+
+git rm
+删除文件
+
+git status
+查看状态
+
+git reset
+撤销保存还未提交的状态
+
+git commit -m "information about remand"
+提交修改
+
+git log --stat --summary
+查看历史日志
+
+q 
+退出当前历史记录
+
+cd 到文件目录下 git log --pretty=oneline 文件名
+查看某个文件的修改记录
+
+git show 版本号
+显示具体的修改
+
+git branch mybranch
+创建分支
+
+git checkout mybranch
+
+git checkout -b mybranch
+切换到分支
+
+创建并切换到新分支
+
+git clone -b <branch> <remote_repo>
+克隆某个分支
+
+git clone http://github.com/*.git
+克隆整个分支
+
+git 克隆时默认只克隆master分支，需要转到其它分支上才能看到其它文件
+
+git reset *（版本号）
+回退到某个版本
+
+git reset --hard 
+回退到上个版本（取消本地未提交的修改）
+
+git checkout -- main.cpp
+恢复一个文件main.cpp
+
+git diff <commit> <commit> 
+获取两个版本之间的变更比较
+
+如：git diff b45ba47d1b297217e3ec6a3ab0f61716a8d6ecbc c244d0bf06d56ec86aaedeefa5dcd84dd9febc60
+
+一般来说，通过 hash 串的前 4～6 位就可以区分，所示可以简写为：
+git diff b45b 355e
+
+提交时忽略特定的文件：修改.git/info/exclude
+
+*.* 忽略所有文件
+
+!*.h 只保留.h文件
+
+!*.cpp 和.cpp文件
+
+!CMakeLists.txt cmake文件也要
+
+提交到github上：
+{
+前提准备:
+1. ssh-keygen -t rsa -C "*@gmail.com"
+2. ssh-agent -s
+3. clip \> ~/.ssh/id_rsa.pub
+4. 在github上设置--SSH keys--Add SSH key--
+}
+1. github上创建仓库，得地址
+1.5 克隆到本地：git clone git@github.com:qanny/*.git
+2. git Bash 转到目录
+3. 生成本地git （或github上已有库，本地没有，新加）
++. git config branch.master.remote origin
++. git config branch.master.merge refs/heads/master
++. git pull
+3.5 git remote rm origin
+4. git remote add origin https://github.com/qanny/*.git
+5. git push -u origin master
+
+---
+
+常见问题解决方法：
+
+git push -u origin master 时出现 Could not resolve hostname github.com
+
+解决方法：ssh -T git@github.com
+
+再次提交即可
+
+git push -u origin master 时出现 error:src refspec master does not match any
+
+目录中没有文件，空目录是不能提交上去的
+
+### others
+
+---
+管理员，在“命令行提示符”输入"bcdedit /set testsigning on"回车,然后命令行提示符会显示“操作成功完成”，就可以打开windows测试模式了。
+
+---
+批量修改文件后缀名：example (bat文件)
+
+ren *.gif *.jpg
+
+ren *.* *.jpg
+
+---
+replace
+
+正则表达式
+
+数字前换行：\s(?=\d+)替换成 \n
+
+---
+控制台输出到txt:
+
+在cmd下运行*.exe > *.txt
+
+---
+自动关机
+
+at 23:30 /every:M,T,W,Th,F,S,Su shutdown -s -t 120
+
+at /delete
+
+---
+
+in word 2007
+
+	---3个连字符生成细黑线
+    ___3个下划线生成粗黑线
+    ###3个井号生成双细线中间夹一个粗黑线
+    ***3个星号生成点线
+    ~~~3个约等号生成波浪线
+
+---
+
+路由
+route print 显示路由信息
+route -f 清除
+    
+---	
+    
+dir /s E:/data >> E:/dir.txt
+
+把E:/data目录下所有文件列表并写入dir.txt

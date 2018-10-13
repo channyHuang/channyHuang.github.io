@@ -4,7 +4,7 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/assets/css/style.css?v=9459a293be5059f374dd414d0ba3990977c5b9d8">
+    <link rel="stylesheet" href="/assets/css/style.css?v=4b0a13c44ca810a7276a4dc187a28b529219736e">
 
 <!-- Begin Jekyll SEO tag v2.5.0 -->
 <title>channy’s page | Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.</title>
@@ -48,14 +48,22 @@
 <p>//Description: VS 错误和其它错误总结</p>
 
 <h1 id="summary_of_coding_errors">Summary_Of_Coding_Errors</h1>
+
 <hr />
-<p>QString -&gt; std::string 
-(x) QString.toLocal8bit()
-(x) QString.toStdString()
-(?) QString.toUtf8()
-(?) QString.toLocal8Bit().constData()
-<strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong>***
-error 在注释中遇到意外的文件结束</p>
+
+<p>QString -&gt; std::string</p>
+
+<p>(x) QString.toLocal8bit()</p>
+
+<p>(x) QString.toStdString()</p>
+
+<p>(?) QString.toUtf8()</p>
+
+<p>(?) QString.toLocal8Bit().constData()</p>
+
+<hr />
+
+<p>error 在注释中遇到意外的文件结束</p>
 
 <p>文件格式不对，尝试改为UTF-8</p>
 
@@ -69,21 +77,28 @@ error 在注释中遇到意外的文件结束</p>
 
 <p>1.#pragma warning(disable:4996)</p>
 
-<p>2.预处理器定义，增加_CRT_SECURE_NO_DEPRECATE
-<strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong>***
-min max不是std的成员</p>
+<p>2.预处理器定义，增加_CRT_SECURE_NO_DEPRECATE</p>
+
+<hr />
+<p>min max不是std的成员</p>
 
 <p>加入#include<algorithm></algorithm></p>
 
 <hr />
 
-<p>1&gt;—— 已启动生成: 项目: 20130925, 配置: Debug Win32 ——
-1&gt;  stdafx.cpp
- 1&gt;d:\code\20130925\20130925\stdafx.cpp(18): error C4996: ‘fopen’: This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
- 1&gt;          d:\vs2012\vc\include\stdio.h(218) : 参见“fopen”的声明
-1&gt;  20130925.cpp
- 1&gt;  正在生成代码…
- ========== 生成: 成功 0 个，失败 1 个，最新 0 个，跳过 0 个==========</p>
+<p>1&gt;—— 已启动生成: 项目: 20130925, 配置: Debug Win32 ——</p>
+
+<p>1&gt;  stdafx.cpp</p>
+
+<p>1&gt;d:\code\20130925\20130925\stdafx.cpp(18): error C4996: ‘fopen’: This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.</p>
+
+<p>1&gt;          d:\vs2012\vc\include\stdio.h(218) : 参见“fopen”的声明</p>
+
+<p>1&gt;  20130925.cpp</p>
+
+<p>1&gt;  正在生成代码…</p>
+
+<p>========== 生成: 成功 0 个，失败 1 个，最新 0 个，跳过 0 个==========</p>
 
 <p>解决方案，项目 -&gt;属性 -&gt; c/c++ -&gt; 预处理器 -&gt; 点击预处理器定义，编辑，加入_CRT_SECURE_NO_WARNINGS，即可。</p>
 
@@ -92,24 +107,32 @@ min max不是std的成员</p>
 <p>经常有些原因需要使用Qt静态链接版本，查了些资料，自己一直没编译过去，于是从</p>
 <ol>
   <li>安装VS2012Qt5插件。</li>
-  <li>编译时会报错”Failed to load platform plugin windows”。
-此时，链接下面的库：
-opengl32.lib
-Qt5PlatformSupport.lib
-qwindows.lib
-并增加下面的代码：
-#include <QtPlugin>
-Q_IMPORT_PLUGIN (QWindowsIntegrationPlugin);
-可能还需要添加的库：
-Ws2_32.lib
-Imm32.lib
-Winmm.lib
-Libcmt.lib
-***************************************************************************</QtPlugin></li>
+  <li>编译时会报错”Failed to load platform plugin windows”。</li>
 </ol>
 
-<p>无法解析的外部符号QMetaObject
-无法解析的外部符号 WSAAsyncSelect</p>
+<p>此时，链接下面的库：</p>
+
+<p>opengl32.lib
+Qt5PlatformSupport.lib
+qwindows.lib</p>
+
+<p>并增加下面的代码：</p>
+
+<p>#include <QtPlugin>
+Q_IMPORT_PLUGIN (QWindowsIntegrationPlugin);</QtPlugin></p>
+
+<p>可能还需要添加的库：</p>
+
+<p>Ws2_32.lib
+Imm32.lib
+Winmm.lib
+Libcmt.lib</p>
+
+<hr />
+
+<p>无法解析的外部符号QMetaObject</p>
+
+<p>无法解析的外部符号 WSAAsyncSelect</p>
 
 <p>在cpp文件末加上#include “moc_*.cpp”</p>
 
@@ -123,59 +146,26 @@ Libcmt.lib
 
 <p>lib之间有冲突。需要删除导入的一些libs。</p>
 
-<p>版 本</p>
+<p><a href="">lib</a></p>
 
-<p>类 型</p>
+<p>例如编译Release版本的单线程的工程，在linker的命令行加入如下的参数： /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrtd.lib</p>
 
-<p>使用的library</p>
+<p>解决办法：
+在CUDA编译选项里加入/MTd 或  /MT</p>
 
-<p>被忽略的library
-R Release</p>
+<p>Project Settings:</p>
 
-<p>单线程</p>
+<p>在有”LIBCMT”冲突错误存在，在“配置属性–&gt;链接器–&gt;输入–&gt;忽略特定库”中把libcmt.lib添加进去或者在“配置属性–&gt;链接器–&gt;命令运”的“附加选项”添加上/NODEFAULTLIB:libcmt.lib</p>
 
-<p>libc.lib</p>
+<p>libcmtd 这个库有时候不能忽略，忽略后会有不能解析的外部符号错误</p>
 
-<p>libcmt.lib, msvcrt.lib, libcd.lib, libcmtd.lib, msvcrtd.lib
-多线程</p>
-
-<p>libcmt.lib</p>
-
-<p>libc.lib, msvcrt.lib, libcd.lib, libcmtd.lib, msvcrtd.lib
-使用DLL的多线程</p>
-
-<p>msvcrt.lib</p>
-
-<p>libc.lib, libcmt.lib, libcd.lib, libcmtd.lib, msvcrtd.lib
-D Debug</p>
-
-<p>单线程</p>
-
-<p>libcd.lib</p>
-
-<p>libc.lib, libcmt.lib, msvcrt.lib, libcmtd.lib, msvcrtd.lib
-多线程</p>
-
-<p>libcmtd.lib</p>
-
-<p>libc.lib, libcmt.lib, msvcrt.lib, libcmtd.lib, msvcrtd.lib
-使用DLL的多线程</p>
-
-<p>msvcrtd.lib</p>
-
-<p>libc.lib, libcmt.lib, msvcrt.lib, libcd.lib, libcmtd.lib
-例如编译Release版本的单线程的工程，在linker的命令行加入如下的参数： /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrtd.lib
-解决办法：
-在CUDA编译选项里加入/MTd 或  /MT
-Project Settings:<br />
-在有”LIBCMT”冲突错误存在，在“配置属性–&gt;链接器–&gt;输入–&gt;忽略特定库”中把libcmt.lib添加进去或者在“配置属性–&gt;链接器–&gt;命令运”的“附加选项”添加上/NODEFAULTLIB:libcmt.lib
-libcmtd 这个库有时候不能忽略，忽略后会有不能解析的外部符号错误
-其实有个方便的方法 链接时加入参数 /FORCE:MULTIPLE</p>
+<p>其实有个方便的方法 链接时加入参数 /FORCE:MULTIPLE</p>
 
 <hr />
 
-<p>Qt5Cored.lib(qeventdispatcher_win.obj) : error LNK2019: unresolved external symbol_WSAAsyncSelect@16 referenced in function “public: void __thiscall            QEventDispatcherWin32Private::doWsaAsyncSelect(int)” (?doWsaAsyncSelect@QEventDispatcherWin32Private@@QAEXH@Z)
-      这个链接容易解决，属性页–&gt;Link–&gt;input  Additional Dependencies 加入Ws2_32.lib, 然后运行</p>
+<p>Qt5Cored.lib(qeventdispatcher_win.obj) : error LNK2019: unresolved external symbol_WSAAsyncSelect@16 referenced in function “public: void __thiscall            QEventDispatcherWin32Private::doWsaAsyncSelect(int)” (?doWsaAsyncSelect@QEventDispatcherWin32Private@@QAEXH@Z)</p>
+
+<p>这个链接容易解决，属性页–&gt;Link–&gt;input  Additional Dependencies 加入Ws2_32.lib, 然后运行</p>
 
 <hr />
 
@@ -184,32 +174,49 @@ libcmtd 这个库有时候不能忽略，忽略后会有不能解析的外部符
 <p>解决方法：add “_XKEYCHECK_H” in Preprocessor Definitions</p>
 
 <hr />
-<p>运行错误：the application was unable to start correctly. Click OK to close the application.
-库或dll有32bit和64bit混合的，改成一致
-也有可以缺失dll,可以尝试把用到的库的所有dll拷过去测试
- <strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>*
-错误：error LNK2026 模块对于SAFESEH映像是不安全的。
-把/SAFESEH:NO加到链接器-命令行-其他选项里
- **</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong>*****
-opencv和cuda混合编程用到cv中的gpu时，链接错误
-自己编译OpenCV得到的gpu的lib替代二进制安装的lib
-运行中错误
-OpenCV Error: Gpu API call (invalid device function) in call
-查看cuda的capability Major，修改cmake的-gencode后面的参数
-set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -gencode arch=compute_30,code=sm_30; -gencode arch=compute_35,code=sm_35; -gencode arch=compute_50,code=sm_50; –use_fast_math ;–restrict; )</p>
+<p>运行错误：the application was unable to start correctly. Click OK to close the application.</p>
+
+<p>库或dll有32bit和64bit混合的，改成一致</p>
+
+<p>也有可以缺失dll,可以尝试把用到的库的所有dll拷过去测试</p>
 
 <hr />
-<p>fatal error C1189: #error :  The C++ Standard Library forbids macroizing keywords. Enable warning C4005 to find the forbidden macro.<br />
-预处理器里添加 _XKEYCHECK_H
-cmake下添加 add_definitions(-D_XKEYCHECK_H)
-<strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong>***
-snprintf不支持：
+
+<p>错误：error LNK2026 模块对于SAFESEH映像是不安全的。</p>
+
+<p>把/SAFESEH:NO加到链接器-命令行-其他选项里</p>
+
+<hr />
+
+<p>opencv和cuda混合编程用到cv中的gpu时，链接错误</p>
+
+<p>自己编译OpenCV得到的gpu的lib替代二进制安装的lib</p>
+
+<p>运行中错误
+OpenCV Error: Gpu API call (invalid device function) in call</p>
+
+<p>查看cuda的capability Major，修改cmake的-gencode后面的参数</p>
+
+<p>set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -gencode arch=compute_30,code=sm_30; -gencode arch=compute_35,code=sm_35; -gencode arch=compute_50,code=sm_50; –use_fast_math ;–restrict; )</p>
+
+<hr />
+<p>fatal error C1189: #error :  The C++ Standard Library forbids macroizing keywords. Enable warning C4005 to find the forbidden macro.</p>
+
+<p>预处理器里添加 _XKEYCHECK_H</p>
+
+<p>cmake下添加 add_definitions(-D_XKEYCHECK_H)</p>
+
+<hr />
+
+<p>snprintf不支持：
 https://www.ijs.si/software/snprintf/</p>
 
 <hr />
-<p>编译器错误 C1128
-Visual C++ 2005 之前的版本中所提供的链接器不能读取使用 /bigobj 生成的 .obj 文件。
-在 Visual Studio 开发环境中设置此编译器选项</p>
+<p>编译器错误 C1128</p>
+
+<p>Visual C++ 2005 之前的版本中所提供的链接器不能读取使用 /bigobj 生成的 .obj 文件。</p>
+
+<p>在 Visual Studio 开发环境中设置此编译器选项</p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>打开项目的“属性页”对话框。 有关详细信息，请参见如何：打开项目属性页。
 单击“C/C++”文件夹。

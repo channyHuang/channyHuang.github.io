@@ -1,6 +1,6 @@
---
+---
 layout: default
---
+---
 
 //Author: channy
 
@@ -38,3 +38,4 @@ cat >> ${file} << EOF
 
 ```
 
+[back](./)
