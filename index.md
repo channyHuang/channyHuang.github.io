@@ -24,7 +24,17 @@ layout: default
 
 [Compute Camera Params and Point Cloud](./Compute_Camera_Params_and_Point_Cloud.html)
 
+[Kalman_Filter](./Kalman_Filter)
+
 [Project Relighting](./Project_Relighting.html)
+
+**C++**
+
+[Summary_Of_Coding_Errors](./Summary_Of_Coding_Errors)
+
+[Matlab_And_C_Combining_Coding](./Matlab_And_C_Combining_Coding)
+
+[Head_File_Include_Each_Other](./Head_File_Include_Each_Other)
 
 **Linux**
 
@@ -32,11 +42,9 @@ layout: default
 
 [Linux_Basic_Comment](./Linux_Basic_Comment)
 
-**C++**
-
-[Summary_Of_Coding_Errors](./Summary_Of_Coding_Errors)
-
 **Android**
+
+[Android_Build_Source](./Android_Build_Source)
 
 [Android_Crack](./Android_Crack.html)
 
@@ -48,7 +56,9 @@ layout: default
 
 [Model_Code_Of_InputOutput](./Model_Code_Of_InputOutput)
 
+[Python_To_Do_Something_I_Like](./Python_To_Do_Something_I_Like)
 
+[Matlab_Gui_Params](./Matlab_Gui_Params)
 
 [Trifles](./Trifles.html)
 

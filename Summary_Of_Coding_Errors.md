@@ -43,8 +43,10 @@ error C4996 解决方法：
 ***************************************************************************
 min max不是std的成员
 
-加入#include<algorithm>
-
+加入
+```c++
+#include<algorithm>
+```
 ***************************************************************************
 
 1>------ 已启动生成: 项目: 20130925, 配置: Debug Win32 ------
@@ -77,9 +79,10 @@ qwindows.lib
 
 并增加下面的代码：
 
+```c++
 #include <QtPlugin>
 Q_IMPORT_PLUGIN (QWindowsIntegrationPlugin);
-
+```
 可能还需要添加的库：
 
 Ws2_32.lib
@@ -105,7 +108,7 @@ QWT无法解析的外部符号"public: static struct QMetaObject const QwtPlot::
  
 lib之间有冲突。需要删除导入的一些libs。 
  
-[lib]()
+![lib](https://raw.githubusercontent.com/qanny/qanny.github.io/master/assets/images/code_error_lib.png)
 
 例如编译Release版本的单线程的工程，在linker的命令行加入如下的参数： /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrtd.lib
 
@@ -177,10 +180,10 @@ Visual C++ 2005 之前的版本中所提供的链接器不能读取使用 /bigob
 
 在 Visual Studio 开发环境中设置此编译器选项
 
-    打开项目的“属性页”对话框。 有关详细信息，请参见如何：打开项目属性页。
-    单击“C/C++”文件夹。
-    单击“命令行”属性页。
-    在“附加选项”框中键入编译器选项。
-	
+打开项目的“属性页”对话框。 有关详细信息，请参见如何：打开项目属性页。
+单击“C/C++”文件夹。
+单击“命令行”属性页。
+在“附加选项”框中键入编译器选项。
+
 [back](./)
 

@@ -4,7 +4,7 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/assets/css/style.css?v=4b0a13c44ca810a7276a4dc187a28b529219736e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=52102c88b64431007bea43c41ab48064ef917bc6">
 
 <!-- Begin Jekyll SEO tag v2.5.0 -->
 <title>channy’s page | Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.</title>
@@ -82,8 +82,9 @@
 <hr />
 <p>min max不是std的成员</p>
 
-<p>加入#include<algorithm></algorithm></p>
-
+<p>加入</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include&lt;algorithm&gt;
+</span></code></pre></div></div>
 <hr />
 
 <p>1&gt;—— 已启动生成: 项目: 20130925, 配置: Debug Win32 ——</p>
@@ -118,9 +119,9 @@ qwindows.lib</p>
 
 <p>并增加下面的代码：</p>
 
-<p>#include <QtPlugin>
-Q_IMPORT_PLUGIN (QWindowsIntegrationPlugin);</QtPlugin></p>
-
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;QtPlugin&gt;
+</span><span class="n">Q_IMPORT_PLUGIN</span> <span class="p">(</span><span class="n">QWindowsIntegrationPlugin</span><span class="p">);</span>
+</code></pre></div></div>
 <p>可能还需要添加的库：</p>
 
 <p>Ws2_32.lib
@@ -146,7 +147,7 @@ Libcmt.lib</p>
 
 <p>lib之间有冲突。需要删除导入的一些libs。</p>
 
-<p><a href="">lib</a></p>
+<p><img src="https://raw.githubusercontent.com/qanny/qanny.github.io/master/assets/images/code_error_lib.png" alt="lib" /></p>
 
 <p>例如编译Release版本的单线程的工程，在linker的命令行加入如下的参数： /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrtd.lib</p>
 
@@ -218,11 +219,10 @@ https://www.ijs.si/software/snprintf/</p>
 
 <p>在 Visual Studio 开发环境中设置此编译器选项</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>打开项目的“属性页”对话框。 有关详细信息，请参见如何：打开项目属性页。
+<p>打开项目的“属性页”对话框。 有关详细信息，请参见如何：打开项目属性页。
 单击“C/C++”文件夹。
 单击“命令行”属性页。
-在“附加选项”框中键入编译器选项。
-</code></pre></div></div>
+在“附加选项”框中键入编译器选项。</p>
 
 <p><a href="./">back</a></p>
 
