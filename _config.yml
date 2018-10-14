@@ -3,3 +3,4 @@ description: Welcome! This is Qianni Huang(qanny, or you can call me channy), a 
 show_downloads: true
 google_analytics:
 theme: jekyll-theme-hacker
+markdown: kramdown
