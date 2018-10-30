@@ -4,7 +4,7 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/assets/css/style.css?v=dc204ed1219c2f65aa79e06306f0c2d32a6f68e9">
+    <link rel="stylesheet" href="/assets/css/style.css?v=7447a39df6695448d4d7e917d55a726d0489c730">
 
 <!-- Begin Jekyll SEO tag v2.5.0 -->
 <title>channy’s page | Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.</title>
@@ -45,7 +45,7 @@
 
 <h1 id="目录">目录</h1>
 
-<p>** 计算机视觉 **</p>
+<p><strong>计算机视觉</strong></p>
 
 <p><a href="./Project_3D_Reconstruction.html">项目－三维重建系统</a></p>
 
@@ -55,7 +55,17 @@
 
 <p><a href="./Compute_Camera_Params_and_Point_Cloud.html">计算机参数和点云计算</a></p>
 
+<p><a href="./Kalman_Filter">Kalman滤波</a></p>
+
 <p><a href="./Project_Relighting.html">项目－重光照</a></p>
+
+<p><strong>C++</strong></p>
+
+<p><a href="./Summary_Of_Coding_Errors">代码错误总结</a></p>
+
+<p><a href="./Matlab_And_C_Combining_Coding">Matlab和C相互调用</a></p>
+
+<p><a href="./Head_File_Include_Each_Other">头文件相互包含</a></p>
 
 <p><strong>Linux</strong></p>
 
@@ -63,11 +73,9 @@
 
 <p><a href="./Linux_Basic_Comment">Linux基本命令</a></p>
 
-<p><strong>C++</strong></p>
-
-<p><a href="./Summary_Of_Coding_Errors">代码错误总结</a></p>
-
 <p><strong>Android</strong></p>
+
+<p><a href="./Android_Build_Source">Android编译源码</a></p>
 
 <p><a href="./Android_Crack.html">Android逆向</a></p>
 
@@ -79,8 +87,149 @@
 
 <p><a href="./Model_Code_Of_InputOutput">基础代码模板</a></p>
 
+<p><a href="./Python_To_Do_Something_I_Like">用Python做自己喜欢的事情</a></p>
+
+<p><a href="./Matlab_Gui_Params">Matlab的Gui参数传递</a></p>
+
 <p><a href="./Trifles.html">其它</a></p>
 
+<h2 id="我想说">我想说</h2>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// feel free
+</span><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">forever</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+	<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"missing you, my code"</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h3 id="关于我">关于我</h3>
+
+<h4 id="编程水平">编程水平</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">语言</th>
+      <th style="text-align: left">水平</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">c++</td>
+      <td style="text-align: left">熟悉</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Android</td>
+      <td style="text-align: left">熟悉</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Python</td>
+      <td style="text-align: left">一般</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="自我介绍">自我介绍</h4>
+
+<ol>
+  <li>
+    <p>喜欢编程，熟悉 C/C++、Matlab及android的framework层中的audio和UI模块，会编写android应用小程序，会用 Python，shell实现简单的功能</p>
+  </li>
+  <li>
+    <p>数学基础扎实，本科数学系，学过数值计算等课程；</p>
+  </li>
+  <li>
+    <p>对计算机视觉领域特别是三维重建方向有深入的研究</p>
+  </li>
+  <li>
+    <p>自学能力强，业余时间学习二外一年能够正常交流</p>
+  </li>
+  <li>
+    <p>目前正在学习机器学习的相关内容，在kaggle上参加过入门级的比赛</p>
+  </li>
+</ol>
+
+<h4 id="外语水平">外语水平</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">语言</th>
+      <th style="text-align: left">水平</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">英语</td>
+      <td style="text-align: left">TOEFL(87), GRE(140+170+2.5)</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">韩语</td>
+      <td style="text-align: left">TOPIK(4级)</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">法语</td>
+      <td style="text-align: left">A2</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="项目经历">项目经历</h3>
+
+<ol>
+  <li>
+    <p>三维重建系统 （2015.03 ~ 2017.03）</p>
+
+    <p>给定手机拍摄的同一静止场景不同视角下的视频或图像序列，主要以人体部位如头、手等作为场景研究对象，目标为重建出场景，精度误差小于5mm</p>
+
+    <p>a) 结合IMU数据和多视角重建理论，当用经典的视觉方法计算图像帧对应的摄像机参数失败时，增加IMU的陀螺仪、加速计、磁通数据建立因子图确定目标函数，融合两种方法求出摄像机外参，并恢复场景的三维点云模型</p>
+
+    <p>b) 根据摄像机参数生成模型点云后，对点云进行表面重建后根据已有模型数据库对点 云模型进一步修复和变形</p>
+
+    <p>c) 根据场景物体的骨架进一步引导模型形变，骨架由点云或模型数据库中的网格模型生成</p>
+
+    <p>负责部分：前期主要负责从三维点云到网格模型重建和修复部分，后期增加 IMU 和视觉的融合部分</p>
+  </li>
+  <li>
+    <p>三维重建后的重光照渲染研究 （2014.07 ~ 2015.06）</p>
+
+    <p>a)   实现一个重光照系统，对于给定的物体模型（点云或网格模型），通过调节光照参 数对该物体进行重光照，并嵌入到新的图像背景中；</p>
+
+    <p>b)   对于给定的物体模型，根据给定的目标背景图像，自动计算光源方向和其它光照参数，对物体进行重光照；</p>
+
+    <p>c)   结合三维重建中求得的摄像机参数，对不同视角下的物体进行重光照，嵌入到视频 的图像帧中生成新的视频；</p>
+
+    <p>d)   研究中遇到过的问题：重光照结果精确度不高，还有待改进 
+ 负责部分：重光照功能全部自己完成</p>
+  </li>
+  <li>
+    <p>服务器日志数据挖掘和可视化研究 （2013.03 ~ 2014.06）</p>
+
+    <p>a)   对日志数据进行统计和分析，发现其中有用的规则，并进行可视化显示；</p>
+
+    <p>b)   根据访问数据捕捉新出现的手机终端，预测新手机产品的出现；</p>
+
+    <p>c)   研究中遇到过的问题：日志数据量大，计算时间长，有待改进；</p>
+
+    <p>负责部分：全部自己完成</p>
+  </li>
+</ol>
+
+<h3 id="相关专利">相关专利</h3>
+
+<p>申请号：201510771082.4 申请日：2015-11-12</p>
+
+<p>基于图像和模型计算光照参数进行重光照渲染的方法.</p>
+
+<p>申请号：201710173548.X 申请日：2017-03-22</p>
+
+<p>一种通过智能手机采集脚型视频和传感器数据获取三维脚型的方法</p>
+
+<h4 id="个人信息">个人信息</h4>
+<dl>
+<dt>名字</dt>
+<dd>Channy</dd>
+<dt>邮箱</dt>
+<dd>349117102@qq.com</dd>
+</dl>
 <hr />
 
 <p><a href="./">返回</a></p>

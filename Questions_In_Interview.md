@@ -13,8 +13,12 @@ layout: default
 
 ## C Plus
 
-1. 静态库和动态库的区别
+0. c和c++的区别
 
+1. virtual函数，虚函数表
+
+### STL
+	
 1. STL库，vector迭代器，map的实现
 
 	![Iterator](https://raw.githubusercontent.com/qanny/qanny.github.io/master/assets/images/iterator.png)
@@ -28,6 +32,22 @@ layout: default
 	迭代器失效：remove/delete
 	
 	vector内存分配：当第一次申请的空间L不够时，第二次申请会申请2L的空间并把原来的数据copy过去
+
+1. 实现STL中的string
+
+	```c++
+	char * strcpy(char * strDest,const char * strSrc) {
+		assert((strDest!=NULL) && (strSrc !=NULL));
+		char * strDestCopy=strDest;
+		while ((*strDest++=*strSrc++)!='\0'); 
+		return strDestCopy;
+	}
+	```
+
+### 其它
+
+1. 静态库和动态库的区别
+
 
 1. const, static
 
@@ -84,17 +104,6 @@ layout: default
 	shared memory
 	
 	socket
-
-1. 实现STL中的string
-
-	```c++
-	char * strcpy(char * strDest,const char * strSrc) {
-		assert((strDest!=NULL) && (strSrc !=NULL));
-		char * strDestCopy=strDest;
-		while ((*strDest++=*strSrc++)!='\0'); 
-		return strDestCopy;
-	}
-	```
 	
 1. 内存分配
 
