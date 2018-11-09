@@ -4,7 +4,7 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/assets/css/style.css?v=7447a39df6695448d4d7e917d55a726d0489c730">
+    <link rel="stylesheet" href="/assets/css/style.css?v=6bf742af75fbf2c75ea51b30383f2283e2bb57ac">
 
 <!-- Begin Jekyll SEO tag v2.5.0 -->
 <title>channy’s page | Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.</title>
@@ -17,7 +17,7 @@
 <meta property="og:url" content="http://localhost:4000/Python_To_Do_Something_I_Like.html" />
 <meta property="og:site_name" content="channy’s page" />
 <script type="application/ld+json">
-{"description":"Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.","@type":"WebPage","url":"http://localhost:4000/Python_To_Do_Something_I_Like.html","headline":"channy’s page","@context":"http://schema.org"}</script>
+{"@type":"WebPage","headline":"channy’s page","url":"http://localhost:4000/Python_To_Do_Something_I_Like.html","description":"Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.","@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
   </head>
@@ -91,6 +91,165 @@
  <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
  
 <span class="n">saveAsPng_1</span><span class="p">();</span>
+</code></pre></div></div>
+
+<h2 id="背日语单词">背日语单词</h2>
+<p>经验：接口和版本对应</p>
+
+<p>用的Tkinter做界面</p>
+
+<p>Tkinter版本不一样接口不一样</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#coding: utf-8</span>
+<span class="kn">import</span> <span class="nn">Tkinter</span>
+<span class="kn">import</span> <span class="nn">MySQLdb</span>
+<span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="c">#import pandas as pd</span>
+
+<span class="n">curIdx</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">answer</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">isShowAnswer</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">what</span> <span class="o">=</span> <span class="p">[</span><span class="s">"mean"</span><span class="p">,</span> <span class="s">"prononce"</span><span class="p">,</span> <span class="s">"word"</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">initWidget</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">mainWin</span>
+    <span class="n">mainWin</span> <span class="o">=</span> <span class="n">Tkinter</span><span class="o">.</span><span class="n">Tk</span><span class="p">()</span>
+    <span class="n">mainWin</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">"Come on, channy"</span><span class="p">)</span>
+    <span class="n">mainWin</span><span class="o">.</span><span class="n">attributes</span><span class="p">(</span><span class="s">'-alpha'</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+ 
+    <span class="k">global</span> <span class="n">isShowAnswer</span>
+    <span class="n">isShowAnswer</span> <span class="o">=</span> <span class="n">Tkinter</span><span class="o">.</span><span class="n">IntVar</span><span class="p">()</span>
+    <span class="n">isShowAnswer</span><span class="o">.</span><span class="nb">set</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">global</span> <span class="n">isTestWhat</span>
+    <span class="n">isTestWhat</span> <span class="o">=</span> <span class="n">Tkinter</span><span class="o">.</span><span class="n">StringVar</span><span class="p">()</span>
+    <span class="n">isTestWhat</span><span class="o">.</span><span class="nb">set</span><span class="p">(</span><span class="n">what</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">global</span> <span class="n">isGivenWhat</span>
+    <span class="n">isGivenWhat</span> <span class="o">=</span> <span class="n">Tkinter</span><span class="o">.</span><span class="n">StringVar</span><span class="p">()</span>
+    <span class="n">isGivenWhat</span><span class="o">.</span><span class="nb">set</span><span class="p">(</span><span class="n">what</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">showAnsBtn</span> <span class="o">=</span> <span class="n">Tkinter</span><span class="o">.</span><span class="n">Checkbutton</span><span class="p">(</span><span class="n">mainWin</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s">"show answer"</span><span class="p">,</span> <span class="n">variable</span><span class="o">=</span><span class="n">isShowAnswer</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="n">showAnswer</span><span class="p">,</span> <span class="n">onvalue</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">offvalue</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">showAnsBtn</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+    <span class="n">Tkinter</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">mainWin</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s">"test what:"</span><span class="p">)</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+    <span class="n">testWhatBtn</span> <span class="o">=</span> <span class="n">Tkinter</span><span class="o">.</span><span class="n">OptionMenu</span><span class="p">(</span><span class="n">mainWin</span><span class="p">,</span> <span class="n">isTestWhat</span><span class="p">,</span> <span class="n">what</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">what</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">what</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">testWhatBtn</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+    <span class="n">Tkinter</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">mainWin</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s">"given what:"</span><span class="p">)</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+    <span class="n">givenWhatBtn</span> <span class="o">=</span> <span class="n">Tkinter</span><span class="o">.</span><span class="n">OptionMenu</span><span class="p">(</span><span class="n">mainWin</span><span class="p">,</span> <span class="n">isGivenWhat</span><span class="p">,</span> <span class="n">what</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">what</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">what</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">givenWhatBtn</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+    <span class="n">Tkinter</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">mainWin</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s">"Select the meaning of Word:"</span><span class="p">)</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+    <span class="n">deleteBtn</span> <span class="o">=</span> <span class="n">Tkinter</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">mainWin</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s">"Delete this word"</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="n">deleteWord</span><span class="p">)</span>
+    <span class="n">deleteBtn</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+    <span class="n">readBtn</span> <span class="o">=</span> <span class="n">Tkinter</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">mainWin</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s">"Read File"</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="n">readFile</span><span class="p">)</span>
+    <span class="n">readBtn</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+    <span class="n">aboutBtn</span> <span class="o">=</span> <span class="n">Tkinter</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">mainWin</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s">"About"</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="n">about</span><span class="p">)</span> 
+    <span class="n">aboutBtn</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>  
+
+    <span class="k">global</span> <span class="n">wordLabel</span>
+    <span class="n">wordLabel</span> <span class="o">=</span> <span class="n">Tkinter</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">mainWin</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s">"word"</span><span class="p">)</span>
+    <span class="n">wordLabel</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+    <span class="k">global</span> <span class="n">selectAns</span>
+    <span class="n">selectAns</span> <span class="o">=</span> <span class="n">Tkinter</span><span class="o">.</span><span class="n">IntVar</span><span class="p">()</span>
+    <span class="n">selectAns</span><span class="o">.</span><span class="nb">set</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+  
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+        <span class="n">answer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Tkinter</span><span class="o">.</span><span class="n">Radiobutton</span><span class="p">(</span><span class="n">mainWin</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s">"A"</span><span class="p">,</span> <span class="n">variable</span><span class="o">=</span><span class="n">selectAns</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="n">showAnswer</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">answer</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+    <span class="n">showWord</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">deleteDB</span><span class="p">():</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">"test.db"</span><span class="p">)</span>
+    <span class="n">cursor</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">"DROP TABLE IF EXISTS WORDS"</span><span class="p">)</span> 
+    <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span> 
+
+<span class="k">def</span> <span class="nf">readFile</span><span class="p">():</span>
+    <span class="n">wordFile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">'words.txt'</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">words</span> <span class="o">=</span> <span class="n">wordFile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">wordFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+ 
+    <span class="n">db</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">"test.db"</span><span class="p">)</span>
+    <span class="n">cursor</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">"DROP TABLE IF EXISTS WORDS"</span><span class="p">)</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">"CREATE TABLE WORDS(ORIGINWORD CHAR(20) NOT NULL, PRONONCE CHAR(20), MEANING CHAR(20), NONE CHAR(10), FRIQUENCY INT)"</span><span class="p">)</span>
+  
+    <span class="n">insertSql</span> <span class="o">=</span> <span class="s">""</span>
+    <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span><span class="p">:</span> 
+        <span class="n">words</span> <span class="o">=</span> <span class="n">word</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">' '</span><span class="p">)</span>
+        <span class="n">lenOfWords</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">lenOfWords</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">wordSplit</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">'[(,)]'</span><span class="p">,</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> 
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wordSplit</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">insertSql</span> <span class="o">=</span> <span class="s">"INSERT INTO WORDS(ORIGINWORD, PRONONCE, MEANING, NONE, FRIQUENCY) values ('</span><span class="si">%</span><span class="s">s', '</span><span class="si">%</span><span class="s">s', '</span><span class="si">%</span><span class="s">s', '</span><span class="si">%</span><span class="s">s', 0)"</span><span class="o">%</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">insertSql</span> <span class="o">=</span> <span class="s">"INSERT INTO WORDS(ORIGINWORD, PRONONCE, MEANING, NONE, FRIQUENCY) values ('</span><span class="si">%</span><span class="s">s', '</span><span class="si">%</span><span class="s">s', '</span><span class="si">%</span><span class="s">s', '</span><span class="si">%</span><span class="s">s', 0)"</span><span class="o">%</span><span class="p">(</span><span class="n">wordSplit</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">wordSplit</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">insertSql</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span> 
+
+<span class="k">def</span> <span class="nf">readDb</span><span class="p">():</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">"test.db"</span><span class="p">)</span>
+    <span class="n">cursor</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>  
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">"SELECT * FROM WORDS"</span><span class="p">)</span>
+    <span class="n">words</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span> 
+    <span class="k">return</span> <span class="n">words</span>
+
+<span class="k">def</span> <span class="nf">deleteWord</span><span class="p">():</span> 
+    <span class="n">db</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">"test.db"</span><span class="p">)</span>
+    <span class="n">cursor</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">"DELETE FROM WORDS WHERE ORIGINWORD = </span><span class="si">%</span><span class="s">s"</span><span class="o">%</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="n">curIdx</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">about</span><span class="p">():</span>
+    <span class="n">aboutWin</span> <span class="o">=</span> <span class="n">Tkinter</span><span class="o">.</span><span class="n">Tk</span><span class="p">()</span>
+    <span class="n">Tkinter</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">aboutWin</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s">"Come on"</span><span class="p">)</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+    <span class="n">aboutWin</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">"About"</span><span class="p">)</span> 
+
+<span class="k">def</span> <span class="nf">showAnswer</span><span class="p">():</span>
+    <span class="n">answer</span><span class="p">[</span><span class="n">curIdx</span><span class="p">][</span><span class="s">'fg'</span><span class="p">]</span> <span class="o">=</span> <span class="s">'green'</span>
+    <span class="n">wordLabel</span><span class="o">.</span><span class="n">after</span><span class="p">(</span><span class="mi">5000</span><span class="p">,</span> <span class="n">showWord</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">showWord</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">curIdx</span>
+    <span class="n">selectAns</span><span class="o">.</span><span class="nb">set</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> 
+    <span class="n">answer</span><span class="p">[</span><span class="n">curIdx</span><span class="p">][</span><span class="s">'fg'</span><span class="p">]</span> <span class="o">=</span> <span class="s">'black'</span>
+    <span class="n">words</span> <span class="o">=</span> <span class="n">readDb</span><span class="p">()</span>
+    <span class="n">lenOfWords</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+    <span class="n">idxs</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">lenOfWords</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="n">curIdx</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    
+    <span class="n">wordIdx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">ansIdx</span> <span class="o">=</span> <span class="mi">0</span> <span class="c">#test mean</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">isGivenWhat</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="o">==</span> <span class="s">"mean"</span><span class="p">):</span>
+        <span class="n">wordIdx</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">isGivenWhat</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="o">==</span> <span class="s">"prononce"</span><span class="p">):</span>
+        <span class="n">wordIdx</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">isTestWhat</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="o">==</span> <span class="s">"mean"</span><span class="p">):</span>
+        <span class="n">ansIdx</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">isTestWhat</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="o">==</span> <span class="s">"prononce"</span><span class="p">):</span>
+        <span class="n">ansIdx</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">wordLabel</span><span class="p">[</span><span class="s">'text'</span><span class="p">]</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="n">idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">wordIdx</span><span class="p">]</span>
+    <span class="n">answer</span><span class="p">[</span><span class="n">curIdx</span><span class="p">][</span><span class="s">'text'</span><span class="p">]</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="n">idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ansIdx</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">curIdx</span> <span class="o">==</span> <span class="n">i</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">answer</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s">'text'</span><span class="p">]</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="n">idxs</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">if</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">curIdx</span><span class="p">)</span> <span class="k">else</span> <span class="n">i</span><span class="p">]][</span><span class="n">ansIdx</span><span class="p">]</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">isShowAnswer</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">showAnswer</span><span class="p">()</span> 
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="n">initWidget</span><span class="p">()</span>
+    <span class="n">mainWin</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>     
+
 </code></pre></div></div>
 
 <p><a href="./">back</a></p>

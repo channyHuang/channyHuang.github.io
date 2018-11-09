@@ -4,7 +4,7 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/assets/css/style.css?v=7447a39df6695448d4d7e917d55a726d0489c730">
+    <link rel="stylesheet" href="/assets/css/style.css?v=6bf742af75fbf2c75ea51b30383f2283e2bb57ac">
 
 <!-- Begin Jekyll SEO tag v2.5.0 -->
 <title>channy’s page | Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.</title>
@@ -17,7 +17,7 @@
 <meta property="og:url" content="http://localhost:4000/Questions_In_Interview.html" />
 <meta property="og:site_name" content="channy’s page" />
 <script type="application/ld+json">
-{"description":"Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.","@type":"WebPage","url":"http://localhost:4000/Questions_In_Interview.html","headline":"channy’s page","@context":"http://schema.org"}</script>
+{"@type":"WebPage","headline":"channy’s page","url":"http://localhost:4000/Questions_In_Interview.html","description":"Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.","@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
   </head>
@@ -54,8 +54,16 @@
 
 <ol>
   <li>
-    <p>静态库和动态库的区别</p>
+    <p>c和c++的区别</p>
   </li>
+  <li>
+    <p>virtual函数，虚函数表</p>
+  </li>
+</ol>
+
+<h3 id="stl">STL</h3>
+
+<ol>
   <li>
     <p>STL库，vector迭代器，map的实现</p>
 
@@ -70,6 +78,25 @@
     <p>迭代器失效：remove/delete</p>
 
     <p>vector内存分配：当第一次申请的空间L不够时，第二次申请会申请2L的空间并把原来的数据copy过去</p>
+  </li>
+  <li>
+    <p>实现STL中的string</p>
+
+    <div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="kt">char</span> <span class="o">*</span> <span class="nf">strcpy</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span> <span class="n">strDest</span><span class="p">,</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">strSrc</span><span class="p">)</span> <span class="p">{</span>
+     <span class="n">assert</span><span class="p">((</span><span class="n">strDest</span><span class="o">!=</span><span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">strSrc</span> <span class="o">!=</span><span class="nb">NULL</span><span class="p">));</span>
+     <span class="kt">char</span> <span class="o">*</span> <span class="n">strDestCopy</span><span class="o">=</span><span class="n">strDest</span><span class="p">;</span>
+     <span class="k">while</span> <span class="p">((</span><span class="o">*</span><span class="n">strDest</span><span class="o">++=*</span><span class="n">strSrc</span><span class="o">++</span><span class="p">)</span><span class="o">!=</span><span class="sc">'\0'</span><span class="p">);</span> 
+     <span class="k">return</span> <span class="n">strDestCopy</span><span class="p">;</span>
+ <span class="p">}</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h3 id="其它">其它</h3>
+
+<ol>
+  <li>
+    <p>静态库和动态库的区别</p>
   </li>
   <li>
     <p>const, static</p>
@@ -133,17 +160,6 @@
     <p>shared memory</p>
 
     <p>socket</p>
-  </li>
-  <li>
-    <p>实现STL中的string</p>
-
-    <div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="kt">char</span> <span class="o">*</span> <span class="nf">strcpy</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span> <span class="n">strDest</span><span class="p">,</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">strSrc</span><span class="p">)</span> <span class="p">{</span>
-     <span class="n">assert</span><span class="p">((</span><span class="n">strDest</span><span class="o">!=</span><span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">strSrc</span> <span class="o">!=</span><span class="nb">NULL</span><span class="p">));</span>
-     <span class="kt">char</span> <span class="o">*</span> <span class="n">strDestCopy</span><span class="o">=</span><span class="n">strDest</span><span class="p">;</span>
-     <span class="k">while</span> <span class="p">((</span><span class="o">*</span><span class="n">strDest</span><span class="o">++=*</span><span class="n">strSrc</span><span class="o">++</span><span class="p">)</span><span class="o">!=</span><span class="sc">'\0'</span><span class="p">);</span> 
-     <span class="k">return</span> <span class="n">strDestCopy</span><span class="p">;</span>
- <span class="p">}</span>
-</code></pre></div>    </div>
   </li>
   <li>
     <p>内存分配</p>

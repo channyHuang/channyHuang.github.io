@@ -13,11 +13,11 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others." />
 <meta property="og:description" content="Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others." />
-<link rel="canonical" href="http://localhost:4000/Trifles.html" />
-<meta property="og:url" content="http://localhost:4000/Trifles.html" />
+<link rel="canonical" href="http://localhost:4000/Linux_Network_Programming_Notes.html" />
+<meta property="og:url" content="http://localhost:4000/Linux_Network_Programming_Notes.html" />
 <meta property="og:site_name" content="channy’s page" />
 <script type="application/ld+json">
-{"@type":"WebPage","headline":"channy’s page","url":"http://localhost:4000/Trifles.html","description":"Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.","@context":"http://schema.org"}</script>
+{"@type":"WebPage","headline":"channy’s page","url":"http://localhost:4000/Linux_Network_Programming_Notes.html","description":"Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.","@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
   </head>
@@ -41,9 +41,43 @@
 
     <div class="container">
       <section id="main_content">
-        <p>(20180927) I’m looking for a job now……job…job…job…</p>
+        <p>//Author: channy</p>
+
+<p>//Create Date: 2018-10-16 11:30:25</p>
+
+<p>//Description: 学习《Linux网络编程（第二版）》一书时的一点笔记</p>
+
+<h1 id="linux_network_programming_notes">Linux_Network_Programming_Notes</h1>
+
+<p>实验环境： Ubuntu 16.04, g++</p>
+
+<h2 id="441-pthreadc">4.4.1 pthread.c</h2>
+<p>thread.cpp: In function ‘void* start_routine(void*)’:</p>
+
+<p>thread.cpp:13:17: error: invalid conversion from ‘void<em>’ to ‘int</em>’ [-fpermissive]</p>
+
+<p>int *running = arg;</p>
+
+<p>-&gt; 需要显式转换(int*)arg</p>
+
+<p>/usr/include/pthread.h:233:12: note:   initializing argument 3 of ‘int pthread_create(pthread_t<em>, const pthread_attr_t</em>, void* (<em>)(void</em>), void*)’
+extern int pthread_create (pthread_t *__restrict __newthread,</p>
+
+<p>-&gt; start_routine不用转换</p>
+
+<p>thread.cpp:40:35: error: invalid conversion from ‘void<em>’ to ‘void**’ [-fpermissive]
+  pthread_join(pt, (void</em>)&amp;ret_join);</p>
+
+<p>-&gt;ret_join改为void *</p>
+
+<p>thread.cpp:(.text+0x103): undefined reference to ‘pthread_create’</p>
+
+<p>thread.cpp:(.text+0x171): undefined reference to ‘pthread_join’</p>
+
+<p>-&gt; 需要加参数-lpthread,因为pthread库不是 Linux 系统默认的库， g++ thread.cpp -lpthread</p>
 
 <p><a href="./">back</a></p>
+
 
       </section>
     </div>
