@@ -36,11 +36,15 @@ layout: default
 
 [Head_File_Include_Each_Other](./Head_File_Include_Each_Other)
 
+[Notes_And_Bugs_In_Work](./Notes_And_Bugs_In_Work)
+
 **Linux**
 
 [Generate_Head_Using_Shell](./Generate_Head_Using_Shell.html)
 
 [Linux_Basic_Comment](./Linux_Basic_Comment)
+
+[Linux_Network_Programming_Notes](./Linux_Network_Programming_Notes)
 
 **Android**
 

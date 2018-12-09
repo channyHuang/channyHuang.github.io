@@ -28,11 +28,15 @@ layout: default
 
 [头文件相互包含](./Head_File_Include_Each_Other)
 
+[工作中的笔记和bug](./Notes_And_Bugs_In_Work)
+
 **Linux**
 
 [用Shell自动生成博客文章的固定部分](./Generate_Head_Using_Shell.html)
 
 [Linux基本命令](./Linux_Basic_Comment)
+
+[Linux网络编程笔记](./Linux_Network_Programming_Notes)
 
 **Android**
 
