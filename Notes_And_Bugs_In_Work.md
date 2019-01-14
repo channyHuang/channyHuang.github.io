@@ -6,7 +6,7 @@ layout: default
 
 //Create Date: 2018-11-26 23:55:39
 
-//Description: 
+//Description: 笔记
 
 # BUGS_IN_WORK
 
@@ -21,3 +21,5 @@ layout: default
 > Sun Dec 16 23:10:01 CST 2018 + 写了个shell自动添加时间，终于可以愉快地写日记了
 
 > Mon Dec 17 23:06:42 CST 2018 + 永远不要高估从别的地方传进来的数据的正确性，做好所有异常处理才是王道——又一个bug的教训。
+
+> 2019-01-14 18:21:14 Qt信号和槽在非Qt环境下需要在子线程中运行 
