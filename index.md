@@ -32,6 +32,8 @@ layout: default
 
 [Process_Mointor(get info of target process)](./Process_Monitor)
 
+[Qt_In_Linux](./Qt_In_Linux)
+
 [Summary_Of_Coding_Errors](./Summary_Of_Coding_Errors)
 
 [Matlab_And_C_Combining_Coding](./Matlab_And_C_Combining_Coding)
@@ -55,6 +57,9 @@ layout: default
 [Android_Crack](./Android_Crack.html)
 
 [Android_Rebuid_Notes](./Android_Rebuid_Notes)
+
+**Daily convenience command**
+[Notes_In_Daily_Coding_Life](./Notes_In_Daily_Coding_Life)
 
 **Other subjects**
 
@@ -101,6 +106,13 @@ for (int i = 0; i <= forever; i++) {
 | English      | TOEFL(87), GRE(140+170+2.5)|
 | Korean       | TOPIK(level 4)             |
 | French       | A2                         |
+
+### Work experience
+
+| Duration          | Company                           | Occupation        |
+|:------------------|:----------------------------------|:------------------|
+| 2017.04 - 2018.08 | Samsung Electric Company          | Software Engineer |
+| 2018.11 - now 	| ...								| C++ Engineer   	|
 
 ### Previous projects
 

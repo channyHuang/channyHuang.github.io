@@ -24,6 +24,8 @@ layout: default
 
 [进程监控（获取指定进程的信息）](./Process_Monitor)
 
+[在Linux下跑Qt应用程序](./Qt_In_Linux)
+
 [代码错误总结](./Summary_Of_Coding_Errors)
 
 [Matlab和C相互调用](./Matlab_And_C_Combining_Coding)
@@ -47,6 +49,9 @@ layout: default
 [Android逆向](./Android_Crack.html)
 
 [Android反编译](./Android_Rebuid_Notes)
+
+**Daily convenience command**
+[日常用到的命令笔记](./Notes_In_Daily_Coding_Life)
 
 **Other subjects**
 
