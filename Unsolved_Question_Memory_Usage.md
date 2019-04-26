@@ -76,5 +76,88 @@ My test file contains about 1,500,000 lines and each line contains 5 '\t' so 6 f
 
 Or because of class alignment? pAddr took 32bytes so are others? But it sounds ridiculous...
 
+Here is total main.cpp (using Qt)
+```c++
+#include <QCoreApplication>
+
+#include <QDebug>
+
+#include <list>
+using namespace std;
+
+class RawStrsWrapper
+{
+    char **rawss;
+    int *sscp;
+    int *StrCountP;
+public:
+    RawStrsWrapper(int count)
+    {
+        rawss=new char*[count];
+        sscp=new int;
+        *sscp=1;
+        StrCountP=new int;
+        *StrCountP=count;
+        for(int i=0;i<count;++i)
+            rawss[i]=NULL;
+    }
+    ~RawStrsWrapper()
+    {
+        if (--*sscp==0)
+        {
+            delete[] rawss;
+            delete sscp;
+            delete StrCountP;
+        }
+    }
+    RawStrsWrapper(const RawStrsWrapper &aSw)
+    {
+        ++(*aSw.sscp);
+        StrCountP=aSw.StrCountP;
+        rawss=aSw.rawss;
+        sscp=aSw.sscp;
+    }
+    RawStrsWrapper operator=(const RawStrsWrapper & aSw)
+    {
+        ++(*aSw.sscp);
+        if (--*sscp==0)
+        {
+            delete [] rawss;
+            delete sscp;
+            delete StrCountP;
+        }
+        StrCountP=aSw.StrCountP;
+        rawss=aSw.rawss;
+        sscp=aSw.sscp;
+        return *this;
+    }
+    char* &operator[](int id)
+    {
+        if (id<0 || id>=(*StrCountP)) return rawss[0];
+        return rawss[id];
+    }
+    int GetStrCount()
+    {
+        return (*StrCountP);
+    }
+};
+
+int main(int argc, char *argv[])
+{
+    QCoreApplication a(argc, argv);
+
+    list<RawStrsWrapper> m_Table;
+
+    for (int i = 0; i < 100000; i++)
+    {
+        RawStrsWrapper strW(6);
+        m_Table.push_back(strW);
+    }
+
+    return a.exec();
+}
+
+```
+
 
 [back](./)
