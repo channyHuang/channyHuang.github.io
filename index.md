@@ -30,6 +30,8 @@ layout: default
 
 **C++**
 
+[Notes_Find_Memory_Leak](./Notes_Find_Memory_Leak)
+
 [Unsolved_Question_Memory_Usage](./Unsolved_Question_Memory_Usage)
 
 [Process_Mointor(get info of target process)](./Process_Monitor)
@@ -46,6 +48,8 @@ layout: default
 
 **Linux**
 
+[Notes_SerialPort_In_Linux](./Notes_SerialPort_In_Linux)
+
 [Generate_Head_Using_Shell](./Generate_Head_Using_Shell.html)
 
 [Linux_Basic_Comment](./Linux_Basic_Comment)
@@ -61,6 +65,7 @@ layout: default
 [Android_Rebuid_Notes](./Android_Rebuid_Notes)
 
 **Daily convenience command**
+
 [Notes_In_Daily_Coding_Life](./Notes_In_Daily_Coding_Life)
 
 **Other subjects**

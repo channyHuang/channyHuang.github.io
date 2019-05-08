@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/assets/css/style.css?v=bef2a282efa515fa0082e785f997fde9f4b7c8a0">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>channy’s page | Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.</title>
+<meta name="generator" content="Jekyll v3.7.4" />
+<meta property="og:title" content="channy’s page" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others." />
+<meta property="og:description" content="Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others." />
+<link rel="canonical" href="http://localhost:4000/Notes_SerialPort_In_Linux.html" />
+<meta property="og:url" content="http://localhost:4000/Notes_SerialPort_In_Linux.html" />
+<meta property="og:site_name" content="channy’s page" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"channy’s page","url":"http://localhost:4000/Notes_SerialPort_In_Linux.html","description":"Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>channy's page</h1>
+        <h2>Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.</h2>
+
+        <section id="downloads">
+          
+            <a href="http://github.com/qanny/qanny.github.io/zipball/gh-pages" class="btn">Download as .zip</a>
+            <a href="http://github.com/qanny/qanny.github.io/tarball/gh-pages" class="btn">Download as .tar.gz</a>
+          
+          <a href="http://github.com/qanny/qanny.github.io" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <p>//Author: channy</p>
+
+<p>//Create Date: 2019-05-06 22:35:45</p>
+
+<p>//Description:</p>
+
+<h1 id="notes_serialport_in_linux">Notes_SerialPort_In_Linux</h1>
+
+<p>Tools: cutecom</p>
+
+<p>工具：cutecom</p>
+
+<p>first, install cutecom using the following command</p>
+
+<p>先用下面的命令安装cutecom</p>
+
+<blockquote>
+  <p>sudo apt install cutecom</p>
+</blockquote>
+
+<p>配置，配置文件在下面路径</p>
+
+<p>then, config cutecom, in ~/.config/cutecom/cutecom5</p>
+
+<p>if forget this path, can use <code class="highlighter-rouge">man config</code> command for help.</p>
+
+<p>如果忘了该路径，可以用 <code class="highlighter-rouge">man config</code> 找找看</p>
+
+<p>or type serialport name directory in cutecom GUI.</p>
+
+<p>或者直接在cutecom的界面上输入端口号</p>
+
+<p>If the target PC does not have serialport, or other situation (for example, virtual machine), then can use virtual port</p>
+
+<p>如果目标机器没有端口，可以用虚拟端口</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#! /usr/bin/env python</span>
+<span class="c">#coding=utf-8</span>
+
+<span class="kn">import</span> <span class="nn">pty</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">select</span>
+
+<span class="k">def</span> <span class="nf">mkpty</span><span class="p">():</span>
+    <span class="n">master1</span><span class="p">,</span> <span class="n">slave</span> <span class="o">=</span> <span class="n">pty</span><span class="o">.</span><span class="n">openpty</span><span class="p">()</span>
+    <span class="n">slaveName1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">ttyname</span><span class="p">(</span><span class="n">slave</span><span class="p">)</span>
+    <span class="n">master2</span><span class="p">,</span> <span class="n">slave</span> <span class="o">=</span> <span class="n">pty</span><span class="o">.</span><span class="n">openpty</span><span class="p">()</span>
+    <span class="n">slaveName2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">ttyname</span><span class="p">(</span><span class="n">slave</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">'</span><span class="se">\n</span><span class="s">slavedevice names: '</span><span class="p">,</span> <span class="n">slaveName1</span><span class="p">,</span> <span class="n">slaveName2</span>
+    <span class="k">return</span> <span class="n">master1</span><span class="p">,</span> <span class="n">master2</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+
+    <span class="n">master1</span><span class="p">,</span> <span class="n">master2</span> <span class="o">=</span> <span class="n">mkpty</span><span class="p">()</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">rl</span><span class="p">,</span> <span class="n">wl</span><span class="p">,</span> <span class="n">el</span> <span class="o">=</span> <span class="n">select</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="n">master1</span><span class="p">,</span><span class="n">master2</span><span class="p">],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">master</span> <span class="ow">in</span> <span class="n">rl</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">master</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+            <span class="k">print</span> <span class="s">"read </span><span class="si">%</span><span class="s">d data."</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">master</span><span class="o">==</span><span class="n">master1</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">master2</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">master1</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>test: using virtual port</p>
+
+<p>然后就可以愉快地调试啦～</p>
+
+<p><a href="./">back</a></p>
+
+
+      </section>
+    </div>
+
+    
+  </body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/assets/css/style.css?v=bef2a282efa515fa0082e785f997fde9f4b7c8a0">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>channy’s page | Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.</title>
+<meta name="generator" content="Jekyll v3.7.4" />
+<meta property="og:title" content="channy’s page" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others." />
+<meta property="og:description" content="Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others." />
+<link rel="canonical" href="http://localhost:4000/Unsolved_Question_Memory_Usage.html" />
+<meta property="og:url" content="http://localhost:4000/Unsolved_Question_Memory_Usage.html" />
+<meta property="og:site_name" content="channy’s page" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"channy’s page","url":"http://localhost:4000/Unsolved_Question_Memory_Usage.html","description":"Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>channy's page</h1>
+        <h2>Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.</h2>
+
+        <section id="downloads">
+          
+            <a href="http://github.com/qanny/qanny.github.io/zipball/gh-pages" class="btn">Download as .zip</a>
+            <a href="http://github.com/qanny/qanny.github.io/tarball/gh-pages" class="btn">Download as .tar.gz</a>
+          
+          <a href="http://github.com/qanny/qanny.github.io" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <p>//Author: channy</p>
+
+<p>//Create Date: 2019-04-25 16:43:33</p>
+
+<p>//Description: unsolved questions in work</p>
+
+<h1 id="about-memory-usage">About Memory Usage</h1>
+<p>Here I defined a calss to store strings.</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">calss</span> <span class="n">MyString</span>
+<span class="p">{</span>
+	<span class="kt">char</span> <span class="o">**</span><span class="n">pAddr</span><span class="p">;</span> 
+	<span class="kt">int</span> <span class="o">*</span><span class="n">pCount</span><span class="p">;</span> <span class="c1">//be used how many times
+</span>	<span class="kt">int</span> <span class="o">*</span><span class="n">pAddrCount</span><span class="p">;</span>
+<span class="k">public</span><span class="o">:</span>
+	<span class="n">MyString</span><span class="p">(</span><span class="kt">int</span> <span class="n">count</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="n">pAddr</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">char</span><span class="o">*</span><span class="p">[</span><span class="n">count</span><span class="p">];</span>
+		<span class="n">pCount</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="p">;</span>
+		<span class="o">*</span><span class="n">pCount</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+		<span class="n">pAddrCount</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="p">;</span>
+		<span class="o">*</span><span class="n">pAddrCount</span> <span class="o">=</span> <span class="n">count</span><span class="p">;</span>
+	<span class="p">}</span>
+	<span class="o">~</span><span class="n">MyString</span><span class="p">()</span>
+	<span class="p">{</span>
+		<span class="k">if</span> <span class="p">(</span><span class="o">--*</span><span class="n">pCount</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="p">{</span>
+			<span class="k">delete</span> <span class="p">[]</span> <span class="n">pAddr</span><span class="p">;</span>
+			<span class="k">delete</span> <span class="n">pCount</span><span class="p">;</span>
+			<span class="k">delete</span> <span class="n">pAddrCount</span><span class="p">;</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="c1">//...
+</span><span class="p">}</span>
+</code></pre></div></div>
+
+<p>Each time I new a MyString, for example
+<strong>MyString mystring(6)</strong>
+then it will takes (6 + 2) * 4 = 32 bytes, right?</p>
+
+<p>now I have about 1,500,000 strings to be stored, when I save them into a list, it costs me about 140M memory, why?</p>
+
+<p>I use it like this</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">std</span><span class="o">::</span><span class="n">list</span><span class="o">&lt;</span><span class="n">MyString</span><span class="o">&gt;</span> <span class="n">mystrings</span><span class="p">;</span>
+
+<span class="kt">bool</span> <span class="nf">readLine</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">line</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="kt">char</span> <span class="o">*</span><span class="n">p</span><span class="p">;</span>
+	<span class="kt">char</span> <span class="o">*</span><span class="n">buf</span> <span class="o">=</span> <span class="n">line</span><span class="p">;</span>
+	
+	<span class="n">MyString</span> <span class="n">mystring</span><span class="p">(</span><span class="mi">6</span><span class="p">);</span>
+	<span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+	
+	<span class="k">while</span> <span class="p">(</span><span class="n">line</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="n">mystring</span><span class="p">[</span><span class="n">i</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="n">line</span><span class="p">;</span>
+		<span class="kt">char</span> <span class="o">*</span><span class="n">nextStart</span> <span class="o">=</span> <span class="n">strchr</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="sc">'\t'</span><span class="p">);</span>
+		<span class="k">if</span> <span class="p">(</span><span class="n">nextStart</span><span class="p">)</span>
+			<span class="n">line</span> <span class="o">=</span> <span class="n">nextStart</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+		<span class="k">else</span> 
+			<span class="n">line</span> <span class="o">=</span> <span class="nb">nullptr</span><span class="p">;</span>
+	<span class="p">}</span>
+	
+	<span class="n">mystrings</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">mystring</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>My test file contains about 1,500,000 lines and each line contains 5 ‘\t’ so 6 fields, normally it should use 32*1,500,000 ~ 40M, but actually it used about 140M, why???</p>
+
+<p>Or because of class alignment? pAddr took 32bytes so are others? But it sounds ridiculous…</p>
+
+<p>Here is total main.cpp (using Qt)</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;QCoreApplication&gt;
+</span>
+<span class="cp">#include &lt;QDebug&gt;
+</span>
+<span class="cp">#include &lt;list&gt;
+</span><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">RawStrsWrapper</span>
+<span class="p">{</span>
+    <span class="kt">char</span> <span class="o">**</span><span class="n">rawss</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="o">*</span><span class="n">sscp</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="o">*</span><span class="n">StrCountP</span><span class="p">;</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">RawStrsWrapper</span><span class="p">(</span><span class="kt">int</span> <span class="n">count</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">rawss</span><span class="o">=</span><span class="k">new</span> <span class="kt">char</span><span class="o">*</span><span class="p">[</span><span class="n">count</span><span class="p">];</span>
+        <span class="n">sscp</span><span class="o">=</span><span class="k">new</span> <span class="kt">int</span><span class="p">;</span>
+        <span class="o">*</span><span class="n">sscp</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+        <span class="n">StrCountP</span><span class="o">=</span><span class="k">new</span> <span class="kt">int</span><span class="p">;</span>
+        <span class="o">*</span><span class="n">StrCountP</span><span class="o">=</span><span class="n">count</span><span class="p">;</span>
+        <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">count</span><span class="p">;</span><span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">rawss</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="nb">NULL</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="o">~</span><span class="n">RawStrsWrapper</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">--*</span><span class="n">sscp</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">delete</span><span class="p">[]</span> <span class="n">rawss</span><span class="p">;</span>
+            <span class="k">delete</span> <span class="n">sscp</span><span class="p">;</span>
+            <span class="k">delete</span> <span class="n">StrCountP</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">RawStrsWrapper</span><span class="p">(</span><span class="k">const</span> <span class="n">RawStrsWrapper</span> <span class="o">&amp;</span><span class="n">aSw</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="o">++</span><span class="p">(</span><span class="o">*</span><span class="n">aSw</span><span class="p">.</span><span class="n">sscp</span><span class="p">);</span>
+        <span class="n">StrCountP</span><span class="o">=</span><span class="n">aSw</span><span class="p">.</span><span class="n">StrCountP</span><span class="p">;</span>
+        <span class="n">rawss</span><span class="o">=</span><span class="n">aSw</span><span class="p">.</span><span class="n">rawss</span><span class="p">;</span>
+        <span class="n">sscp</span><span class="o">=</span><span class="n">aSw</span><span class="p">.</span><span class="n">sscp</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">RawStrsWrapper</span> <span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span> <span class="n">RawStrsWrapper</span> <span class="o">&amp;</span> <span class="n">aSw</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="o">++</span><span class="p">(</span><span class="o">*</span><span class="n">aSw</span><span class="p">.</span><span class="n">sscp</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">--*</span><span class="n">sscp</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">delete</span> <span class="p">[]</span> <span class="n">rawss</span><span class="p">;</span>
+            <span class="k">delete</span> <span class="n">sscp</span><span class="p">;</span>
+            <span class="k">delete</span> <span class="n">StrCountP</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">StrCountP</span><span class="o">=</span><span class="n">aSw</span><span class="p">.</span><span class="n">StrCountP</span><span class="p">;</span>
+        <span class="n">rawss</span><span class="o">=</span><span class="n">aSw</span><span class="p">.</span><span class="n">rawss</span><span class="p">;</span>
+        <span class="n">sscp</span><span class="o">=</span><span class="n">aSw</span><span class="p">.</span><span class="n">sscp</span><span class="p">;</span>
+        <span class="k">return</span> <span class="o">*</span><span class="k">this</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kt">char</span><span class="o">*</span> <span class="o">&amp;</span><span class="k">operator</span><span class="p">[](</span><span class="kt">int</span> <span class="n">id</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">id</span><span class="o">&lt;</span><span class="mi">0</span> <span class="o">||</span> <span class="n">id</span><span class="o">&gt;=</span><span class="p">(</span><span class="o">*</span><span class="n">StrCountP</span><span class="p">))</span> <span class="k">return</span> <span class="n">rawss</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+        <span class="k">return</span> <span class="n">rawss</span><span class="p">[</span><span class="n">id</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="kt">int</span> <span class="n">GetStrCount</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="p">(</span><span class="o">*</span><span class="n">StrCountP</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">QCoreApplication</span> <span class="n">a</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span>
+
+    <span class="n">list</span><span class="o">&lt;</span><span class="n">RawStrsWrapper</span><span class="o">&gt;</span> <span class="n">m_Table</span><span class="p">;</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">100000</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">RawStrsWrapper</span> <span class="n">strW</span><span class="p">(</span><span class="mi">6</span><span class="p">);</span>
+        <span class="n">m_Table</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">strW</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">a</span><span class="p">.</span><span class="n">exec</span><span class="p">();</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<p><a href="./">back</a></p>
+
+      </section>
+    </div>
+
+    
+  </body>
+</html>

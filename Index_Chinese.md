@@ -22,6 +22,8 @@ layout: default
 
 **C++**
 
+[笔记-查找内存泄漏](./Notes_Find_Memory_Leak)
+
 [未解决问题之内存使用量](./Unsolved_Question_Memory_Usage)
 
 [进程监控（获取指定进程的信息）](./Process_Monitor)
@@ -38,6 +40,8 @@ layout: default
 
 **Linux**
 
+[笔记-在linux下调试串口通信](./Notes_SerialPort_In_Linux)
+
 [用Shell自动生成博客文章的固定部分](./Generate_Head_Using_Shell.html)
 
 [Linux基本命令](./Linux_Basic_Comment)
@@ -53,6 +57,7 @@ layout: default
 [Android反编译](./Android_Rebuid_Notes)
 
 **Daily convenience command**
+
 [日常用到的命令笔记](./Notes_In_Daily_Coding_Life)
 
 **Other subjects**
