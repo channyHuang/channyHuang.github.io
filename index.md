@@ -34,6 +34,8 @@ layout: default
 
 [Unsolved_Question_Memory_Usage](./Unsolved_Question_Memory_Usage)
 
+[CPlus_Judge_Program_Alive](./blog/CPlus_Judge_Program_Alive)
+
 [Process_Mointor(get info of target process)](./Process_Monitor)
 
 [Qt_In_Linux](./Qt_In_Linux)
@@ -79,6 +81,10 @@ layout: default
 [Matlab_Gui_Params](./Matlab_Gui_Params)
 
 [Trifles](./Trifles.html)
+
+**Relax - outside of coding**
+
+[The_English_We_Speak](./fun/Notes_The_English_We_Speak)
 
 ## I want to tell you
 

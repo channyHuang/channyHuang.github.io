@@ -26,6 +26,8 @@ layout: default
 
 [未解决问题之内存使用量](./Unsolved_Question_Memory_Usage)
 
+[判断指定参数启动的进程是否存在](./blog/CPlus_Judge_Program_Alive)
+
 [进程监控（获取指定进程的信息）](./Process_Monitor)
 
 [在Linux下跑Qt应用程序](./Qt_In_Linux)
@@ -71,6 +73,10 @@ layout: default
 [Matlab的Gui参数传递](./Matlab_Gui_Params)
 
 [其它](./Trifles.html)
+
+**Relax - outside of coding**
+
+[The_English_We_Speak](./fun/Notes_The_English_We_Speak)
 
 ## 我想说
 
