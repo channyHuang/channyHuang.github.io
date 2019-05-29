@@ -8,71 +8,71 @@ layout: default
 
 **计算机视觉**
 
-[项目－三维重建系统](./Project_3D_Reconstruction.html)
+[项目－三维重建系统](./blog/CV/Project_3D_Reconstruction.html)
 
-[OpenCV特征点检测](./Feature_Detection_In_OpenCV.html)
+[OpenCV特征点检测](./blog/CV/Feature_Detection_In_OpenCV.html)
 
-[OpenCV特征点匹配](./Feature_Matching_In_OpenCV.html)
+[OpenCV特征点匹配](./blog/CV/Feature_Matching_In_OpenCV.html)
 
-[计算机参数和点云计算](./Compute_Camera_Params_and_Point_Cloud.html)
+[计算机参数和点云计算](./blog/CV/Compute_Camera_Params_and_Point_Cloud.html)
 
-[Kalman滤波](./Kalman_Filter)
+[Kalman滤波](./blog/CV/Kalman_Filter)
 
-[项目－重光照](./Project_Relighting.html)
+[项目－重光照](./blog/CV/Project_Relighting.html)
 
 **C++**
 
-[笔记-查找内存泄漏](./Notes_Find_Memory_Leak)
+[笔记-查找内存泄漏](./blog/C++/Notes_Find_Memory_Leak)
 
-[未解决问题之内存使用量](./Unsolved_Question_Memory_Usage)
+[未解决问题之内存使用量](./blog/C++/Unsolved_Question_Memory_Usage)
 
 [判断指定参数启动的进程是否存在](./blog/CPlus_Judge_Program_Alive)
 
-[进程监控（获取指定进程的信息）](./Process_Monitor)
+[进程监控（获取指定进程的信息）](./blog/C++/Process_Monitor)
 
-[在Linux下跑Qt应用程序](./Qt_In_Linux)
+[在Linux下跑Qt应用程序](./blog/linux/Qt_In_Linux)
 
-[代码错误总结](./Summary_Of_Coding_Errors)
+[代码错误总结](./blog/C++/Summary_Of_Coding_Errors)
 
-[Matlab和C相互调用](./Matlab_And_C_Combining_Coding)
+[Matlab和C相互调用](./blog/C++/Matlab_And_C_Combining_Coding)
 
-[头文件相互包含](./Head_File_Include_Each_Other)
+[头文件相互包含](./blog/C++/Head_File_Include_Each_Other)
 
-[工作中的笔记和bug](./Notes_And_Bugs_In_Work)
+[工作中的笔记和bug](./blog/C++/Notes_And_Bugs_In_Work)
 
 **Linux**
 
-[笔记-在linux下调试串口通信](./Notes_SerialPort_In_Linux)
+[笔记-在linux下调试串口通信](./blog/linux/Notes_SerialPort_In_Linux)
 
-[用Shell自动生成博客文章的固定部分](./Generate_Head_Using_Shell.html)
+[用Shell自动生成博客文章的固定部分](./blog/tools/Generate_Head_Using_Shell)
 
-[Linux基本命令](./Linux_Basic_Comment)
+[Linux基本命令](./blog/linux/Linux_Basic_Comment)
 
-[Linux网络编程笔记](./Linux_Network_Programming_Notes)
+[Linux网络编程笔记](./blog/linux/Linux_Network_Programming_Notes)
 
 **Android**
 
-[Android编译源码](./Android_Build_Source)
+[Android编译源码](./blog/Andorid/Android_Build_Source)
 
-[Android逆向](./Android_Crack.html)
+[Android逆向](./blog/Android/Android_Crack.html)
 
-[Android反编译](./Android_Rebuid_Notes)
+[Android反编译](./blog/Android/Android_Rebuid_Notes)
 
 **Daily convenience command**
 
-[日常用到的命令笔记](./Notes_In_Daily_Coding_Life)
+[日常用到的命令笔记](./blog/Notes_In_Daily_Coding_Life)
 
 **Other subjects**
 
-[面试中遇到过的问题总结](./Questions_In_Interview.html)
+[面试中遇到过的问题总结](./blog/Questions_In_Interview.html)
 
-[基础代码模板](./Model_Code_Of_InputOutput)
+[基础代码模板](./blog/others/Model_Code_Of_InputOutput)
 
-[用Python做自己喜欢的事情](./Python_To_Do_Something_I_Like)
+[用Python做自己喜欢的事情](./blog/others/Python_To_Do_Something_I_Like)
 
-[Matlab的Gui参数传递](./Matlab_Gui_Params)
+[Matlab的Gui参数传递](./blog/others/Matlab_Gui_Params)
 
-[其它](./Trifles.html)
+[其它](./blog/Trifles.html)
 
 **Relax - outside of coding**
 

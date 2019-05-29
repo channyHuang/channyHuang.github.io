@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/assets/css/style.css?v=66eb05618adc27639b2de2d6a2ffa04248f96e41">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>channy’s page | Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.</title>
+<meta name="generator" content="Jekyll v3.7.4" />
+<meta property="og:title" content="channy’s page" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others." />
+<meta property="og:description" content="Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others." />
+<link rel="canonical" href="http://localhost:4000/blog/Questions_In_Interview.html" />
+<meta property="og:url" content="http://localhost:4000/blog/Questions_In_Interview.html" />
+<meta property="og:site_name" content="channy’s page" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"channy’s page","url":"http://localhost:4000/blog/Questions_In_Interview.html","description":"Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>channy's page</h1>
+        <h2>Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.</h2>
+
+        <section id="downloads">
+          
+            <a href="http://github.com/qanny/qanny.github.io/zipball/gh-pages" class="btn">Download as .zip</a>
+            <a href="http://github.com/qanny/qanny.github.io/tarball/gh-pages" class="btn">Download as .tar.gz</a>
+          
+          <a href="http://github.com/qanny/qanny.github.io" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <p>//Author: channy</p>
+
+<p>//Create Date: 2018-10-14 08:45:11</p>
+
+<p>//Description: 最近忙着找工作面试，顺手记录一下遇见的问题，就当是笔记了。</p>
+
+<h1 id="questions-in-interview-c-plus--android">Questions In Interview (C Plus &amp; Android)</h1>
+<h1 id="面试中遇到的一些问题-c-plus--android">面试中遇到的一些问题 (C Plus &amp; Android)</h1>
+
+<h2 id="c-plus">C Plus</h2>
+
+<ol>
+  <li>
+    <p>c和c++的区别</p>
+  </li>
+  <li>
+    <p>virtual函数，虚函数表</p>
+  </li>
+</ol>
+
+<h3 id="stl">STL</h3>
+
+<ol>
+  <li>
+    <p>STL库，vector迭代器，map的实现</p>
+
+    <p><img src="https://raw.githubusercontent.com/qanny/qanny.github.io/master/assets/images/iterator.png" alt="Iterator" /></p>
+
+    <p>list: 内部维护一个list指针，双向</p>
+
+    <p>map: 平𧗾二叉树（红黑树），二分查找</p>
+
+    <p>unordered_map: hash_map,需要定义hash_value和==</p>
+
+    <p>迭代器失效：remove/delete</p>
+
+    <p>vector内存分配：当第一次申请的空间L不够时，第二次申请会申请2L的空间并把原来的数据copy过去</p>
+  </li>
+  <li>
+    <p>实现STL中的string</p>
+
+    <div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="kt">char</span> <span class="o">*</span> <span class="nf">strcpy</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span> <span class="n">strDest</span><span class="p">,</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">strSrc</span><span class="p">)</span> <span class="p">{</span>
+     <span class="n">assert</span><span class="p">((</span><span class="n">strDest</span><span class="o">!=</span><span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">strSrc</span> <span class="o">!=</span><span class="nb">NULL</span><span class="p">));</span>
+     <span class="kt">char</span> <span class="o">*</span> <span class="n">strDestCopy</span><span class="o">=</span><span class="n">strDest</span><span class="p">;</span>
+     <span class="k">while</span> <span class="p">((</span><span class="o">*</span><span class="n">strDest</span><span class="o">++=*</span><span class="n">strSrc</span><span class="o">++</span><span class="p">)</span><span class="o">!=</span><span class="sc">'\0'</span><span class="p">);</span> 
+     <span class="k">return</span> <span class="n">strDestCopy</span><span class="p">;</span>
+ <span class="p">}</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h3 id="其它">其它</h3>
+
+<ol>
+  <li>
+    <p>静态库和动态库的区别</p>
+  </li>
+  <li>
+    <p>const, static</p>
+
+    <p>const int n;</p>
+
+    <p>const char* p; -&gt; 指针内容不可变</p>
+
+    <p>char* const p; -&gt; 指针不可变</p>
+
+    <p>f(const char* p)</p>
+
+    <p>const char* f()</p>
+
+    <p>f() const -&gt; 常成员函数</p>
+  </li>
+  <li>
+    <p>new, malloc</p>
+
+    <p>分配大小</p>
+
+    <p>初始化</p>
+
+    <p>内存管理</p>
+  </li>
+  <li>
+    <p>多态、继承</p>
+
+    <p>多态(虚函数) -&gt; 一个接口，多种状态，运行时确定调用的函数地址</p>
+
+    <p>重载 -&gt; 多个同名不同参数的函数</p>
+  </li>
+  <li>
+    <p>指针、引用</p>
+  </li>
+  <li>
+    <p>多线程同步方法</p>
+
+    <p>临界区</p>
+
+    <p>事件</p>
+
+    <p>信号量</p>
+
+    <p>互斥量</p>
+  </li>
+  <li>
+    <p>智能指针</p>
+
+    <p>计数器记录指针的引用对象个数</p>
+  </li>
+  <li>
+    <p>进程间的通信</p>
+
+    <p>pipe</p>
+
+    <p>message queue</p>
+
+    <p>signal</p>
+
+    <p>shared memory</p>
+
+    <p>socket</p>
+  </li>
+  <li>
+    <p>内存分配</p>
+  </li>
+</ol>
+
+<p>在C++中，内存分成5个区，他们分别是堆、栈、自由存储区、全局/静态存储区和常量存储区。</p>
+
+<p>栈：在执行函数时，函数内局部变量的存储单元都可以在栈上创建，函数执行结束时这些存储单元自动被释放。栈内存分配运算内置于处理器的指令集中，效率很高，但是分配的内存容量有限。</p>
+
+<p>堆：就是那些由 new分配的内存块，他们的释放编译器不去管，由我们的应用程序去控制，一般一个new就要对应一个 delete。如果程序员没有释放掉，那么在程序结束后，操作系统会自动回收。</p>
+
+<p>自由存储区：就是那些由malloc等分配的内存块，他和堆是十分相似的，不过它是用free来结束自己的生命的。</p>
+
+<p>全局/静态存储区：全局变量和静态变量被分配到同一块内存中，在以前的C语言中，全局变量又分为初始化的和未初始化的，在C++里面没有这个区分了，他们共同占用同一块内存区。</p>
+
+<p>常量存储区：这是一块比较特殊的存储区，他们里面存放的是常量，不允许修改。</p>
+
+<ol>
+  <li>堆和栈究竟的区别</li>
+</ol>
+
+<p>主要的区别由以下几点：</p>
+
+<p>(1). 管理方式不同
+(2). 空间大小不同
+(3). 能否产生碎片不同
+(4). 生长方向不同
+(5). 分配方式不同
+(6). 分配效率不同</p>
+
+<p>管理方式：对于栈来讲，是由编译器自动管理，无需我们手工控制；对于堆来说，释放工作由程序员控制，容易产生memory leak。</p>
+
+<p>空间大小：一般来讲在32位系统下，堆内存可以达到4G的空间，从这个角度来看堆内存几乎是没有什么限制的。但是对于栈来讲，一般都是有一定的空间大小的，例如，在VC6下面，默认的栈空间大小是1M（好像是，记不清楚了）。当然，我们可以修改：</p>
+
+<p>打开工程，依次操作菜单如下：Project-&gt;Setting-&gt;Link，在Category 中选中Output，然后在Reserve中设定堆栈的最大值和commit。</p>
+
+<p>注意：reserve最小值为4Byte；commit是保留在虚拟内存的页文件里面，它设置的较大会使栈开辟较大的值，可能增加内存的开销和启动时间。</p>
+
+<p>碎片问题：对于堆来讲，频繁的new/delete势必会造成内存空间的不连续，从而造成大量的碎片，使程序效率降低。对于栈来讲，则不会存在这个问题，因为栈是先进后出的队列，他们是如此的一一对应，以至于永远都不可能有一个内存块从栈中间弹出，在他弹出之前，在他上面的后进的栈内容已经被弹出，详细的可以参考数据结构，这里我们就不再一一讨论了。</p>
+
+<p>生长方向：对于堆来讲，生长方向是向上的，也就是向着内存地址增加的方向；对于栈来讲，它的生长方向是向下的，是向着内存地址减小的方向增长。</p>
+
+<p>分配方式：堆都是动态分配的，没有静态分配的堆。栈有2种分配方式：静态分配和动态分配。静态分配是编译器完成的，比如局部变量的分配。动态分配由alloca函数进行分配，但是栈的动态分配和堆是不同的，他的动态分配是由编译器进行释放，无需我们手工实现。</p>
+
+<p>分配效率：栈是机器系统提供的数据结构，计算机会在底层对栈提供支持：分配专门的寄存器存放栈的地址，压栈出栈都有专门的指令执行，这就决定了栈的效率比较高。堆则是C/C++函数库提供的，它的机制是很复杂的，例如为了分配一块内存，库函数会按照一定的算法（具体的算法可以参考数据结构/操作系统）在堆内存中搜索可用的足够大小的空间，如果没有足够大小的空间（可能是由于内存碎片太多），就有可能调用系统功能去增加程序数据段的内存空间，这样就有机会分到足够大小的内存，然后进行返回。显然，堆的效率比栈要低得多。</p>
+
+<p>从这里我们可以看到，堆和栈相比，由于大量new/delete的使用，容易造成大量的内存碎片；由于没有专门的系统支持，效率很低；由于可能引发用户态和核心态的切换，内存的申请，代价变得更加昂贵。所以栈在程序中是应用最广泛的，就算是函数的调用也利用栈去完成，函数调用过程中的参数，返回地址，EBP和局部变量都采用栈的方式存放。所以，我们推荐大家尽量用栈，而不是用堆。</p>
+
+<p>虽然栈有如此众多的好处，但是由于和堆相比不是那么灵活，有时候分配大量的内存空间，还是用堆好一些。</p>
+
+<p>无论是堆还是栈，都要防止越界现象的发生（除非你是故意使其越界），因为越界的结果要么是程序崩溃，要么是摧毁程序的堆、栈结构，产生以想不到的结果,就算是在你的程序运行过程中，没有发生上面的问题，你还是要小心，说不定什么时候就崩掉，那时候debug可是相当困难的：）</p>
+
+<h2 id="algorithm">Algorithm</h2>
+<ol>
+  <li>单向二叉树（父节点-&gt;子节点），查找两节点的公共祖先
+    <div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="n">inLeftOrRight</span><span class="p">(</span><span class="n">Node</span> <span class="o">*</span><span class="n">parent</span><span class="p">,</span> <span class="n">Node</span> <span class="o">*</span><span class="n">child</span><span class="p">)</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>判断单向链表是否有环</p>
+
+    <p>两个指针，一个每次递增一步，一个每次递增两步</p>
+  </li>
+  <li>
+    <p>大数中找最大的100个数</p>
+
+    <p>堆排序</p>
+  </li>
+  <li>
+    <p>数组移位</p>
+  </li>
+  <li>
+    <p>一个序列中一个元素出现一次，其它出现三次，找出出现一次的元素</p>
+
+    <p>ps: 很想知道这种问题如果没有见过，有多少人能够自己想到答案</p>
+  </li>
+</ol>
+
+<h2 id="android">Android</h2>
+<ol>
+  <li>
+    <p>进程和线程的区别（貌似是Android中经典的经典问题）</p>
+
+    <p>一般情况下一个app占用一个进程（也有占用多个的）；</p>
+
+    <p>一个进程有多个线程，共享进程的资源，线程也有属于自己的私有资源；</p>
+  </li>
+  <li>
+    <p>进程间的通信</p>
+
+    <p>bundle/Intent</p>
+
+    <p>Broadcast</p>
+
+    <p>Message</p>
+
+    <p>AIDL</p>
+
+    <p>ContentProvider</p>
+
+    <p>Socket</p>
+  </li>
+  <li>
+    <p>json和xml的区别</p>
+
+    <p>突然间后悔了。。。</p>
+
+    <p>格式，解析，语言支持，可读性，速度</p>
+  </li>
+  <li>
+    <p>内存回收机制，内存泄漏</p>
+
+    <blockquote>
+      <p>非static类中的static变量</p>
+    </blockquote>
+
+    <blockquote>
+      <p>Handle</p>
+    </blockquote>
+
+    <blockquote>
+      <p>单例</p>
+    </blockquote>
+
+    <blockquote>
+      <p>资源未关闭，File, BroadcastReceiver…</p>
+    </blockquote>
+  </li>
+</ol>
+
+<p>工具：LeakCanary</p>
+
+<h2 id="others">Others</h2>
+
+<p><a href="./">back</a></p>
+
+      </section>
+    </div>
+
+    
+  </body>
+</html>

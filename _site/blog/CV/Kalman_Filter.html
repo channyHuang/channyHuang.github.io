@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/assets/css/style.css?v=66eb05618adc27639b2de2d6a2ffa04248f96e41">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>channy’s page | Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.</title>
+<meta name="generator" content="Jekyll v3.7.4" />
+<meta property="og:title" content="channy’s page" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others." />
+<meta property="og:description" content="Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others." />
+<link rel="canonical" href="http://localhost:4000/blog/CV/Kalman_Filter.html" />
+<meta property="og:url" content="http://localhost:4000/blog/CV/Kalman_Filter.html" />
+<meta property="og:site_name" content="channy’s page" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"channy’s page","url":"http://localhost:4000/blog/CV/Kalman_Filter.html","description":"Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>channy's page</h1>
+        <h2>Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.</h2>
+
+        <section id="downloads">
+          
+            <a href="http://github.com/qanny/qanny.github.io/zipball/gh-pages" class="btn">Download as .zip</a>
+            <a href="http://github.com/qanny/qanny.github.io/tarball/gh-pages" class="btn">Download as .tar.gz</a>
+          
+          <a href="http://github.com/qanny/qanny.github.io" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <p>//Author: channy</p>
+
+<p>//Create Date: 2018-10-13 17:24:28</p>
+
+<p>//Description: 用自己的话理解Kalman滤波</p>
+
+<head>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+            inlineMath: [['$','$']]
+            }
+        });
+    </script>
+</head>
+
+<h1 id="kalman_filter">Kalman_Filter</h1>
+
+<p>有人看不懂，可能是因为不清楚已知的变量有哪些</p>
+
+<p>PS：写推导过程最好先将已知量、求解量先列出来，不建议推导过程中突然冒出个变量，不知道是已知的还是由什么推导出来的这个变量</p>
+
+<h2 id="已有变量">已有变量</h2>
+
+<p>状态值 $\vec{x_k} = (\vec{p}, \vec{v})$, 状态中的变量都服从<code class="highlighter-rouge">Gauss</code>分布$N(\mu, \sigma^2)$</p>
+
+<p>协方差矩阵 <script type="math/tex">% <![CDATA[
+P_k = 
+\left[
+\begin{matrix}
+\Sigma_{pp} & \Sigma_{pv} \\ 
+\Sigma_{vp} & \Sigma_{vv} \\
+\end{matrix}
+\right] %]]></script>, $\Sigma_{ij}$状态中的变量相关关系</p>
+
+<p>预测矩阵 $F_k$, 预测从当前状态转移到下一状态</p>
+
+<p>控制矩阵 $B_k$</p>
+
+<p>控制向量 $\vec{u_k}$</p>
+
+<p>控制噪声协方差 $Q_k$</p>
+
+<p>最佳估计值 $\hat{x_k}$</p>
+
+<p>测量值 $\vec{z_k}$</p>
+
+<p>测量数据的变量间的协方差矩阵$H_k$</p>
+
+<p>测量噪声$R_k$</p>
+
+<p>假设变量有两个，用到的有两个<code class="highlighter-rouge">Gauss</code>分布、预测分布（即两个分布融合后的分布）和测量分布$(\mu_1, \Sigma_1) = (\vec{z_k}, R_k)$</p>
+
+<p>也就是说，上面的变量除最佳估计值$\hat{x_k}$外都是已知的</p>
+
+<h2 id="理论推导">理论推导</h2>
+
+<p>如果$x$的协方差矩阵是$Cov(x) = \Sigma$, 那么$Ax$的协方差矩阵是$Cov(Ax) = A\Sigma A^T$</p>
+
+<p>所以</p>
+
+<script type="math/tex; mode=display">\hat{x}_k = F_k \hat{x}_{k-1} + B_k \vec{u_k}\</script>
+
+<script type="math/tex; mode=display">P_k = F_k P_{k-1} F_k^T + Q_k</script>
+
+<p><code class="highlighter-rouge">Gauss</code>分布融合后还是<code class="highlighter-rouge">Gauss</code>分布，可知卡尔曼增益</p>
+
+<script type="math/tex; mode=display">K = \Sigma_0 (\Sigma_0 + \Sigma_1)^{-1}</script>
+
+<script type="math/tex; mode=display">\vec{\mu}^{'} = \vec{\mu_0} + K(\vec{\mu_1} - \vec{\mu_0})</script>
+
+<script type="math/tex; mode=display">\Sigma^{'} = \Sigma_0 - K \Sigma_0</script>
+
+<p>记预测分布$(\mu_0, \Sigma_0) = (H_k \hat{x}_k, H_k P_k H_k^T)$, 测量分布$(\mu_1, \Sigma_1) = (\vec{z_k}, R_k)$</p>
+
+<p>可求得
+<script type="math/tex">K = H_k P_k H_k^T + R_k)^{-1}</script></p>
+
+<p>最终得到更新方程</p>
+
+<script type="math/tex; mode=display">\hat{x}_k^{'} = \hat{x}_k + K^{'} (\vec{z_k} - \hat{x}_k)</script>
+
+<script type="math/tex; mode=display">P_k^{'} = P_k - K^{'} H_k P_k</script>
+
+<script type="math/tex; mode=display">K^{'} = P_k H_k^T (H_k P_k H_k^T + R_k)^{-1}</script>
+
+<h2 id="reference">Reference</h2>
+<p><a href="http://www.bzarg.com/p/how-a-kalman-filter-works-in-pictures/">How a Kalman filter works, in pictures</a></p>
+
+<hr />
+
+<p><a href="./">back</a></p>
+
+
+      </section>
+    </div>
+
+    
+  </body>
+</html>

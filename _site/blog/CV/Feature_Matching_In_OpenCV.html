@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/assets/css/style.css?v=66eb05618adc27639b2de2d6a2ffa04248f96e41">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Feature Matching In OpenCV | channy’s page</title>
+<meta name="generator" content="Jekyll v3.7.4" />
+<meta property="og:title" content="Feature Matching In OpenCV" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others." />
+<meta property="og:description" content="Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others." />
+<link rel="canonical" href="http://localhost:4000/blog/CV/Feature_Matching_In_OpenCV.html" />
+<meta property="og:url" content="http://localhost:4000/blog/CV/Feature_Matching_In_OpenCV.html" />
+<meta property="og:site_name" content="channy’s page" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"Feature Matching In OpenCV","url":"http://localhost:4000/blog/CV/Feature_Matching_In_OpenCV.html","description":"Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>channy's page</h1>
+        <h2>Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.</h2>
+
+        <section id="downloads">
+          
+            <a href="http://github.com/qanny/qanny.github.io/zipball/gh-pages" class="btn">Download as .zip</a>
+            <a href="http://github.com/qanny/qanny.github.io/tarball/gh-pages" class="btn">Download as .tar.gz</a>
+          
+          <a href="http://github.com/qanny/qanny.github.io" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <h1 id="feature-matching-in-opencv">Feature Matching In OpenCV</h1>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Mat readImage(string filename) {
+	Mat img = imread(filename), imgGray;
+	if( img.empty()) {
+		cout &lt;&lt; "Couldn'g open image " &lt;&lt; filename &lt;&lt; ". Usage: detect &lt;image_name&gt;\n";
+		return Mat();
+	}
+	//namedWindow( "image", 1 );
+	//imshow("image", img);
+	//waitKey(0);
+	
+	if (img.channels() == 3) {
+		cvtColor(img, imgGray, COLOR_BGR2GRAY);
+	} else {
+		img.copyTo(imgGray);
+	}
+	
+	return imgGray;
+}
+
+int main( int argc, char** argv ) {
+	cv::CommandLineParser parser(argc, argv, "{ @input | ./fruits.jpg | ./fruits.jpg}");
+    
+	string filename1 = parser.get&lt;string&gt;("@input");
+	string filename2 = parser.get&lt;string&gt;("@input");
+	
+	Mat img1 = readImage(filename1);
+	Mat img2 = readImage(filename2);
+	
+	vector&lt;KeyPoint&gt; detectKeyPoint1, detectKeyPoint2;
+	Mat descriptors1, descriptors2;
+	Ptr&lt;ORB&gt; orb = ORB::create(5000);
+	orb-&gt;detectAndCompute(img1, noArray(), detectKeyPoint1, descriptors1);
+	orb-&gt;detectAndCompute(img2, noArray(), detectKeyPoint2, descriptors2);
+
+	if (descriptors1.type() != CV_32F) {
+		descriptors1.convertTo(descriptors1, CV_32F);
+		descriptors2.convertTo(descriptors2, CV_32F);
+	}
+	
+	FlannBasedMatcher matcher;
+	vector&lt;DMatch&gt; matches;
+	matcher.match(descriptors1, descriptors2, matches);
+	
+	Mat imgMatch;
+	drawMatches(img1, detectKeyPoint1, img2, detectKeyPoint2, matches, imgMatch, Scalar::all(-1), Scalar::all(-1),vector&lt;char&gt;(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+	
+	imshow("match", imgMatch);
+	waitKey(0);
+	
+	return 0;
+}
+</code></pre></div></div>
+
+<p>Let’s start at <code class="highlighter-rouge">FlannBasedMatcher.match()</code> function. <code class="highlighter-rouge">FlannBasedMatcher</code> is a derived class of <code class="highlighter-rouge">DescriptorMatcher</code>, then will jump to <code class="highlighter-rouge">DescriptorMatcher.match()</code> and enter <code class="highlighter-rouge">knnMatch</code> to find the most k nearby matches, seems so easy.</p>
+
+
+      </section>
+    </div>
+
+    
+  </body>
+</html>

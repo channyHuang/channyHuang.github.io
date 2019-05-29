@@ -16,71 +16,71 @@ layout: default
 
 >By the way, there won't be any theory in these notes, because I think that theory can be learned from books and others' blogs. There are so many blogs that have a deep description in algorithms, including the formulation, deduction, paper, thesis, etc. I won't write these in my articles unless I have different opinions or new ideas.
 
-[Project 3D Reconstruction](./Project_3D_Reconstruction.html)
+[Project 3D Reconstruction](./blog/CV/Project_3D_Reconstruction.html)
 
-[Feature Detection In OpenCV](./Feature_Detection_In_OpenCV.html)
+[Feature Detection In OpenCV](./blog/CV/Feature_Detection_In_OpenCV.html)
 
-[Feature Matching In OpenCV](./Feature_Matching_In_OpenCV.html)
+[Feature Matching In OpenCV](./blog/CV/Feature_Matching_In_OpenCV.html)
 
-[Compute Camera Params and Point Cloud](./Compute_Camera_Params_and_Point_Cloud.html)
+[Compute Camera Params and Point Cloud](./blog/CV/Compute_Camera_Params_and_Point_Cloud.html)
 
-[Kalman_Filter](./Kalman_Filter)
+[Kalman_Filter](./blog/CV/Kalman_Filter)
 
-[Project Relighting](./Project_Relighting.html)
+[Project Relighting](./blog/CV/Project_Relighting.html)
 
 **C++**
 
-[Notes_Find_Memory_Leak](./Notes_Find_Memory_Leak)
+[Notes_Find_Memory_Leak](./blog/C++/Notes_Find_Memory_Leak)
 
-[Unsolved_Question_Memory_Usage](./Unsolved_Question_Memory_Usage)
+[Unsolved_Question_Memory_Usage](./blog/C++/Unsolved_Question_Memory_Usage)
 
 [CPlus_Judge_Program_Alive](./blog/CPlus_Judge_Program_Alive)
 
-[Process_Mointor(get info of target process)](./Process_Monitor)
+[Process_Mointor(get info of target process)](./blog/C++/Process_Monitor)
 
-[Qt_In_Linux](./Qt_In_Linux)
+[Qt_In_Linux](./blog/linux/Qt_In_Linux)
 
-[Summary_Of_Coding_Errors](./Summary_Of_Coding_Errors)
+[Summary_Of_Coding_Errors](./blog/C++/Summary_Of_Coding_Errors)
 
-[Matlab_And_C_Combining_Coding](./Matlab_And_C_Combining_Coding)
+[Matlab_And_C_Combining_Coding](./blog/C++/Matlab_And_C_Combining_Coding)
 
-[Head_File_Include_Each_Other](./Head_File_Include_Each_Other)
+[Head_File_Include_Each_Other](./blog/C++/Head_File_Include_Each_Other)
 
-[Notes_And_Bugs_In_Work](./Notes_And_Bugs_In_Work)
+[Notes_And_Bugs_In_Work](./blog/C++/Notes_And_Bugs_In_Work)
 
 **Linux**
 
-[Notes_SerialPort_In_Linux](./Notes_SerialPort_In_Linux)
+[Notes_SerialPort_In_Linux](./blog/linux/Notes_SerialPort_In_Linux)
 
-[Generate_Head_Using_Shell](./Generate_Head_Using_Shell.html)
+[Generate_Head_Using_Shell](./blog/tools/Generate_Head_Using_Shell.html)
 
-[Linux_Basic_Comment](./Linux_Basic_Comment)
+[Linux_Basic_Comment](./blog/linux/Linux_Basic_Comment)
 
-[Linux_Network_Programming_Notes](./Linux_Network_Programming_Notes)
+[Linux_Network_Programming_Notes](./blog/linux/Linux_Network_Programming_Notes)
 
 **Android**
 
-[Android_Build_Source](./Android_Build_Source)
+[Android_Build_Source](./blog/Android/Android_Build_Source)
 
-[Android_Crack](./Android_Crack.html)
+[Android_Crack](./blog/Android/Android_Crack.html)
 
-[Android_Rebuid_Notes](./Android_Rebuid_Notes)
+[Android_Rebuid_Notes](./blog/Android/Android_Rebuid_Notes)
 
 **Daily convenience command**
 
-[Notes_In_Daily_Coding_Life](./Notes_In_Daily_Coding_Life)
+[Notes_In_Daily_Coding_Life](./blog/Notes_In_Daily_Coding_Life)
 
 **Other subjects**
 
-[Questions In Interview](./Questions_In_Interview.html)
+[Questions In Interview](./blog/Questions_In_Interview.html)
 
-[Model_Code_Of_InputOutput](./Model_Code_Of_InputOutput)
+[Model_Code_Of_InputOutput](./blog/others/Model_Code_Of_InputOutput)
 
-[Python_To_Do_Something_I_Like](./Python_To_Do_Something_I_Like)
+[Python_To_Do_Something_I_Like](./blog/others/Python_To_Do_Something_I_Like)
 
-[Matlab_Gui_Params](./Matlab_Gui_Params)
+[Matlab_Gui_Params](./blog/others/Matlab_Gui_Params)
 
-[Trifles](./Trifles.html)
+[Trifles](./blog/Trifles.html)
 
 **Relax - outside of coding**
 

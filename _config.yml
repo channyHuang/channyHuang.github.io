@@ -1,6 +1,14 @@
 title: channy's page 
+SEOTitle: channy's page | blog
 description: Welcome! This is Qianni Huang(qanny, or you can call me channy), a software engineer mainly in Computer Vision, expecially in 3D reconstruction. But this area is too hard to find a job in my city, so I decide to change my area to Linux network coding. This blog is used to write some notes I learned in CV or others.
 show_downloads: true
 google_analytics:
 theme: jekyll-theme-hacker
 markdown: kramdown
+
+
+
+#Sidebar settings
+sidebar: true  #添加侧边栏
+sidebar-about-description: "简单的描述一下你自己"
+sidebar-avatar: /thumbnail.png     #你的大头贴，请使用绝对地址.注意：名字区分大小写！后缀名也是
