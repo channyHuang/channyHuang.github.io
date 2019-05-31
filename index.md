@@ -86,6 +86,8 @@ layout: default
 
 [The_English_We_Speak](./fun/Notes_The_English_We_Speak)
 
+[Notes_Francais](./fun/Notes_Francais)
+
 ## I want to tell you
 
 ```c++

@@ -78,6 +78,8 @@ layout: default
 
 [The_English_We_Speak](./fun/Notes_The_English_We_Speak)
 
+[法语学习笔记](./fun/Notes_Francais)
+
 ## 我想说
 
 ```c++
