@@ -40,6 +40,8 @@ export QT_DEBUG_PLUGINS=1
 ./xxx 
 ```
 
+There is also another reason will cause this error "Segmentation fault", that is the qt library in target PC is not the same as the compiling PC. This can auso use `QT_DEBUG_PLUGINS=1` to locate where the problem is.
+
 # Optimize Method
 ## Write install files
 ```
