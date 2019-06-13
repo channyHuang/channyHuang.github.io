@@ -20,6 +20,12 @@ at /delete
 sudo usermod -aG vboxsf $(username)
 ```
 
+# pyinstall error str object has no attribute items
 
+As other python error, the version of libraries do not match.
+
+Update setuptools to version 40+, solved
+
+用pyinstaller把脚本转化成exe时报错，升级setuptools到40+版本后解决~
 
 [back](./)
