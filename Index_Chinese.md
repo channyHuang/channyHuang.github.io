@@ -40,6 +40,8 @@ layout: default
 
 [工作中的笔记和bug](./blog/C++/Notes_And_Bugs_In_Work)
 
+[笔记：依赖各厂家sdk开发标准化接口sdk遇到的坑](./blog/C++/Notes_Develop_SDK_Base_On_Other_SDK)
+
 **Linux**
 
 [笔记-在linux下调试串口通信](./blog/linux/Notes_SerialPort_In_Linux)

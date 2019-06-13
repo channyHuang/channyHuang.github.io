@@ -48,6 +48,8 @@ layout: default
 
 [Notes_And_Bugs_In_Work](./blog/C++/Notes_And_Bugs_In_Work)
 
+[Notes_Develop_SDK_Base_On_Other_SDK](./blog/C++/Notes_Develop_SDK_Base_On_Other_SDK)
+
 **Linux**
 
 [Notes_SerialPort_In_Linux](./blog/linux/Notes_SerialPort_In_Linux)
