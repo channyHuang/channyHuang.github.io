@@ -12,6 +12,8 @@ layout: default
 
 When using std::cout and select in linux, a strange thing happened.
 
+Reason: cout didn't flush. Need to add std::cout.flush(). Perfect~
+
 For example, 
 ```c++
 //using Qt
