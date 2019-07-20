@@ -68,6 +68,8 @@ layout: default
 
 [面试中遇到过的问题总结](./blog/Questions_In_Interview.html)
 
+[面试中遇到过的问题总结_服务器](./blog/Questions_In_Interview_Server.html)
+
 [基础代码模板](./blog/others/Model_Code_Of_InputOutput)
 
 [用Python做自己喜欢的事情](./blog/others/Python_To_Do_Something_I_Like)

@@ -76,6 +76,8 @@ layout: default
 
 [Questions In Interview](./blog/Questions_In_Interview.html)
 
+[Questions In Interview_Server](./blog/Questions_In_Interview_Server.html)
+
 [Model_Code_Of_InputOutput](./blog/others/Model_Code_Of_InputOutput)
 
 [Python_To_Do_Something_I_Like](./blog/others/Python_To_Do_Something_I_Like)
