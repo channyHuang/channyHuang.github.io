@@ -6,11 +6,11 @@ categories:
 tags:
 - C++
 ---
-//Author: channy
+//Description: 笔记：依赖各厂家sdk开发标准化接口sdk遇到的坑
 
 //Create Date: 2019-06-13 17:45:01
 
-//Description: 
+//Author: channy
 
 # Notes_Develop_SDK_Base_On_Other_SDK (笔记：依赖各厂家sdk开发标准化接口sdk遇到的坑)
 

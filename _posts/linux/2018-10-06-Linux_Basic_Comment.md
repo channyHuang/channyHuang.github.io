@@ -7,12 +7,11 @@ tags:
 - Linux
 - Command
 ---
-
-//Author: channy
+//Description: Notes when coding in linux
 
 //Create Date: 2018-10-06 10:25:19
 
-//Description: 
+//Author: channy
 
 # Linux_Basic_Comment
 

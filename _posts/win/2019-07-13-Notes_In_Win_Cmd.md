@@ -6,12 +6,11 @@ categories:
 tags:
 - Windows
 ---
-
-//Author: channy
+//Description: Nodes, Windows
 
 //Create Date: 2019-07-13 17:12:08
 
-//Description: 
+//Author: channy 
 
 # Notes_In_Win_Cmd
 

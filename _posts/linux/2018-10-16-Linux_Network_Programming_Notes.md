@@ -6,11 +6,11 @@ categories:
 tags:
 - Linux
 ---
-//Author: channy
+//Description: 学习《Linux网络编程（第二版）》一书时的一点笔记
 
 //Create Date: 2018-10-16 11:30:25
 
-//Description: 学习《Linux网络编程（第二版）》一书时的一点笔记
+//Author: channy
 
 # Linux_Network_Programming_Notes
 

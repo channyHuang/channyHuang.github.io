@@ -6,11 +6,11 @@ categories:
 tags:
 - Matlab
 ---
-//Author: channy
+//Description: Matlab gui 传递参数
 
 //Create Date: 2018-10-13 13:44:29
 
-//Description: Matlab gui 传递参数
+//Author: channy
 
 # Matlab_Gui_Params
 

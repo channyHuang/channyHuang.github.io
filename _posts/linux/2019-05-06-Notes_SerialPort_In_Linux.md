@@ -7,11 +7,11 @@ tags:
 - Linux
 - Qt
 ---
-//Author: channy
+//Description: Develop in linux, using SerialPort to commulate
 
 //Create Date: 2019-05-06 22:35:45
 
-//Description: 
+//Author: channy
 
 # Notes_SerialPort_In_Linux
 

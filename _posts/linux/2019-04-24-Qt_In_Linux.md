@@ -7,11 +7,11 @@ tags:
 - Linux
 - Qt
 ---
-//Author: channy
+//Description: notes about how to publish qt execute files in linux machines without Qt 
 
 //Create Date: 2019-04-24 16:30:25
 
-//Description: notes about how to publish qt execute files in linux machines without Qt 
+//Author: channy
 
 # Normal Method
 ## Prepare files

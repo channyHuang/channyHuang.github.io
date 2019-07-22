@@ -6,11 +6,11 @@ categories:
 tags:
 - C++
 ---
-//Author: channy
+//Description: VS 错误和其它错误总结
 
 //Create Date: 2018-10-10 11:35:49
 
-//Description: VS 错误和其它错误总结
+//Author: channy
 
 # Summary_Of_Coding_Errors
 

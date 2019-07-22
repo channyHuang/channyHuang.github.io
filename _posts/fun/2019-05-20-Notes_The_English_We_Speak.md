@@ -7,11 +7,11 @@ tags:
 - English
 - Learning
 ---
-//Author: channy
+//Description: One of my favourite podcast: The english we speak. But one day, I can not touch it anymore. Maybe it is blocked by goverment (don't be surprise, google, facebook and some other sites are all blocked in my country...) 
 
 //Create Date: 2019-05-20 00:14:45
 
-//Description: One of my favourite podcast: The english we speak. But one day, I can not touch it anymore. Maybe it is blocked by goverment (don't be surprise, google, facebook and some other sites are all blocked in my country...) 
+//Author: channy
 
 # Notes_The_English_We_Speak
 

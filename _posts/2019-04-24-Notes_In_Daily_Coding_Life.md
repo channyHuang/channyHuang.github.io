@@ -4,11 +4,11 @@ title: Notes_In_Daily_Coding_Life
 categories:
 tags:
 ---
-//Author: channy
+//Description: Just some notes in daily coding life
 
 //Create Date: 2019-04-24 16:59:35
 
-//Description: Just some notes in daily coding life
+//Author: channy
 
 # set PC to auto start  
 ```

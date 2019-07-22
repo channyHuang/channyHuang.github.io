@@ -8,6 +8,8 @@ tags:
 - Project
 - 3D Reconstruction
 ---
+//Description: previous project, 3D reconstruction, greduate paper
+
 # Project - 3D Reconstruction
 
 Here is a little introduction about one of my previous projects -- 3D reconstruction.

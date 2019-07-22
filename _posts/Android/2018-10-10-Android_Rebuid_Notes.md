@@ -7,11 +7,11 @@ tags:
 - Android
 - Rebuild 
 ---
-//Author: channy
+//Description: Android_Rebuild_Notes (Android逆向笔记)
 
 //Create Date: 2018-10-10 09:57:46
 
-//Description: 
+//Author: channy
 
 # Android_Rebuild_Notes (Android逆向笔记)
 

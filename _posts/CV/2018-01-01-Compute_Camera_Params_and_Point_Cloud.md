@@ -7,6 +7,7 @@ tags:
 - Computer Vision
 - 3D Reconstruction
 ---
+//Description: Math base of 3D reconstruction
 
 # Compute Camera Params and Point Cloud
 

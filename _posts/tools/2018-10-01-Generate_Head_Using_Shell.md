@@ -6,11 +6,11 @@ categories:
 tags:
 - Shell
 ---
+//Description: Generate File Head Using Shell
+
 //Author: channy
 
 //Create Date: 2018-10-01 10:24:25
-
-//Description: 
 
 # f1
 
@@ -47,11 +47,11 @@ categories:
 tags:
 - C++
 ---
-//Author: channy
+//Description:
 
 //Create Date: `date +"%F %T"`
 
-//Description: 
+//Author: channy
 
 # ${filename}
 

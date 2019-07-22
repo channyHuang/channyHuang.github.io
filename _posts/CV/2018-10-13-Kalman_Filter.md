@@ -7,11 +7,11 @@ tags:
 - Computer Vision
 - Filter
 ---
-//Author: channy
+//Description: 用自己的话理解Kalman滤波
 
 //Create Date: 2018-10-13 17:24:28
 
-//Description: 用自己的话理解Kalman滤波
+//Author: channy
 
 <head>
     <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>

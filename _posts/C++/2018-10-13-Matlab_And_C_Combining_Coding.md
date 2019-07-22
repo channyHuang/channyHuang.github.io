@@ -6,11 +6,11 @@ categories:
 tags:
 - C++
 ---
-//Author: channy
+//Description: Matlab和C相互调用
 
 //Create Date: 2018-10-13 13:27:33
 
-//Description: 
+//Author: channy
 
 # Matlab_And_C_Combining_Coding
 

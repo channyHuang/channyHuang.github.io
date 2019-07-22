@@ -6,11 +6,11 @@ categories:
 tags:
 - Python
 ---
-//Author: channy
+//Description: Using Python to do something interesting
 
 //Create Date: 2018-10-13 13:38:46
 
-//Description: 
+//Author: channy
 
 # Python_To_Do_Something_I_Like
 

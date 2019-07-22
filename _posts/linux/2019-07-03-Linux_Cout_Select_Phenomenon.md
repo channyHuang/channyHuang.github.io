@@ -6,11 +6,11 @@ categories:
 tags:
 - Linux
 ---
-//Author: channy
+//Description: Linux IO Questions
 
 //Create Date: 2019-07-03 14:53:52
 
-//Description: 
+//Author: channy
 
 # Linux_Cout_Select_Phenomenon
 

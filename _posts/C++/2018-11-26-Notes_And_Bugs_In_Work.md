@@ -6,11 +6,11 @@ categories:
 tags:
 - C++
 ---
-//Author: channy
+//Description: 笔记
 
 //Create Date: 2018-11-26 23:55:39
 
-//Description: 笔记
+//Author: channy
 
 # BUGS_IN_WORK
 

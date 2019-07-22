@@ -7,12 +7,11 @@ tags:
 - Francais
 - Learning
 ---
-
-//Author: channy
+//Description: learning francais, some notes
 
 //Create Date: 2019-05-31 08:20:24
 
-//Description: 
+//Author: channy
 
 # Notes_Francais
 时态

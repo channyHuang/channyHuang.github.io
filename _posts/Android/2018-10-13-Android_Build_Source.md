@@ -8,11 +8,11 @@ tags:
 - Source
 - Build
 ---
-//Author: channy
+//Description: Build android source in linux, steps
 
 //Create Date: 2018-10-13 17:16:45
 
-//Description: 
+//Author: channy
 
 # Android_Build_Source
 

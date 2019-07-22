@@ -9,11 +9,11 @@ tags:
 - Linux
 - Qt
 ---
-//Author: channy
+//Description: 给定进程名称、启动参数，判断该进程是否正在运行，启动参数不同的不算 
 
 //Create Date: 2019-05-17 15:37:32
 
-//Description: 给定进程名称、启动参数，判断该进程是否正在运行，启动参数不同的不算 
+//Author: channy
 
 # CPlus_Judge_Program_Alive
 

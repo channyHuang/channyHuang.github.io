@@ -6,12 +6,11 @@ categories:
 tags:
 - C++
 ---
-
-//Author: channy
+//Description: 头文件相互包含
 
 //Create Date: 2018-10-13 13:49:04
 
-//Description: 
+//Author: channy
 
 # Head_File_Include_Each_Other
 

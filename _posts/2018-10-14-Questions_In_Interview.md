@@ -6,11 +6,11 @@ categories:
 tags:
 - C++
 ---
-//Author: channy
+//Description: 最近忙着找工作面试，顺手记录一下遇见的问题，就当是笔记了。
 
 //Create Date: 2018-10-14 08:45:11
 
-//Description: 最近忙着找工作面试，顺手记录一下遇见的问题，就当是笔记了。
+//Author: channy
 
 # Questions In Interview (C Plus & Android)
 # 面试中遇到的一些问题 (C Plus & Android)
