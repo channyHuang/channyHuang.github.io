@@ -1,7 +1,11 @@
 ---
 layout: default
+title: BUGS_IN_WORK
+categories:
+- C++
+tags:
+- C++
 ---
-
 //Author: channy
 
 //Create Date: 2018-11-26 23:55:39

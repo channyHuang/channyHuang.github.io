@@ -1,15 +1,18 @@
 ---
 layout: default
+title: Notes_Develop_SDK_Base_On_Other_SDK（笔记：依赖各厂家sdk开发标准化接口sdk遇到的坑）
+categories:
+- C++
+tags:
+- C++
 ---
-
 //Author: channy
 
 //Create Date: 2019-06-13 17:45:01
 
 //Description: 
 
-# Notes_Develop_SDK_Base_On_Other_SDK
-# 笔记：依赖各厂家sdk开发标准化接口sdk遇到的坑
+# Notes_Develop_SDK_Base_On_Other_SDK (笔记：依赖各厂家sdk开发标准化接口sdk遇到的坑)
 
 > Be careful about struct alignment, it will cause crash...
 

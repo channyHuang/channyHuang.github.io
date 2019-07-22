@@ -1,7 +1,11 @@
 ---
 layout: default
+title: Matlab_And_C_Combining_Coding
+categories:
+- C++
+tags:
+- C++
 ---
-
 //Author: channy
 
 //Create Date: 2018-10-13 13:27:33

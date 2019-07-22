@@ -1,7 +1,11 @@
 ---
 layout: default
+title: Questions In Interview (C Plus & Android)
+categories:
+- C++
+tags:
+- C++
 ---
-
 //Author: channy
 
 //Create Date: 2018-10-14 08:45:11

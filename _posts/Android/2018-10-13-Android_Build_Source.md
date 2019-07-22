@@ -1,7 +1,13 @@
 ---
 layout: default
+title: Android_Build_Source（Android源码编译）
+categories:
+- Android
+tags:
+- Android
+- Source
+- Build
 ---
-
 //Author: channy
 
 //Create Date: 2018-10-13 17:16:45

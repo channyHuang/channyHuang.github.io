@@ -1,7 +1,14 @@
 ---
 layout: default
+title: CPlus_Judge_Program_Alive
+categories:
+- C++
+tags:
+- C++
+- Windows
+- Linux
+- Qt
 ---
-
 //Author: channy
 
 //Create Date: 2019-05-17 15:37:32

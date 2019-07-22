@@ -1,7 +1,12 @@
 ---
 layout: default
+title: Qt In Linux
+categories:
+- Linux
+tags:
+- Linux
+- Qt
 ---
-
 //Author: channy
 
 //Create Date: 2019-04-24 16:30:25

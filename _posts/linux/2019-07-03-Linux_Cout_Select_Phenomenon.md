@@ -1,7 +1,11 @@
 ---
 layout: default
+title: Linux_Cout_Select_Phenomenon
+categories:
+- Linux
+tags:
+- Linux
 ---
-
 //Author: channy
 
 //Create Date: 2019-07-03 14:53:52

@@ -1,5 +1,11 @@
 ---
 layout: default
+title: Notes_Francais
+categories:
+- Francais
+tags: 
+- Francais
+- Learning
 ---
 
 //Author: channy

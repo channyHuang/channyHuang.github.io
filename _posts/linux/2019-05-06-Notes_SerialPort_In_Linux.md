@@ -1,7 +1,12 @@
 ---
 layout: default
+title: Notes_SerialPort_In_Linux
+categories:
+- Linux
+tags:
+- Linux
+- Qt
 ---
-
 //Author: channy
 
 //Create Date: 2019-05-06 22:35:45

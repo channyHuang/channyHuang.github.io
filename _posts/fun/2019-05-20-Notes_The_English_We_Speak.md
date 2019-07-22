@@ -1,7 +1,12 @@
 ---
 layout: default
+title: Notes_The_English_We_Speak
+categories:
+- English
+tags: 
+- English
+- Learning
 ---
-
 //Author: channy
 
 //Create Date: 2019-05-20 00:14:45

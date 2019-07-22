@@ -1,7 +1,11 @@
 ---
 layout: default
+title: Notes_Template
+categories:
+- C++
+tags:
+- Notes
 ---
-
 //Author: channy
 
 //Create Date: 2018-10-10 10:45:11

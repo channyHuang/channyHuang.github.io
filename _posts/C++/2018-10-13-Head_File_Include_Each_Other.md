@@ -1,5 +1,10 @@
 ---
 layout: default
+title: Head_File_Include_Each_Other
+categories:
+- C++
+tags:
+- C++
 ---
 
 //Author: channy

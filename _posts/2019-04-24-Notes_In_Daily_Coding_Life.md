@@ -1,7 +1,9 @@
 ---
 layout: default
+title: Notes_In_Daily_Coding_Life
+categories:
+tags:
 ---
-
 //Author: channy
 
 //Create Date: 2019-04-24 16:59:35

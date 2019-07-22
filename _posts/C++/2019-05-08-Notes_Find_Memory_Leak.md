@@ -1,5 +1,10 @@
 ---
 layout: default
+title: Notes_Find_Memory_Leak
+categories:
+- C++
+tags:
+- C++
 ---
 
 //Author: channy

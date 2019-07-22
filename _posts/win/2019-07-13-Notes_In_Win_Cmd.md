@@ -1,5 +1,10 @@
 ---
 layout: default
+title: Notes_In_Win_Cmd
+categories:
+- Windows
+tags:
+- Windows
 ---
 
 //Author: channy

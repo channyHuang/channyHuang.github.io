@@ -1,5 +1,11 @@
 ---
 layout: default
+title: Linux_Basic_Comment
+categories:
+- Linux
+tags:
+- Linux
+- Command
 ---
 
 //Author: channy

@@ -1,5 +1,12 @@
 ---
 layout: default
+title: Feature Matching In OpenCV
+categories:
+- Computer Vision
+tags:
+- Computer Vision
+- OpenCV
+- Feature
 ---
 
 # Feature Matching In OpenCV

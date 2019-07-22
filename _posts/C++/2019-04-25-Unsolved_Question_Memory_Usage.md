@@ -1,7 +1,11 @@
 ---
 layout: default
+title: About Memory Usage
+categories:
+- C++
+tags:
+- C++
 ---
-
 //Author: channy
 
 //Create Date: 2019-04-25 16:43:33

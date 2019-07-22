@@ -1,7 +1,13 @@
 ---
 layout: default
+title: Project - 3D Reconstruction
+categories:
+- Computer Vision
+tags:
+- Computer Vision
+- Project
+- 3D Reconstruction
 ---
-
 # Project - 3D Reconstruction
 
 Here is a little introduction about one of my previous projects -- 3D reconstruction.

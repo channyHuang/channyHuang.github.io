@@ -1,7 +1,11 @@
 ---
 layout: default
+title: Summary_Of_Coding_Errors
+categories:
+- C++
+tags:
+- C++
 ---
-
 //Author: channy
 
 //Create Date: 2018-10-10 11:35:49

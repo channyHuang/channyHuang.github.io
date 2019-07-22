@@ -1,5 +1,12 @@
 ---
 layout: default
+title: Feature Detection In OpenCV
+categories:
+- Computer Vision
+tags:
+- Computer Vision
+- OpenCV
+- Feature Dection
 ---
 
 # Feature Detection In OpenCV

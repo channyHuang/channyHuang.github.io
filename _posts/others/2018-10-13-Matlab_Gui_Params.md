@@ -1,7 +1,11 @@
 ---
 layout: default
+title: Matlab_Gui_Params
+categories:
+- Matlab
+tags:
+- Matlab
 ---
-
 //Author: channy
 
 //Create Date: 2018-10-13 13:44:29

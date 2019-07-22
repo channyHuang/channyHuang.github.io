@@ -1,5 +1,12 @@
 ---
 layout: default
+title: Project Relighting
+categories:
+- Computer Vision
+tags:
+- Computer Vision
+- Project
+- light
 ---
 
 # Project Relighting

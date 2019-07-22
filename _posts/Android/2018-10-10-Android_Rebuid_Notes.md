@@ -1,15 +1,19 @@
 ---
 layout: default
+title: Android_Rebuild_Notes（Android逆向笔记）
+categories:
+- Android
+tags:
+- Android
+- Rebuild 
 ---
-
 //Author: channy
 
 //Create Date: 2018-10-10 09:57:46
 
 //Description: 
 
-# Android_Rebuid_Notes
-# Android逆向笔记
+# Android_Rebuild_Notes (Android逆向笔记)
 
 工具都大同小异
 

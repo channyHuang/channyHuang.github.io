@@ -1,14 +1,18 @@
 ---
 layout: default
+title: Process_Monitor
+categories:
+- C++
+tags:
+- C++
 ---
-
 //Author: channy
 
 //Create Date: 2019-04-12 22:26:52
 
 //Description: 
 
-# Process_Monitor.md
+# Process_Monitor
 
 At the beginning, is there any api which can get exec file verison in linux?
 在linux下有没有类似于winapi-GetFileVersion获取可执行文件版本号的方法？

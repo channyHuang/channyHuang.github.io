@@ -23,8 +23,12 @@ if ! grep "^#!" ${file} &>/dev/null; then
 cat >> ${file} << EOF
 ---
 layout: default
+totle: ${file}
+categories:
+- C++
+tags:
+- C++
 ---
-
 //Author: channy
 
 //Create Date: `date +"%F %T"`

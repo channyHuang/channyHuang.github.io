@@ -1,7 +1,11 @@
 ---
 layout: default
+title: Python_To_Do_Something_I_Like
+categories:
+- Python
+tags:
+- Python
 ---
-
 //Author: channy
 
 //Create Date: 2018-10-13 13:38:46

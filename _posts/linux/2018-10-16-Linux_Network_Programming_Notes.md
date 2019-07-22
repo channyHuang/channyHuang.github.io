@@ -1,7 +1,11 @@
 ---
 layout: default
+title: Linux_Network_Programming_Notes
+categories:
+- Linux
+tags:
+- Linux
 ---
-
 //Author: channy
 
 //Create Date: 2018-10-16 11:30:25
