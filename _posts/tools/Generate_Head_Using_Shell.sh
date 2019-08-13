@@ -6,7 +6,8 @@ fi
 
 filename=$1
 path=$2
-file=${filename}".md"
+curTime = $(date "+%Y-%m-%d-")
+file=${curTime}${filename}".md"
 cd ${path}
 
 if [ -f "${file}" ]; then
@@ -23,7 +24,7 @@ if ! grep "^#!" ${file} &>/dev/null; then
 cat >> ${file} << EOF
 ---
 layout: default
-totle: ${file}
+title: ${file}
 categories:
 - C++
 tags:
@@ -37,7 +38,7 @@ tags:
 
 # ${filename}
 
-[back](./)
+[back](/)
 
 EOF
 fi
