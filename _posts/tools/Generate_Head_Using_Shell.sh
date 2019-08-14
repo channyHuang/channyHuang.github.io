@@ -6,7 +6,7 @@ fi
 
 filename=$1
 path=$2
-curTime = $(date "+%Y-%m-%d-")
+curTime=$(date "+%Y-%m-%d-")
 file=${curTime}${filename}".md"
 cd ${path}
 
