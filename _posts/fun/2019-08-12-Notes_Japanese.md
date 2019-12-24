@@ -15,6 +15,7 @@ tags:
 # Notes_Japanese
 
 [原笔记1](/../docs/japanese.docx)
+
 [原笔记2](/../docs/japanese 2.docx)
 
 [初级语法指南](http://res.wokanxing.info/jpgramma/index.html)
