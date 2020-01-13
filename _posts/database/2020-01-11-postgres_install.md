@@ -28,10 +28,13 @@ step 4: pg_ctl启动服务，psql连一个客户端，gdb attach上就可以愉�
 
 OS: CentOs 8
 
-官网下的镜像，安装完后yum -y install不管装什么都报match not found???纠结了好久偶然发现配置/etc/yum.repos.d/CentOs-Base.repo中的local被注释掉了，打开～
+官网下的镜像，安装完后yum -y install不管装什么都报match not found???纠结了好久偶然发现网络没连。。。设置网络为自动连接。
 
-step 1: 参照github上的说明文档安装第三方库，截止至2020-01-11，CentOs 8中默认源没有python-devel和libssh2-devel
+step 1: 参照github上的说明文档安装第三方库，截止至2020-01-11，CentOs 8中默认源没有python-devel和libssh2-devel，改用CentOs 7
 
-step 2: 
+step 2: configure，make，make install同pg类似
+
+step 3: 
+
 [back](/)
 

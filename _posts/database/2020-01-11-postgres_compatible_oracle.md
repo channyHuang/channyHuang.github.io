@@ -28,7 +28,7 @@ pg: SELECT * FROM table1, table2 WHERE table1.id = table2.id;
 
 oracle: SELECT * FROM table1, table2 WHERE table1.id(+) = table2.id;
 
-
+参考ADB，增加终结符，在yylex中判断返回cur_token，并在parsetree转变成querytree时转换回JoinExpr，后续同pg
 
 [back](/)
 
