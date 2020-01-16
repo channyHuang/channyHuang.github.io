@@ -34,7 +34,7 @@ step 1: 参照github上的说明文档安装第三方库，截止至2020-01-11�
 
 step 2: configure，make，make install同pg类似
 
-step 3: 
+step 3: 在postgres下启动，出现Postgres-XL错误，待进一步探索。 
 
 [back](/)
 
