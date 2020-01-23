@@ -12,7 +12,6 @@ tags:
 
 //Author: channy
 
-
 # postgres base flow
 
 ## 进程信息
@@ -46,9 +45,26 @@ main
 		reset_shared (share memory)
 		StartupDataBase (StartChildProcess)
 			AuxiliaryProcessMain (启动其它相关进程)
+				CheckerModeMain
+				StartupProcessMain
+				BootstrapModeMain
+				BackgroundWriterMain
+				CheckpointerMain
+				WalWriterMain
+				WalReceiverMain
 		ServerLoop (接收连接请求)
 			PostgresMain
+			MaybeStartWalReceiver
+			maybe_start_bgworkers
 ```
+
+* EXEC_BACKEND 仅当编译/运行平台为windows系列时，才有可能定义 EXEC_BACKEND。
+```
+6891 if test "$PORTNAME" = "win32"; then
+6892   CPPFLAGS="$CPPFLAGS -I$srcdir/src/include/port/win32 -DEXEC_BACKEND"
+6893 fi
+```
+
 
 ## 基本流程
 

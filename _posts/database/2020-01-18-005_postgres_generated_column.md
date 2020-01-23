@@ -12,8 +12,6 @@ tags:
 
 //Author: channy
 
-# 005_postgres_generated_column
-
 # postgres generated column
 
 ## 带虚拟列的表的create
@@ -184,35 +182,6 @@ transformTopLevelStmt (analyze.c)
 				transformUpdateTargetList (pg12+虚拟列也放入要更新的list中)
 ```
 
-//part of function `transformUpdateTargetList` in analyze.c
-```
-//判断更新的tupdesc中有虚拟列
-if (tupdesc->constr &&
-	tupdesc->constr->has_generated_stored)
-{
-//对每一列处理
-	for (int i = 0; i < tupdesc->constr->num_defval; i++)
-	{
-		AttrDefault defval = tupdesc->constr->defval[i];
-		Node	   *expr;
-		Bitmapset  *attrs_used = NULL;
-//跳过非虚拟列
-		/* skip if not generated column */
-		if (!TupleDescAttr(tupdesc, defval.adnum - 1)->attgenerated)
-			continue;
-//把表达式从存储的string型转换成exprTree结构，从中获取该虚拟列依赖的列增加到上下文中，表达式在创建表时存储在pg_attrdef的adbin字段
-//(gdb) p defval.adbin
-//$2 = 0x7f4522c05af8 "{FUNCEXPR :funcid 669 :funcresulttype 1043 :funcretset false :funcvariadic false :funcformat 2 :funccollid 100 :inputcollid 100 :args ({COERCEVIAIO :arg {OPEXPR :opno 514 :opfuncid 141 :opresulttype 2"...
-		expr = stringToNode(defval.adbin);
-		pull_varattnos(expr, 1, &attrs_used);
-//把虚拟列的attrNumber增加到target_rte要更新的列中
-		if (bms_overlap(target_rte->updatedCols, attrs_used))
-			target_rte->extraUpdatedCols = bms_add_member(target_rte->extraUpdatedCols,
-														  defval.adnum - FirstLowInvalidHeapAttributeNumber);
-	}
-}
-```
-
 //insert into testtable values(12,2);
 ```
 ExecModifyTable (nodeModifyTable.c)
@@ -224,92 +193,20 @@ ExecModifyTable (nodeModifyTable.c)
 	//ExecUpdate (pg12+ExecComputeStoredGenerated)
 ```
 
-//part of function `ExecComputeStoredGenerated`
+pg有自己的Expr格式和处理流程
+
 ```
-void
-ExecComputeStoredGenerated(EState *estate, TupleTableSlot *slot)
-{
-	ResultRelInfo *resultRelInfo = estate->es_result_relation_info;
-	Relation	rel = resultRelInfo->ri_RelationDesc;
-	TupleDesc	tupdesc = RelationGetDescr(rel);
-	int			natts = tupdesc->natts;
-	MemoryContext oldContext;
-	Datum	   *values;
-	bool	   *nulls;
-
-	Assert(tupdesc->constr && tupdesc->constr->has_generated_stored);
-//初始化
-	/*
-	 * If first time through for this result relation, build expression
-	 * nodetrees for rel's stored generation expressions.  Keep them in the
-	 * per-query memory context so they'll survive throughout the query.
-	 */
-	if (resultRelInfo->ri_GeneratedExprs == NULL)
-	{
-		oldContext = MemoryContextSwitchTo(estate->es_query_cxt);
-//申请存储表达式的空间，列数*sizeof(ExprState *)
-		resultRelInfo->ri_GeneratedExprs =
-			(ExprState **) palloc(natts * sizeof(ExprState *));
-//对每一列，如果是虚拟列
-		for (int i = 0; i < natts; i++)
-		{
-			if (TupleDescAttr(tupdesc, i)->attgenerated == ATTRIBUTE_GENERATED_STORED)
-			{
-				Expr	   *expr;
-//把对应的计算表达式从存储的string型转换成需要的格式，这里是Expr
-				expr = (Expr *) build_column_default(rel, i + 1);
-				if (expr == NULL)
-					elog(ERROR, "no generation expression found for column number %d of table \"%s\"",
-						 i + 1, RelationGetRelationName(rel));
-//存储到刚刚申请的空间中
-				resultRelInfo->ri_GeneratedExprs[i] = ExecPrepareExpr(expr, estate);
-			}
-		}
-
-		MemoryContextSwitchTo(oldContext);
-	}
-
-	oldContext = MemoryContextSwitchTo(GetPerTupleMemoryContext(estate));
-
-	values = palloc(sizeof(*values) * natts);
-	nulls = palloc(sizeof(*nulls) * natts);
-
-	slot_getallattrs(slot);
-	memcpy(nulls, slot->tts_isnull, sizeof(*nulls) * natts);
-//对每一列
-	for (int i = 0; i < natts; i++)
-	{
-		Form_pg_attribute attr = TupleDescAttr(tupdesc, i);
-//如果是虚拟列
-		if (attr->attgenerated == ATTRIBUTE_GENERATED_STORED)
-		{
-			ExprContext *econtext;
-			Datum		val;
-			bool		isnull;
-
-			econtext = GetPerTupleExprContext(estate);
-			econtext->ecxt_scantuple = slot;
-//计算
-			val = ExecEvalExpr(resultRelInfo->ri_GeneratedExprs[i], econtext, &isnull);
-
-			values[i] = val;
-			nulls[i] = isnull;
-		}
-		else
-		{
-			if (!nulls[i])
-				values[i] = datumCopy(slot->tts_values[i], attr->attbyval, attr->attlen);
-		}
-	}
-//保存
-	ExecClearTuple(slot);
-	memcpy(slot->tts_values, values, sizeof(*values) * natts);
-	memcpy(slot->tts_isnull, nulls, sizeof(*nulls) * natts);
-	ExecStoreVirtualTuple(slot);
-	ExecMaterializeSlot(slot);
-
-	MemoryContextSwitchTo(oldContext);
-}
+ExecComputeStoredGenerated (nodeModifyTable.c)
+	ExecPrepareExpr
+		ExecInitExpr
+			ExprEvalPushStep 		
+	slot_getallattrs (tuptable.h)
+		slot_getsomeattrs
+			slot_getsomeattrs_int (execTuples.c，获取值的地址到slot的tts_values中)
+				tts_buffer_heap_getsomeattrs
+	ExecEvalExpr 
+		ExecInterpExprStillValid (execExprInterp.c)
+			ExecInterpExpr
 ```
 
 ## gdb 调试信息
