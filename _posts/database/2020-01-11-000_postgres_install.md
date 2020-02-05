@@ -1,6 +1,6 @@
 ---
 layout: default
-title: 2020-01-11-postgres_install.md
+title: 000_postgres_install.md
 categories:
 - C++
 tags:
