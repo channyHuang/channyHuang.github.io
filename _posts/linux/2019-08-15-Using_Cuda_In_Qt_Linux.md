@@ -1,6 +1,6 @@
 ---
 layout: default
-title: 2019-08-15-Using_Cuda_In_Qt_Linux.md
+title: Using_Cuda_In_Qt_Linux
 categories:
 - C++
 tags:

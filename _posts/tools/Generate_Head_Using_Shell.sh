@@ -24,7 +24,7 @@ if ! grep "^#!" ${file} &>/dev/null; then
 cat >> ${file} << EOF
 ---
 layout: default
-title: ${file}
+title: ${filename}
 categories:
 - C++
 tags:
