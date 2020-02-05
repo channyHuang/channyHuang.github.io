@@ -1,6 +1,6 @@
 ---
 layout: default
-title: 2020-01-23-010_postgres_others.md
+title: 010_postgres_others
 categories:
 - C++
 tags:

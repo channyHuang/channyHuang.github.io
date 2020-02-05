@@ -1,6 +1,6 @@
 ---
 layout: default
-title: 2020-01-18-005_postgres_generated_column.md
+title: 005_postgres_generated_column
 categories:
 - C++
 tags:

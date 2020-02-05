@@ -1,6 +1,6 @@
 ---
 layout: default
-title: 2020-01-23-008_postgres_function_procedure_trigger.md
+title: 008_postgres_function_procedure_trigger
 categories:
 - C++
 tags:

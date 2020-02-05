@@ -1,6 +1,6 @@
 ---
 layout: default
-title: 2020-01-18-007_postgres_store_struct.md
+title: 007_postgres_store_struct
 categories:
 - C++
 tags:

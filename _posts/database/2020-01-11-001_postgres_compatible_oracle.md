@@ -1,6 +1,6 @@
 ---
 layout: default
-title: 2020-01-11-postgres_compatible_oracle.md
+title: 001_postgres_compatible_oracle
 categories:
 - C++
 tags:

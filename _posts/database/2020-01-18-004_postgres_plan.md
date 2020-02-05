@@ -1,6 +1,6 @@
 ---
 layout: default
-title: 2020-01-18-004_postgres_plan.md
+title: 004_postgres_plan
 categories:
 - C++
 tags:

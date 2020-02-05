@@ -1,6 +1,6 @@
 ---
 layout: default
-title: 2020-01-23-009_postgres_function_return_type.md
+title: 009_postgres_function_return_type
 categories:
 - C++
 tags:

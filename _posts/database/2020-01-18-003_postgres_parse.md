@@ -1,6 +1,6 @@
 ---
 layout: default
-title: 2020-01-18-003_postgres_parse.md
+title: 003_postgres_parse
 categories:
 - C++
 tags:

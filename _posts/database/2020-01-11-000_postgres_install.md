@@ -1,6 +1,6 @@
 ---
 layout: default
-title: 000_postgres_install.md
+title: 000_postgres_install
 categories:
 - C++
 tags:
