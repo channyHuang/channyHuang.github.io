@@ -28,6 +28,7 @@ tags:
 | table | | 无 |
 
 1. **在函数体内in类型参数允许修改**
+
 ```sql
 --oracle,下述语句在创建时会报错，oracle不允许在函数内修改in参数的值
 create function out_test_2(a int, b int) return int as
@@ -60,6 +61,7 @@ LINE/COL ERROR
 ```
 
 2. **当函数参数带一个out时，return后面带的类型必须和第一个out类型一致**
+
 ```sql
 --Postgresql中当函数参数带一个out时，return后面带的类型必须和第一个out类型一致
 create or replace function out_test_11(a int, out b int) returns text
@@ -114,6 +116,7 @@ step 1. 把pl_gram.y中对应的判断增加读取return的值
 结果：能够正常create函数没有报错,具体赋值在后续问题6中一同修改
 
 4. **函数查重时只检查输入参数不检查输出参数**
+
 ```sql
 --postgresql
 create or replace function out_test_11(a int, out b int) returns int
@@ -181,12 +184,14 @@ step 1: 把proallargtypes加入到cache的key值里面
 step 2: 在SearchSysCache3查找后进行对比out类型，相同则继续原来的流程；不同则新增加函数
 
 结果：修改中。。。
+
 ```
 /* cache key columns should always be NOT NULL */
 			Assert(attr->attnotnull);
 ```
 
 5. **本质上同问题3(函数查重时只检查输入参数不检查输出参数)，procedure中调用函数也只检查输入参数**
+
 ```sql
 --postgres
 create or replace procedure test_11()
@@ -259,9 +264,8 @@ transformOptionalSelectInto (analyze.c)
 					FuncnameGetCandidates (返回NULL)
 ```
 
-
-
 6. **函数参数有多个out时，函数返回类型必须是record（同问题1）**
+
 ```sql
 --postgresql
 create or replace function out_test_12(a int, out b int, out c int) returns int
@@ -297,6 +301,7 @@ Function created.
 ```
 
 7. **inout类型赋值只在函数里面，函数外面依旧是原值，赋给inout的值给了return**
+
 ```sql
 --pg
 create or replace function out_test_2(a int, inout b int) returns int
@@ -327,8 +332,7 @@ declare
 ret out_re;
 begin
 ret = out_test5(0);
-raise notice '%', ret.b;
-raise notice '%', ret.c;
+raise notice '%', ret
 end $$;
 CREATE PROCEDURE
 ```

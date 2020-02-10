@@ -17,6 +17,7 @@ tags:
 
 ## 测试样例
 ### trigger测试样例
+
 ```sql
 --postgres
 create function proc() returns trigger as
@@ -40,12 +41,24 @@ INSERT 0 1
 ```
 
 ### function测试样例
-- 样例1
+
 ```sql
 --postgres
 create function f_test_11(a int, out b int) returns int as $$
 begin
 b = 1;
+return;
+end $$
+language plpgsql;
+
+create function f_test_12(a int, out b int, out c int) returns record as $$
+begin
+a = 9;
+raise notice 'a = %', a;
+b = a + 3;
+raise notice 'b = %', b;
+c = a * 3;
+raise notice 'c = %', c;
 return;
 end $$
 language plpgsql;
@@ -60,8 +73,34 @@ raise notice '%', a;
 raise notice '%', b;
 end $$
 language plpgsql;
+
+create type res_test_12 as (b int, c int);
+--CREATE TYPE
+create procedure p_test_12() as $$
+declare
+ret res_test_12;
+a int = 14;
+begin
+raise notice 'begin';
+ret = f_test_12(a); //assign
+raise notice 'end';
+raise notice '%', ret;
+raise notice '%', a;
+end $$
+language plpgsql;
+
+postgres=# call p_test_11();
+NOTICE:  1
+NOTICE:  0
+CALL
+
+postgres=# call p_test_12();
+NOTICE:  9
+NOTICE:  (12,27)
+NOTICE:  14
+CALL
 ```
-- 样例2
+
 ```sql
 --postgresql，in参数值可以在函数内部被临时修改，而oracle的不可以修改
 create function out_test2(a int, b int) returns int as $$
@@ -91,7 +130,9 @@ CALL
 
 ## 基本流程
 ### create function 创建函数
+
 function对应于CreateFunctionStmt，同样地，trigger对应CreateTrigStmt
+
 ```
 (gdb) p *$stmt
 $5 = {type = T_CreateFunctionStmt, is_procedure = false, 
@@ -123,6 +164,7 @@ ProcessUtilitySlow (utility.c)
 [pg_trigger](http://postgres.cn/docs/11/catalog-pg-trigger.html)
 
 #### 相关结构体
+
 ```c++
 typedef struct FmgrInfo
 {
@@ -152,6 +194,7 @@ typedef struct FunctionCallInfoBaseData
 ```
 
 ### call procedure 调用函数
+
 ```
 ...
 ProcessUtility (utility.c)
@@ -172,24 +215,128 @@ ProcessUtility (utility.c)
 							exec_stmts
 								exec_stmt (只有in时返回值存储在PLpgSQL_execstate结构体的retval中)
 						/exec_stmt_assign (PLPGSQL_STMT_ASSIGN 赋值语句，临时值存储在estate->datums[stmt->varno]中)
-						/exec_stmt_return (PLPGSQL_STMT_RETURN 返回语句,样例中stmt->retvarno=-1,但stmt->expr在只有in时不为空，有out时为空，return的值存储在estate->retval中)
+						/exec_stmt_return (PLPGSQL_STMT_RETURN 返回语句,样例中stmt->retvarno=-1/3,但stmt->expr在只有in时不为空，有out时为空，return的值存储在estate->retval中)
 				SPI_finish
 ```
 
 ```
-//其它相关函数
-exec_stmt_assign (pl_exec.c)
-	exec_assign_expr
-		exec_eval_expr
-			exec_eval_simple_expr 
-		exec_assign_value
-ExecInterpExpr (execExprInterp.c,表达式求值,计算样例中的b=1)
-ExecInterpExprStillValid
-ExecEvalExpr (executor.h)
+plpgsql_call_handler (call procedure p_test_12)
+	plpgsql_exec_function
+		plpgsql_estate_setup
+		exec_stmt (pl_exec.c)
+			exec_stmt_block
+				exec_stmts
+					exec_stmt	
+						exec_stmt_assign (pl_exec.c)
+							exec_assign_expr
+								exec_eval_expr
+									exec_eval_simple_expr 
+										ExecEvalExpr (executor.h)
+											ExecInterpExprStillValid (execExprInterp.c)
+												ExecInterpExpr (execExprInterp.c,表达式求值,计算样例中的b=1,传入参数econtext中存储了函数的in参数econtext->ecxt_param_list_info->paramFetchArg，EEOP_PARAM_CALLBACK->plpgsql_param_eval_var传入输入参数的值存储在estate->datums[], EEOP_FUNCEXPR进入函数f_test_12)
+													plpgsql_call_handler (call function f_test_12)
+							exec_assign_value
+							
+plpgsql_call_handler (call function f_test_12)
+	plpgsql_exec_function
+```
+
+```
+--postgres
+create procedure p_test_12() as $$
+declare
+ret res_test_12;
+a int = 14;
+begin
+raise notice 'begin';
+ret = f_test_12(a); //assign
+raise notice 'end';
+raise notice '%', ret;
+raise notice '%', a;
+end $$
+language plpgsql;
+
+//exec_stmts 调试，对应p_test_12里面begin和end之间的五个语句
+(gdb) p *(PLpgSQL_stmt *)(stmts->head->data.ptr_value)
+$24 = {cmd_type = PLPGSQL_STMT_RAISE, lineno = 6, stmtid = 1}
+(gdb) p *(PLpgSQL_stmt *)(stmts->head->next->data.ptr_value)
+$25 = {cmd_type = PLPGSQL_STMT_ASSIGN, lineno = 7, stmtid = 2}
+(gdb) p *(PLpgSQL_stmt *)(stmts->head->next->next->data.ptr_value)
+$26 = {cmd_type = PLPGSQL_STMT_RAISE, lineno = 8, stmtid = 3}
+(gdb) p *(PLpgSQL_stmt *)(stmts->head->next->next->next->data.ptr_value)
+$27 = {cmd_type = PLPGSQL_STMT_RAISE, lineno = 9, stmtid = 4}
+(gdb) p *(PLpgSQL_stmt *)(stmts->head->next->next->next->next->data.ptr_value)
+$28 = {cmd_type = PLPGSQL_STMT_RAISE, lineno = 10, stmtid = 5}
+(gdb) p *(PLpgSQL_stmt *)(stmts->head->next->next->next->next->next->data.ptr_value)
+$29 = {cmd_type = PLPGSQL_STMT_RETURN, lineno = 0, stmtid = 7}
+
+(gdb) set $stmt = (PLpgSQL_stmt_assign *)(stmts->head->next->data.ptr_value)
+(gdb) p *$stmt
+$31 = {cmd_type = PLPGSQL_STMT_ASSIGN, lineno = 7, stmtid = 2, varno = 1, 
+  expr = 0x556203f582e8}
+(gdb) set $expr = (PLpgSQL_expr *)($stmt->expr)
+(gdb) p *$expr
+$32 = {query = 0x556203f58380 "SELECT f_test_12(a)", plan = 0x556203f5e888, 
+  paramnos = 0x556203f58a28, rwparam = -1, func = 0x556203e81f60, ns = 0x556203f58110, 
+  expr_simple_expr = 0x556203f5e2e8, expr_simple_generation = 2, expr_simple_type = 2249, 
+  expr_simple_typmod = -1, expr_simple_state = 0x556203f35178, expr_simple_in_use = false, 
+  expr_simple_lxid = 21}
+(gdb) set $func = (PLpgSQL_function *)$expr->func
+(gdb) p *$func
+$33 = {fn_signature = 0x556203f2d948 "p_test_12()", fn_oid = 24629, fn_xmin = 597, 
+  fn_tid = {ip_blkid = {bi_hi = 0, bi_lo = 78}, ip_posid = 6}, 
+  fn_is_trigger = PLPGSQL_NOT_TRIGGER, fn_input_collation = 0, 
+  fn_hashkey = 0x556203f272e0, fn_cxt = 0x556203f2d830, fn_rettype = 2278, 
+  fn_rettyplen = 4, fn_retbyval = true, fn_retistuple = false, fn_retisdomain = false, 
+  fn_retset = false, fn_readonly = false, fn_prokind = 112 'p', fn_nargs = 0, 
+  fn_argvarnos = {0 <repeats 100 times>}, out_param_varno = -1, found_varno = 0, 
+  new_varno = 0, old_varno = 0, resolve_option = PLPGSQL_RESOLVE_ERROR, 
+  print_strict_params = false, extra_warnings = 0, extra_errors = 0, nstatements = 7, 
+  ndatums = 3, datums = 0x556203f589f0, copiable_size = 200, action = 0x556203f58938, 
+  cur_estate = 0x7ffc5aa2f6d0, use_count = 1}
+```
+
+```
+exec_eval_simple_expr (econtext->ecxt_param_list_info = setup_param_list(estate, expr);)
+
+Breakpoint 11, plpgsql_estate_setup (estate=0x7ffc5aa2ee50, 
+    func=0x556203e82378, rsi=0x0, simple_eval_estate=0x0) at pl_exec.c:3880
+3880	{
+(gdb) p *func
+$52 = {fn_signature = 0x556203f159b8 "f_test_12(integer)", fn_oid = 24630, 
+  fn_xmin = 599, fn_tid = {ip_blkid = {bi_hi = 0, bi_lo = 78}, ip_posid = 7}, 
+  fn_is_trigger = PLPGSQL_NOT_TRIGGER, fn_input_collation = 0, 
+  fn_hashkey = 0x556203f27128, fn_cxt = 0x556203f158a0, fn_rettype = 2249, 
+  fn_rettyplen = -1, fn_retbyval = false, fn_retistuple = true, 
+  fn_retisdomain = false, fn_retset = false, fn_readonly = false, 
+  fn_prokind = 102 'f', fn_nargs = 1, fn_argvarnos = {0 <repeats 100 times>}, 
+  out_param_varno = 3, found_varno = 4, new_varno = 0, old_varno = 0, 
+  resolve_option = PLPGSQL_RESOLVE_ERROR, print_strict_params = false, 
+  extra_warnings = 0, extra_errors = 0, nstatements = 8, ndatums = 5, 
+  datums = 0x556203f7f6d8, copiable_size = 288, action = 0x556203f7f680, 
+  cur_estate = 0x0, use_count = 1}	
 ```
 
 ### 函数调用的流程（pg源码）
 
+![函数调用流程图](./procedure_call.png)
+
+| 函数名 | 功能简介 | 输出 |
+|:---|:---|:---|
+| plpgsql_call_handler | call的入口 | 输入FunctionCallInfoBaseData，输出Datum即为return的返回值 |
+| plpgsql_exec_function | 调用运行函数 | 输出Datum即为return的返回值 |
+| exec_stmt | 计算return的表态式 | 输出return code，返回值在输入参数estate中存储，函数第一次走exec_stmt_block，后续根据函数体的具体内容选择assign赋值、call调用其它函数、return返回、if/case/loop等不同的分支 |
+| exec_stmt_assign | 处理函数体内的赋值操作，在执行过程中，对函数的in/out参数的赋值结果都记录在输入参数estate->datums[]中 | void | 
+| exec_stmt_return | 处理返回操作，有stmt->retvarno个参数，对于多个out，estate->datums[retvarno]存储返回结果record（PLPGSQL_DTYPE_ROW）| 输出return code |
+| make_tuple_from_row | 把out参数转化成record |  void |
+
+由于pg支持同名函数，而函数又只用in参数的类型进行区分，故returns的类型只能限定为和out参数类型一致（只有一个out参数）或是record类型（有多个out参数），否则的话会出现out参数值和returns的值无法同时传回来的问题
+
+| out参数的个数 | 函数返回值类型限制 | 函数返回值结构 | 函数返回值存储情况 |
+|:---|:---|:---|:---|
+| 0 | 无 | Datum | 存储函数体中"return {expr};"中表达式expr的值 |
+| 1 | 和out参数类型一致 | Datum |  执行函数后out参数的值 |
+| 2 | record | Datum | 执行函数后所有out参数的值集 | 
 
 [back](/)
 
