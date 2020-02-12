@@ -53,10 +53,9 @@ language plpgsql;
 
 create function f_test_12(a int, out b int, out c int) returns record as $$
 begin
+raise notice 'begin f';
 a = 9;
-raise notice 'a = %', a;
 b = a + 3;
-raise notice 'b = %', b;
 c = a * 3;
 raise notice 'c = %', c;
 return;
@@ -79,13 +78,11 @@ create type res_test_12 as (b int, c int);
 create procedure p_test_12() as $$
 declare
 ret res_test_12;
-a int = 14;
+x int = 14;
 begin
-raise notice 'begin';
-ret = f_test_12(a); //assign
-raise notice 'end';
+raise notice 'begin p';
+ret = f_test_12(x);
 raise notice '%', ret;
-raise notice '%', a;
 end $$
 language plpgsql;
 
@@ -213,14 +210,14 @@ ProcessUtility (utility.c)
 					exec_stmt (Java spi. 类似于Android里面调用C++用NDK?)
 						exec_stmt_block 
 							exec_stmts
-								exec_stmt (只有in时返回值存储在PLpgSQL_execstate结构体的retval中)
+								exec_stmt (只有in时返回值存储在PLpgSQL_execstate结构体的retval中) 
 						/exec_stmt_assign (PLPGSQL_STMT_ASSIGN 赋值语句，临时值存储在estate->datums[stmt->varno]中)
 						/exec_stmt_return (PLPGSQL_STMT_RETURN 返回语句,样例中stmt->retvarno=-1/3,但stmt->expr在只有in时不为空，有out时为空，return的值存储在estate->retval中)
 				SPI_finish
 ```
 
 ```
-plpgsql_call_handler (call procedure p_test_12)
+plpgsql_call_handler (pl_handler.c, call procedure p_test_12)
 	plpgsql_exec_function
 		plpgsql_estate_setup
 		exec_stmt (pl_exec.c)
@@ -230,7 +227,10 @@ plpgsql_call_handler (call procedure p_test_12)
 						exec_stmt_assign (pl_exec.c)
 							exec_assign_expr
 								exec_eval_expr
-									exec_eval_simple_expr 
+									exec_eval_simple_expr (expr->expr_simple_state(op))
+										ExecInitExprWithParams
+											ExecInitExprRec
+												ExecInitFunc
 										ExecEvalExpr (executor.h)
 											ExecInterpExprStillValid (execExprInterp.c)
 												ExecInterpExpr (execExprInterp.c,表达式求值,计算样例中的b=1,传入参数econtext中存储了函数的in参数econtext->ecxt_param_list_info->paramFetchArg，EEOP_PARAM_CALLBACK->plpgsql_param_eval_var传入输入参数的值存储在estate->datums[], EEOP_FUNCEXPR进入函数f_test_12)
@@ -316,6 +316,57 @@ $52 = {fn_signature = 0x556203f159b8 "f_test_12(integer)", fn_oid = 24630,
   datums = 0x556203f7f6d8, copiable_size = 288, action = 0x556203f7f680, 
   cur_estate = 0x0, use_count = 1}	
 ```
+
+```
+plpgsql_exec_function //把fcinfo里的in值存储到estate->datums里面
+
+(gdb) set $dat = (PLpgSQL_var *)(estate.datums[0])
+(gdb) p *$dat
+$11 = {dtype = PLPGSQL_DTYPE_VAR, dno = 0, refname = 0x55732b27f0c0 "a", lineno = 0, 
+  isconst = false, notnull = false, default_val = 0x0, datatype = 0x55732b27efb0, 
+  cursor_explicit_expr = 0x0, cursor_explicit_argrow = 0, cursor_options = 0, value = 0, 
+  isnull = true, freeval = false, promise = PLPGSQL_PROMISE_NONE}
+(gdb) p fcinfo->args[0].value
+$12 = 14
+
+ExecInterpExpr //op = state->steps; fcinfo = op->d.func.fcinfo_data;
+
+(gdb) 
+ExecInitFunc (scratch=0x7ffe9db56030, node=0x55732b276968, 
+    args=0x55732b276a20, funcid=32825, inputcollid=0, state=0x55732b283798)
+    at execExpr.c:2229
+(gdb) p *fcinfo
+$28 = {flinfo = 0x55732b283830, context = 0x0, resultinfo = 0x0, 
+  fncollation = 0, isnull = false, nargs = 1, args = 0x55732b2838a8}
+(gdb) p *fcinfo->args
+$29 = {value = 0, isnull = false}
+
+
+//a int = 14
+Breakpoint 1, ExecInitExprWithParams (node=0x55732b276bf8, ext_params=0x0)
+    at execExpr.c:158
+158	{
+(gdb) p *node
+$1 = {type = T_Const}
+(gdb) p *(Const *)node
+$2 = {xpr = {type = T_Const}, consttype = 23, consttypmod = -1, 
+  constcollid = 0, constlen = 4, constvalue = 14, constisnull = false, 
+  constbyval = true, location = 7}
+(gdb) c
+Continuing.
+
+//f_test_12(a)
+Breakpoint 1, ExecInitExprWithParams (node=0x55732b27a888, 
+    ext_params=0x55732b25ae30) at execExpr.c:158
+158	{
+(gdb) p *node
+$3 = {type = T_FuncExpr}
+(gdb) p *(FuncExpr *)node
+$4 = {xpr = {type = T_FuncExpr}, funcid = 32825, funcresulttype = 2249, 
+  funcretset = false, funcvariadic = false, funcformat = COERCE_EXPLICIT_CALL, 
+  funccollid = 0, inputcollid = 0, args = 0x55732b27a940, location = 7}
+```
+
 
 ### 函数调用的流程（pg源码）
 
