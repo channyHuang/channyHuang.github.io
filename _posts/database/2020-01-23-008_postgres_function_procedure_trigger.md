@@ -128,6 +128,8 @@ CALL
 ## 基本流程
 ### create function 创建函数
 
+![函数创建流程](./procedure_create.png)
+
 function对应于CreateFunctionStmt，同样地，trigger对应CreateTrigStmt
 
 ```
