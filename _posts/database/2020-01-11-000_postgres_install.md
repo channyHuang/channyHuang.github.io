@@ -18,6 +18,8 @@ OS: Ubuntu 18.04
 
 step 1: 参照文档下载源码安装，configure打开debug功能，可能会提示没有安装readline,zlib,bison,ssh等第三方库，configure之后修改src/Makefile.global去掉编译优化-O2方便调试，安装完成后，必须`再次执行configure`，否则后续重新make的时候会失败但报成功导致修改不生效！！！
 
+./configure --enable-debug --enable-cassert
+
 step 2: 修改/etc/sysctl.d/10-ptrace.conf使非root用户也能gdb attach
 
 step 3: 新建用户postgres, initDB后修改连接配置postgresql.conf和pg_hba.conf
