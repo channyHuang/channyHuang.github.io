@@ -392,6 +392,265 @@ bandit23@bandit:/tmp/channy$ cat bandit24_pass
 UoMYTrfrBFHyQXmg6gzctqAwOmw1IohZ
 ```
 
-25. 
+25. 要用bash不能用sh, bash兼容sh，反之不行
+
+```
+bandit24@bandit:/tmp/channy$ cat bandit25.sh
+#!/bin/bash
+
+for i in {0..9999}
+do
+	printf "UoMYTrfrBFHyQXmg6gzctqAwOmw1IohZ %04d\n" $i
+done
+
+bandit24@bandit:/tmp/channy$ bash bandit25.sh | nc localhost 30002
+# ...
+Wrong! Please enter the correct pincode. Try again.
+Correct!
+The password of user bandit25 is uNG9O58gUE7snukf3bvZ0rxhtnjzSGzG
+
+Exiting.
+```
+
+26. ???
+
+```
+# password: 5czgV9L3Xx8JPOyRbXh6lQbmIOWvPT6Z
+```
+
+27. connect failed
+
+利用vim的:set shell=/bin/bash修改shell，再通过:shell获得bash
+
+```
+bandit26@bandit:~$ ls
+bandit27-do  text.txt
+bandit26@bandit:~$ ./bandit27-do
+Run a command as another user.
+  Example: ./bandit27-do id
+bandit26@bandit:~$ ./bandit27-do cat /etc/bandit_pass/bandit27
+3ba3118a22e93127a4ed485be72ef5ea
+```
+
+28. git
+
+```
+bandit27@bandit:/tmp/channy$ git clone  ssh://bandit27-git@localhost/home/bandit27-git/repo
+Cloning into 'repo'...
+Could not create directory '/home/bandit27/.ssh'.
+The authenticity of host 'localhost (127.0.0.1)' can't be established.
+ECDSA key fingerprint is SHA256:98UL0ZWr85496EtCRkKlo20X3OPnyPSB5tB5RPbhczc.
+Are you sure you want to continue connecting (yes/no)? yes
+Failed to add the host to the list of known hosts (/home/bandit27/.ssh/known_hosts).
+This is a OverTheWire game server. More information on http://www.overthewire.org/wargames
+
+bandit27-git@localhost's password:
+remote: Counting objects: 3, done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 3 (delta 0), reused 0 (delta 0)
+Receiving objects: 100% (3/3), done.
+bandit27@bandit:/tmp/channy$ ls
+repo
+bandit27@bandit:/tmp/channy$ cd repo
+bandit27@bandit:/tmp/channy/repo$ ls
+README
+bandit27@bandit:/tmp/channy/repo$ vim README
+bandit27@bandit:/tmp/channy/repo$ cat README
+The password to the next level is: 0ef186ac70e04ea33b4c1853d2526fa2
+```
+
+29. git log, git diff
+
+```
+bandit28@bandit:/tmp/channy$ git clone ssh://bandit28-git@localhost/home/bandit28-git/repo
+Cloning into 'repo'...
+Could not create directory '/home/bandit28/.ssh'.
+The authenticity of host 'localhost (127.0.0.1)' can't be established.
+ECDSA key fingerprint is SHA256:98UL0ZWr85496EtCRkKlo20X3OPnyPSB5tB5RPbhczc.
+Are you sure you want to continue connecting (yes/no)? yes
+Failed to add the host to the list of known hosts (/home/bandit28/.ssh/known_hosts).
+This is a OverTheWire game server. More information on http://www.overthewire.org/wargames
+
+bandit28-git@localhost's password:
+remote: Counting objects: 9, done.
+remote: Compressing objects: 100% (6/6), done.
+remote: Total 9 (delta 2), reused 0 (delta 0)
+Receiving objects: 100% (9/9), done.
+Resolving deltas: 100% (2/2), done.
+
+bandit28@bandit:/tmp/channy$ ls
+repo
+bandit28@bandit:/tmp/channy$ cd repo
+bandit28@bandit:/tmp/channy/repo$ ls
+README.md
+bandit28@bandit:/tmp/channy/repo$ vim README.md
+
+bandit28@bandit:/tmp/channy/repo$ git log
+commit 073c27c130e6ee407e12faad1dd3848a110c4f95
+Author: Morla Porla <morla@overthewire.org>
+Date:   Tue Oct 16 14:00:39 2018 +0200
+
+    fix info leak
+
+commit 186a1038cc54d1358d42d468cdc8e3cc28a93fcb
+Author: Morla Porla <morla@overthewire.org>
+Date:   Tue Oct 16 14:00:39 2018 +0200
+
+    add missing data
+
+commit b67405defc6ef44210c53345fc953e6a21338cc7
+Author: Ben Dover <noone@overthewire.org>
+Date:   Tue Oct 16 14:00:39 2018 +0200
+
+    initial commit of README.md
+bandit28@bandit:/tmp/channy/repo$ git diff 186a10
+diff --git a/README.md b/README.md
+index 3f7cee8..5c6457b 100644
+--- a/README.md
++++ b/README.md
+@@ -4,5 +4,5 @@ Some notes for level29 of bandit.
+ ## credentials
+
+ - username: bandit29
+-- password: bbc96594b4e001778eee9975372716b2
++- password: xxxxxxxxxx
+```
+
+30. git branch -a, git checkout 
+
+```
+bandit29@bandit:/tmp/channy$ git clone ssh://bandit29-git@localhost/home/bandit29-git/repo
+Cloning into 'repo'...
+Could not create directory '/home/bandit29/.ssh'.
+The authenticity of host 'localhost (127.0.0.1)' can't be established.
+ECDSA key fingerprint is SHA256:98UL0ZWr85496EtCRkKlo20X3OPnyPSB5tB5RPbhczc.
+Are you sure you want to continue connecting (yes/no)? yes
+Failed to add the host to the list of known hosts (/home/bandit29/.ssh/known_hosts).
+This is a OverTheWire game server. More information on http://www.overthewire.org/wargames
+
+bandit29-git@localhost's password:
+remote: Counting objects: 16, done.
+remote: Compressing objects: 100% (11/11), done.
+remote: Total 16 (delta 2), reused 0 (delta 0)
+Receiving objects: 100% (16/16), done.
+Resolving deltas: 100% (2/2), done.
+
+bandit29@bandit:/tmp/channy/repo$ git branch -a
+* master
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/dev
+  remotes/origin/master
+  remotes/origin/sploits-dev
+
+bandit29@bandit:/tmp/channy/repo$ git checkout dev
+Branch dev set up to track remote branch dev from origin.
+Switched to a new branch 'dev'
+bandit29@bandit:/tmp/channy/repo$ ls
+code  README.md
+
+bandit29@bandit:/tmp/channy/repo$ cat README.md
+# Bandit Notes
+Some notes for bandit30 of bandit.
+
+## credentials
+
+- username: bandit30
+- password: 5b90576bedb2cc04c86a9e924ce42faf
+
+```
+
+31. git .git, git show --name-only, git show-ref --tags -d
+
+```
+bandit30@bandit:/tmp/channy$ git clone  ssh://bandit30-git@localhost/home/bandit30-git/repo
+Cloning into 'repo'...
+Could not create directory '/home/bandit30/.ssh'.
+The authenticity of host 'localhost (127.0.0.1)' can't be established.
+ECDSA key fingerprint is SHA256:98UL0ZWr85496EtCRkKlo20X3OPnyPSB5tB5RPbhczc.
+Are you sure you want to continue connecting (yes/no)? yes
+Failed to add the host to the list of known hosts (/home/bandit30/.ssh/known_hosts).
+This is a OverTheWire game server. More information on http://www.overthewire.org/wargames
+
+bandit30-git@localhost's password:
+remote: Counting objects: 4, done.
+remote: Total 4 (delta 0), reused 0 (delta 0)
+Receiving objects: 100% (4/4), done.
+
+bandit30@bandit:/tmp/channy/repo$ cat README.md
+just an epmty file... muahaha
+
+bandit30@bandit:/tmp/channy/repo$ cd .git
+bandit30@bandit:/tmp/channy/repo/.git$ ls
+branches  description  hooks  info  objects      refs
+config    HEAD         index  logs  packed-refs
+bandit30@bandit:/tmp/channy/repo/.git$ cat packed-refs 
+# pack-refs with: peeled fully-peeled 
+3aa4c239f729b07deb99a52f125893e162daac9e refs/remotes/origin/master
+f17132340e8ee6c159e0a4a6bc6f80e1da3b1aea refs/tags/secret
+bandit30@bandit:/tmp/channy/repo/.git$ cd ..
+bandit30@bandit:/tmp/channy/repo$ git show --name-only secret
+47e603bb428404d265f59c42920d81e5
+```
+
+32. git 
+
+```
+bandit31@bandit:/tmp/channy/repo$ cat README.md 
+This time your task is to push a file to the remote repository.
+
+Details:
+    File name: key.txt
+    Content: 'May I come in?'
+    Branch: master
+
+bandit31@bandit:/tmp/channy/repo$ git add -f key.txt
+
+bandit31@bandit:/tmp/channy/repo$ git push
+Could not create directory '/home/bandit31/.ssh'.
+The authenticity of host 'localhost (127.0.0.1)' can't be established.
+ECDSA key fingerprint is SHA256:98UL0ZWr85496EtCRkKlo20X3OPnyPSB5tB5RPbhczc.
+Are you sure you want to continue connecting (yes/no)? yes
+Failed to add the host to the list of known hosts (/home/bandit31/.ssh/known_hosts).
+This is a OverTheWire game server. More information on http://www.overthewire.org/wargames
+
+bandit31-git@localhost's password:
+Counting objects: 3, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (2/2), done.
+Writing objects: 100% (3/3), 324 bytes | 0 bytes/s, done.
+Total 3 (delta 0), reused 0 (delta 0)
+remote: ### Attempting to validate files... ####
+remote:
+remote: .oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.
+remote:
+remote: Well done! Here is the password for the next level:
+remote: 56a9bf19c63d650ce78e6ec0354ee45e
+remote:
+remote: .oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.
+remote:
+To ssh://localhost/home/bandit31-git/repo
+ ! [remote rejected] master -> master (pre-receive hook declined)
+error: failed to push some refs to 'ssh://bandit31-git@localhost/home/bandit31-git/repo'
+
+```
+
+33. $0, whoami
+
+不管输入什么都变成了大写的，从而导致命令执行失败，则改用$0，获得shell，然后通过whoami可以知道自己是bandit33 
+
+```
+  Enjoy your stay!
+
+WELCOME TO THE UPPERCASE SHELL
+
+>> $0
+$ whoami
+bandit33
+$ cat /etc/bandit_pass/bandit33
+c9c3199ddf4121b10cf581a98d51caee
+```
+
+34. At this moment, level 34 does not exist yet.
+
 [back](./)
 
