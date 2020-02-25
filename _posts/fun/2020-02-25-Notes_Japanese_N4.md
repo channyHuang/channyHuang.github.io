@@ -119,5 +119,10 @@ tags:
 ~掉、~完
 
 (音变) てしま　->　ちゃ
+
+![n4-1.png](./jpimages/n4-1.png)
+![n4-2.png](./jpimages/n4-2.png)
+![n4-3.png](./jpimages/n4-3.png)
+
 [back](/)
 
