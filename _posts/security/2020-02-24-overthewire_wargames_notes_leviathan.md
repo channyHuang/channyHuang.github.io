@@ -18,7 +18,7 @@ tags:
 
 [reference](https://jhalon.github.io/over-the-wire-leviathan/)
 
-1. 我和小伙伴们都惊呆了~
+## 1. 我和小伙伴们都惊呆了~
 
 ```
 leviathan0@leviathan:~$ ls -a
@@ -29,7 +29,7 @@ bookmarks.html
 leviathan0@leviathan:~/.backup$ cat bookmarks.html | grep leviathan
 <DT><A HREF="http://leviathan.labs.overthewire.org/passwordus.html | This will be fixed later, the password for leviathan1 is rioGegei8m" ADD_DATE="1155384634" LAST_CHARSET="ISO-8859-1" ID="rdf:#$2wIU71">password to leviathan1</A>
 ```
-2. ltrace, strace 
+## 2. ltrace, strace 
 
 ```
 leviathan1@leviathan:~$ ls -lrht -a
@@ -61,7 +61,7 @@ password: sex
 $ cat /etc/leviathan_pass/leviathan2
 ougahZi8Ta
 ```
-3. 没解出来
+## 3. 没解出来
 
 ```
 leviathan2@leviathan:~$ ls -lrht -a
@@ -100,7 +100,7 @@ leviathan2@leviathan:/tmp/channy$ ~/printfile "pass file.txt"
 Ahdiemoo1j
 /bin/cat: file.txt: No such file or directory
 ```
-4. 
+## 4. 
 
 ```
 leviathan3@leviathan:~$ ls -lrht -a
@@ -135,7 +135,7 @@ $ cat /etc/leviathan_pass/leviathan4
 vuH0coox6m
 ```
 
-5. 
+## 5. 
 
 ```
 leviathan4@leviathan:~$ ls -lrht -a
@@ -161,7 +161,7 @@ fopen("/etc/leviathan_pass/leviathan5", "r")     = 0
 Tith4cokei
 ```
 
-6. 
+## 6. 
 
 ```
 leviathan5@leviathan:~$ ls -lrht -a
@@ -179,7 +179,7 @@ leviathan5@leviathan:~$ ./leviathan5
 UgaoFee4li
 ```
 
-7. 
+## 7. 
 
 ```
 leviathan6@leviathan:~$ ls -lrht -a

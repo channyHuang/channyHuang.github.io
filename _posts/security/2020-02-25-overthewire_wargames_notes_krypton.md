@@ -117,7 +117,7 @@ MNOPQRSTUVWXYZABCDEFGHIJKLkrypton2@krypton:/tmp/channy$
 caesariseasy
 ```
 
-4. 
+## 4. 
 
 ```
 krypton3@krypton:/krypton/krypton3$ ls -lrht   
@@ -158,7 +158,7 @@ CG和BG可以是IN或ON，但是 CBG到ION，我们可以将CG转换为IN，将B
 整理后：WELL DONE THE LEVEL FOUR PASSWORD IS BRUTE
 ```
 
-5. 
+## 5. 
 
 ```
 krypton4@krypton:/krypton/krypton4$ ls -lrht
@@ -182,13 +182,13 @@ http://www.simonsingh.net/The_Black_Chamber/vigenere_cracking_tool.html
 
 得到的密钥为FREKEY，之后就可以进行解密了，最后结果为’CLEAR TEXT’
 
-6. 本关和上一关差不多，但是没有告知密钥长度，可以根据krypton4中说的方式获得长度。
+## 6. 本关和上一关差不多，但是没有告知密钥长度，可以根据krypton4中说的方式获得长度。
 
 利用此网站的统计数据（http://www.simonsingh.net/The_Black_Chamber/vigenere_cracking_tool.html），猜出密钥长度，然后进行对比，得到密钥为：‘KEYLENGTH’，一开始猜测长度为3，但发现后面的密钥匹配很难匹配，所以改成9，然后就得到了密钥。
 
 之后利用krypton4的脚本进行解码即可，解码得到‘RANDOM’
 
-7. 看文件目录，感觉和krypton2相似。给了一个明文生成密文，如此我们可以输入重复的内容，比如A*200，查看得到的密文，由此判断密钥。得到密文，我们可以看到密文中是“EICTDGYIYZKTHNSIRFXYCPFUEOCKRN”的重复，所以猜测这个是密钥，然后按照前几题的思路，写个脚本进行解密，得到下一关的密码。
+## 7. 看文件目录，感觉和krypton2相似。给了一个明文生成密文，如此我们可以输入重复的内容，比如A*200，查看得到的密文，由此判断密钥。得到密文，我们可以看到密文中是“EICTDGYIYZKTHNSIRFXYCPFUEOCKRN”的重复，所以猜测这个是密钥，然后按照前几题的思路，写个脚本进行解密，得到下一关的密码。
 
 [back](/)
 
