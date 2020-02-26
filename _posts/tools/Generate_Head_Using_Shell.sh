@@ -42,4 +42,4 @@ tags:
 
 EOF
 fi
-vim +8 $1".md"
+vim +8 ${file}
