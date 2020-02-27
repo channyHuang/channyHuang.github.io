@@ -16,6 +16,10 @@ tags:
 
 [address](https://overthewire.org/wargames/natas/)
 
+[reference1-26](https://www.cnblogs.com/ichunqiu/p/9554885.html)
+
+[reference11-20](https://zhuanlan.zhihu.com/p/45702581)
+
 ## 1. <!--The password for natas1 is gtVrDuiDfck831PqWsLEZy5gyDz1clto -->
 
 ![natas1](./natas/natas1.png)
@@ -755,7 +759,113 @@ for i in range(0,32):
                         break
 ```
 
+xvKIqDjy4OPv7wCRgDlmj0pFsCsDjhdP
+
 ## 19.
-## 20. 
+
+```php
+<?
+
+$maxid = 640; // 640 should be enough for everyone
+
+function isValidAdminLogin() { /* {{{ */
+    if($_REQUEST["username"] == "admin") {
+    /* This method of authentication appears to be unsafe and has been disabled for now. */
+        //return 1;
+    }
+
+    return 0;
+}
+/* }}} */
+function isValidID($id) { /* {{{ */
+    return is_numeric($id);
+}
+/* }}} */
+function createID($user) { /* {{{ */
+    global $maxid;
+    return rand(1, $maxid);
+}
+/* }}} */
+function debug($msg) { /* {{{ */
+    if(array_key_exists("debug", $_GET)) {
+        print "DEBUG: $msg<br>";
+    }
+}
+/* }}} */
+function my_session_start() { /* {{{ */
+    if(array_key_exists("PHPSESSID", $_COOKIE) and isValidID($_COOKIE["PHPSESSID"])) {
+    if(!session_start()) {
+        debug("Session start failed");
+        return false;
+    } else {
+        debug("Session start ok");
+        if(!array_key_exists("admin", $_SESSION)) {
+        debug("Session was old: admin flag set");
+        $_SESSION["admin"] = 0; // backwards compatible, secure
+        }
+        return true;
+    }
+    }
+
+    return false;
+}
+/* }}} */
+function print_credentials() { /* {{{ */
+    if($_SESSION and array_key_exists("admin", $_SESSION) and $_SESSION["admin"] == 1) {
+    print "You are an admin. The credentials for the next level are:<br>";
+    print "<pre>Username: natas19\n";
+    print "Password: <censored></pre>";
+    } else {
+    print "You are logged in as a regular user. Login as an admin to retrieve credentials for natas19.";
+    }
+}
+/* }}} */
+
+$showform = true;
+if(my_session_start()) {
+    print_credentials();
+    $showform = false;
+} else {
+    if(array_key_exists("username", $_REQUEST) && array_key_exists("password", $_REQUEST)) {
+    session_id(createID($_REQUEST["username"]));
+    session_start();
+    $_SESSION["admin"] = isValidAdminLogin();
+    debug("New session started");
+    $showform = false;
+    print_credentials();
+    }
+} 
+
+if($showform) {
+?>
+```
+
+此题是考查SessionID伪造漏洞
+
+通过BurpSuite-Intruder Attack模块设置字典1-640进行暴力破解
+
+当PHPSESSID=138时，获得natas19密码
+
+4IwIrekcuZlA9OsjOkoUtwU6lhokCPYs
+
+## 20.
+
+随便输入username和password，抓包观察PHPSESSID，发现是输入的信息，按照password-username的格式，由ascill码转化为16进制，猜测正确PHPSESSID，应该是id-admin，用python构造字典，burp抓包后使用intruder模块，导入字典后进行暴力破解。
+
+当PHPSESSID=38392d61646d696e时，得到key。
+Key：eofm3Wsshxc5bwtVnEuGIlr7ivb9KABF
+
+## 21.
+ 
+由于服务端对sessionID进行了合法性校验，因此无法直接通过修改PHPSESSID来读取密码文件的信息
+但username没有任何校验，因此可以在其中注入\nadmin 1使读取的时候对Session进行间接篡改
+
+
+IFekPyrQXftziDEsUr3x21sYuahypdgJ
+
+## 22.
+
+放弃。。。
+
 [back](/)
 

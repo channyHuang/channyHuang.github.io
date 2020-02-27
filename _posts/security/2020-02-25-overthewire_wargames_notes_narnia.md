@@ -178,6 +178,8 @@ int main(int argc, char **argv){
 }
 ``` 
 
+ifile 和 ofile 挨在一起， 然后strcpy 又没有对长度进行一个检查，
+
 
 
 [back](/)
