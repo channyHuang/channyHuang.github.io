@@ -836,7 +836,7 @@ if(my_session_start()) {
     }
 } 
 
-if($showform) {
+
 ?>
 ```
 
