@@ -763,7 +763,7 @@ xvKIqDjy4OPv7wCRgDlmj0pFsCsDjhdP
 
 ## 19.
 
-```php
+```
 <?
 
 $maxid = 640; // 640 should be enough for everyone
