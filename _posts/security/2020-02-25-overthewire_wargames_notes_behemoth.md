@@ -14,7 +14,7 @@ tags:
 
 # overthewire_wargames_notes_behemoth
 
-反编译
+相比于narnia, 没有源码，反编译
 
 [address](https://overthewire.org/wargames/behemoth/)
 
@@ -59,6 +59,45 @@ $ cat /etc/behemoth_pass/behemoth1
 aesebootiv
 ```
 
+## 2. 
+
+```
+(gdb) disassemble main
+Dump of assembler code for function main:
+   0x0804844b <+0>:	push   %ebp
+   0x0804844c <+1>:	mov    %esp,%ebp
+   0x0804844e <+3>:	sub    $0x44,%esp
+   0x08048451 <+6>:	push   $0x8048500
+   0x08048456 <+11>:	call   0x8048300 <printf@plt>
+   0x0804845b <+16>:	add    $0x4,%esp
+   0x0804845e <+19>:	lea    -0x43(%ebp),%eax
+   0x08048461 <+22>:	push   %eax
+   0x08048462 <+23>:	call   0x8048310 <gets@plt>
+   0x08048467 <+28>:	add    $0x4,%esp
+   0x0804846a <+31>:	push   $0x804850c
+   0x0804846f <+36>:	call   0x8048320 <puts@plt>
+   0x08048474 <+41>:	add    $0x4,%esp
+   0x08048477 <+44>:	mov    $0x0,%eax
+   0x0804847c <+49>:	leave  
+   0x0804847d <+50>:	ret    
+End of assembler dump.
+```
+
+从逆向出来的汇编代码看，程序很简单，使用gets()得到用户输入，然后puts()输出"Authentication failure.\nSorry."提示结束就可以了，没有匹配，也就是没有正确的密码。不过从gets()这是一个不安全的函数，这里也没有边界检查，说明存在缓冲区溢出漏洞，这是可以利用的。
+
+[reference](http://su.xmd5.org/static/drops/binary-5831.html)
+
+## 3. 
+
+## 4.
+
+## 5.
+
+## 6.
+
+## 7.
+
+## 8.
 
 [back](/)
 
