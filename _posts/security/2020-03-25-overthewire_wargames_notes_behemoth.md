@@ -85,7 +85,7 @@ End of assembler dump.
 
 从逆向出来的汇编代码看，程序很简单，使用gets()得到用户输入，然后puts()输出"Authentication failure.\nSorry."提示结束就可以了，没有匹配，也就是没有正确的密码。不过从gets()这是一个不安全的函数，这里也没有边界检查，说明存在缓冲区溢出漏洞，这是可以利用的。
 
-[reference](http://su.xmd5.org/static/drops/binary-5831.html)
+
 
 ## 3. 
 

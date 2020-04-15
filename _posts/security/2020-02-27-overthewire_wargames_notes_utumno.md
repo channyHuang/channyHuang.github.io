@@ -6,9 +6,9 @@ categories:
 tags:
 - C++
 ---
-//Description:
+//Description: 通过wargame的utumno学习linux反编译笔记
 
-//Create Date: 2020-02-25 16:29:58
+//Create Date: 2020-02-27 16:29:58
 
 //Author: channy
 

@@ -6,9 +6,9 @@ categories:
 tags:
 - C++
 ---
-//Description:
+//Description: 通过wargame的narnia学习linux反编译的一些笔记, shellcode
 
-//Create Date: 2020-02-25 15:42:55
+//Create Date: 2020-02-26 15:42:55
 
 //Author: channy
 
