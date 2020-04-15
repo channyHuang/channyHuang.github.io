@@ -6,9 +6,9 @@ categories:
 tags:
 - C++
 ---
-//Description:
+//Description: linux下的反编译，通过wargames学习的笔记
 
-//Create Date: 2020-02-25 16:20:07
+//Create Date: 2020-03-25 16:20:07
 
 //Author: channy
 

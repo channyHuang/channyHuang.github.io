@@ -826,7 +826,7 @@ IFekPyrQXftziDEsUr3x21sYuahypdgJ
 
 ## 22.
 
-```source code
+```
 function print_credentials() { /* {{{ */
     if($_SESSION and array_key_exists("admin", $_SESSION) and $_SESSION["admin"] == 1) {
     print "You are an admin. The credentials for the next level are:<br>";
@@ -873,7 +873,7 @@ Password: D0vlad33nQF0Hz2EP255TP5wSW9ZsRSE
 
 24. 一要求提交的参数中含有iloveyou，二要求它大于10.考验的是php的字符串向数字的转换规则，即截取最前几个数字，舍去不符合格式的部分。
 
-```source code
+```
 if(array_key_exists("passwd",$_REQUEST)){
         if(strstr($_REQUEST["passwd"],"iloveyou") && ($_REQUEST["passwd"] > 10 )){
             echo "<br>The credentials for the next level are:<br>";
