@@ -18,5 +18,18 @@ tags:
 
 ## markdown-plus-plus
 
+## 装机必备
+
+> git
+> vim
+> notepad++
+> xshell, xftp
+> everything
+> accessport 串口调试小助手 vspd虚拟串口
+> dependency viewdll
+> easyMD5 MD5校验
+
+
+
 [back](/)
 
