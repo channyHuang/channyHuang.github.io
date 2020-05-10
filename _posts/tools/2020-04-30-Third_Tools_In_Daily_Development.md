@@ -29,6 +29,15 @@ tags:
 > dependency viewdll
 > easyMD5 MD5校验
 
+## 工具网站
+
+> [在线流程图](https://www.edrawmax.cn/online/)
+
+> [模拟手写](http://www.beautifulcarrot.com/)
+
+> [pdf工具](https://smallpdf.com/cn)
+
+> [在线运行](https://www.shellcheck.net/ shell)
 
 
 [back](/)
