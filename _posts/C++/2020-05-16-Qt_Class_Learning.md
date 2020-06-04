@@ -82,7 +82,45 @@ examples的states里面的，可以移动的widget
     this->setPalette(palette);
 ```
 
+# QXmlStreamReader
 
+读取xml文件的类
+
+## QXmlStreamReader::TokenType
+
+xml标签类型，有StartDocument, EndDocument, StartElement, EndElement, Characters这几种比较常用的类型
+
+主要是Element吧，以下面的xml文件为例
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<start>
+<person id="123456">Doctor
+    <name>The Doctor</name>
+    <age>1300</age>
+</person>
+</start>
+```
+
+QXmlStreamReader初始化时可以直接赋值，也可以用addData赋值。
+
+用readNext层层遍历标签，标签头为StartElement,内容为Characters
+
+```
+    QXmlStreamReader::TokenType nToken = m_qxmlReader.readNext();
+    while (!m_qxmlReader.atEnd() && !m_qxmlReader.hasError()) {
+        if (nToken == QXmlStreamReader::StartElement) {
+            //......
+        }
+        nToken = m_qxmlReader.readNext();
+    }
+```
+
+标签头中的内容为Attributes，可以用hasAttribute判断是否存在对应名称的Attribute, 用value获取（如果有的>话）
+```
+QXmlStreamAttributes qxmlAttributes = m_qxmlReader.attributes();
+```
+
+很简单，over~
 
 [back](/)
 
