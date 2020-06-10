@@ -22,25 +22,35 @@ menuBar()->setNativeMenuBar(false);
 ```
 才会显示~
 
-### QGraphicsTextItem, QGraphicsItem, QGraphicsObject
+### QGraphicsView -> QAbstractScrollArea -> QFrame -> QWidget
 
-可以看成动画里面的单个元素，比如 examples的sub-attaq里面的文字、小船、炸弹等等，可以设置单个元素的一些特性，显示移动停止之类的。
+视图，可设置场景scene，最终show的widget
 
-### QState, QStateMachine
+### QGraphicsScene -> QObject
 
-状态和状态机。记录元素所在的状态，比如开始状态、结束状态这种。不同的状态就可以对应不同的Animation啦。
+场景。是把下面的item啦、State和StateMachine啦等等结合起来形成最终的动画。主要方法有addItem()。一个scene可以在多个view中显示
 
-### QPropertyAnimation, QGraphicsTransform, QGraphicsRotation, QGraphicsTransform
+### QGraphicsTextItem -> QGraphicsObject -> QGraphicsItem
+
+可以看成动画里面的单个元素，比如 examples的sub-attaq里面的文字、小船、炸弹等等，可以设置单个元素的一些特性，显示移动停止之类的。可以setTransform、setPos等
+
+### QStateMachine -> QState
+
+QState -> QAbstarctState -> QObject
+
+状态和状态机。记录元素所在的状态，比如开始状态、结束状态这种。不同的状态就可以对应不同的Animation啦。有addTransition()
+
+### QPropertyAnimation -> QVariantAnimation -> QAbstractAnimation,  QGraphicsTransform, QGraphicsRotation, QGraphicsTransform -> QObject
 
 在Android里动画一般分为两种：视图动画和属性动画。视图动画基本就是补间、渐变、平移、缩放、旋转及这类组合，一般只改变视觉效果，不改变属性；而属性动画顾名思义。
 
-### QSequentialAnimationGroup, QParallelAnimationGroup
+### QSequentialAnimationGroup, QParallelAnimationGroup -> QAnimationGroup -> QAbstractAnimation -> QObject
 
 既然是group咯那就是Animation的集合啦？
 
-### QGraphicsScene
+### QAbstractTransition
 
-场景。是把上面的item啦、State和StateMachine啦等等结合起来形成最终的动画。
+类似于group，QSignalTransition接收到signal后才进行的动画
 
 那么剩下的就很简单了
 
@@ -69,6 +79,69 @@ examples的states里面的，可以移动的widget
 ### QEasingCurve
 
 线性运动轨迹
+
+#### Examples
+
+样例1: 图像移动，从一点移动到另一点（参考: animatedtiles）
+
+```c++
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    //动画元素，如图像
+    AnimationItem *item = new AnimationItem;
+    item->setPixmap(QPixmap("ellipse.png"));
+    //场景，坐标，元素需要加入到场景
+    QGraphicsScene *scene = new QGraphicsScene(-500, -500, 500, 500);
+    scene->addItem(item);
+    scene->setBackgroundBrush(Qt::black);
+    //状态，为了简化，只有两个，item每在一个点为一个状态，两点共两个状态
+    QState *rootStates = new QState;
+    QState *state1 = new QState(rootStates);
+    state1->assignProperty(item, "pos", QPointF(-300, -300));
+    QState *state2 = new QState(rootStates);
+    state2->assignProperty(item, "pos", QPointF(100, 100));
+    //视图，类似于窗口吧
+    QGraphicsView *view = new QGraphicsView(scene);
+    view->setWindowTitle("graphics view");
+    view->setFixedSize(1000, 1000);
+    view->show();
+    //设置状态机，初始状态
+    rootStates->setInitialState(state1);
+    QStateMachine states;
+    states.addState(rootStates);
+    states.setInitialState(rootStates);
+    //设置定时器，状态跳转
+    QTimer *timer = new QTimer;
+    timer->setSingleShot(true);
+    timer->start(1000);
+
+    QAbstractTransition *trans = state1->addTransition(timer, SIGNAL(timeout()), state2);
+    states.start();
+
+    return a.exec();
+}
+
+
+class AnimationItem
+        : public QObject, public QGraphicsPixmapItem
+{
+    Q_OBJECT
+    //这一句没有动画不会生效
+    Q_PROPERTY(QPointF pos READ pos WRITE setPos)
+public:
+    explicit AnimationItem(QObject *parent = nullptr);
+    ~AnimationItem();
+
+signals:
+
+public slots:
+};
+```
+
+样例中用了64个item分别按照button中的形状设置各自的位置，button的click事件即为触发动画转换，同时设置了平行动画ParallelAnimation
+
+over~
 
 ## QPalette
 
