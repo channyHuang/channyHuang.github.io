@@ -72,7 +72,7 @@ scene类:
 
 考虑被bomb或torpedo击中的结束情况就差不多了。
 
-### QGraphicsProxyWidget
+### QGraphicsProxyWidget -> QGraphicsWidget
 
 examples的states里面的，可以移动的widget
 
@@ -142,6 +142,96 @@ public slots:
 样例中用了64个item分别按照button中的形状设置各自的位置，button的click事件即为触发动画转换，同时设置了平行动画ParallelAnimation
 
 over~
+
+---
+
+样例2: 元素缩放 (参考: appchooser)
+
+```c++
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    //动画元素，这次是widget
+    AnimationWidget *item = new AnimationWidget;
+    item->setPixmap(QPixmap("ellipse.png"));
+    item->setGeometry(QRect(0, 0, 100, 100));
+
+    QGraphicsScene *scene = new QGraphicsScene(0, 0, 300, 300);
+    scene->setBackgroundBrush(Qt::white);
+    scene->addItem(item);
+    //增加了点击事件，点击回到state1
+    QStateMachine states;
+    QState *rootStates = new QState(&states);
+    QState *state1 = new QState(rootStates);
+    state1->assignProperty(item, "geometry", QRect(0, 0, 100, 100));
+    rootStates->addTransition(item, SIGNAL(clicked()), state1);
+    QState *state2 = new QState(rootStates);
+    state2->assignProperty(item, "geometry", QRect(100, 100, 200, 200));
+    rootStates->setInitialState(state1);
+
+    QGraphicsView *view = new QGraphicsView(scene);
+    view->setWindowTitle("graphics view");
+    view->show();
+    
+    states.setGlobalRestorePolicy(QState::RestoreProperties);
+    states.addDefaultAnimation(new QPropertyAnimation(item, "geometry"));
+    states.setInitialState(rootStates);
+    //平移加缩放
+    QTimer *timer = new QTimer;
+    //timer->setSingleShot(true);
+    timer->start(2000);
+
+    QAbstractTransition *trans = state1->addTransition(timer, SIGNAL(timeout()), state2);
+    states.start();
+
+    return a.exec();
+}
+
+class AnimationWidget
+        : public QGraphicsWidget
+{
+    Q_OBJECT
+public:
+    AnimationWidget(QObject *parent = nullptr);
+    ~AnimationWidget();
+    //需要重写paint才能显示出图像
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override
+    {
+        painter->drawPixmap(QPointF(), p);
+    }
+    //重写点击事件回应
+    void mousePressEvent(QGraphicsSceneMouseEvent *) override
+    {
+        emit clicked();
+    }
+
+    void setPixmap(QPixmap qPixmap)
+    {
+        orig = qPixmap;
+        p = qPixmap;
+    }
+    //缩放功能
+    void setGeometry(const QRectF &rect) override
+    {
+        QGraphicsWidget::setGeometry(rect);
+
+        if (rect.size().width() > orig.size().width())
+            p = orig.scaled(rect.size().toSize());
+        else
+            p = orig;
+    }
+Q_SIGNALS:
+    void clicked();
+
+private:
+    QPixmap orig;
+    QPixmap p;
+};
+```
+
+so easy, over~
+
+
 
 ## QPalette
 

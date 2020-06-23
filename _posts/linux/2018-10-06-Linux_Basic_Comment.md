@@ -27,11 +27,29 @@ then run 'source ~/.bashrc' to make it work. enjoy~
 
 ## Basic comment
 
-
 ```shell
 awk
 sed
 top -p $(pidof xxx)
 ```
 
+## disk
+
+查看当前目录下哪个子目录占用空间大
+
+```
+du -s /root/* | sort -nr
+```
+
+查看磁盘空间占用情况
+
+```
+df -h
+```
+
+查看当前目录占用总空间，不列出详情
+
+```
+du -sh
+```
 [back](./)
