@@ -231,7 +231,51 @@ private:
 
 so easy, over~
 
+样例3: 曲线控制运动速度 (参考easing)
 
+```c++
+Widget::Widget(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::Widget)
+{
+    ui->setupUi(this);
+
+    AnimationItem *item = new AnimationItem;
+    item->setPixmap(QPixmap("ellipse.png"));
+    //item->setPos(250, 250);
+    QGraphicsScene *scene = new QGraphicsScene(0, 0, 300, 300);
+    scene->addItem(item);
+    QGraphicsView *view = new QGraphicsView;
+    view->setWindowTitle("view title");
+    view->setScene(scene);
+    view->show();
+
+    QPropertyAnimation *anim = new QPropertyAnimation(item, "pos");
+    anim->setEasingCurve(QEasingCurve::BezierSpline);
+    anim->setStartValue(QPointF(0, 0));
+    anim->setEndValue(QPointF(100, 100));
+    anim->setDuration(1000);
+    anim->start();
+}
+```
+
+view, 场景，item都和前几例一样，只需要增加QPropertyAnimation绑定item就可以了, so easy ~
+
+样例4. 平行动画 (参考moveblocks)
+
+四个item，位置移动，就是把两个state的移动一起吧，坐标很复杂，仿佛回到了建模时代。。。
+
+样例5. states
+
+集中了位置平移、缩放、透明度
+
+样例6. stickman
+
+从入门到放弃的好样例
+
+样例7. sub-attaq 
+
+成型的小游戏
 
 ## QPalette
 
