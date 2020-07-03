@@ -329,5 +329,92 @@ QXmlStreamAttributes qxmlAttributes = m_qxmlReader.attributes();
 
 很简单，over~
 
+# QFont
+
+主要是QFont::Weight
+
+```
+    QFont ft("Helvetica Neue", 20, 400);
+    for (int i = 125; i <= 130; i++) {
+        ft.setWeight(i);
+        qDebug() << "set weight: " << i << ", actual weight: " << ft.weight();
+    }
+
+    ft.setWeight(QFont::Normal);
+    qDebug() << "set weight: " << QFont::Normal << ", actual weight: " << ft.weight();
+
+// result
+set weight:  125 , actual weight:  125
+set weight:  126 , actual weight:  126
+set weight:  127 , actual weight:  127
+set weight:  128 , actual weight:  0
+set weight:  129 , actual weight:  1
+set weight:  130 , actual weight:  2
+set weight:  50 , actual weight:  50
+
+// Mapping OpenType weight value.
+    enum Weight {
+        Thin     = 0,    // 100
+        ExtraLight = 12, // 200
+        Light    = 25,   // 300
+        Normal   = 50,   // 400
+        Medium   = 57,   // 500
+        DemiBold = 63,   // 600
+        Bold     = 75,   // 700
+        ExtraBold = 81,  // 800
+        Black    = 87    // 900
+    };
+```
+
+范围0-127 
+
+## 和QFont有关的一个显示问题
+
+```
+加载字库
+QFontDatabase::addApplicationFont(":/fonts/NotoSansTC-Medium.otf");
+```
+
+还需要注意修改资源文件.qrc，确保新加的字库文件在里面，否则addApplicationFont会返回-1哦~
+
+然后需要确认要显示的文字在字库中，特别是一些罕见的字。win下可以用FontCreator打开.ttf/.otf等文件，直接复制粘贴需要显示的字进行查找，不要用输入法输入，因为从unicode上来讲，有同形字但是unicode不相同的，比如"吏讀"的"吏"字
+
+```
+//遇到过字形相同unicode不同的字
+----- (copy) char = [吏], unicode = [63966], hex = [f9de] -----
+----- (copy) char = [讀], unicode = [63834], hex = [f95a] -----
+----- (copy) char = [･], unicode = [65381], hex = [ff65] -----
+----- (copy) char = [吏], unicode = [63966], hex = [f9de] -----
+----- (copy) char = [頭], unicode = [38957], hex = [982d] -----
+----- (type) char = [吏], unicode = [21519], hex = [540f] -----
+----- (type) char = [讀], unicode = [35712], hex = [8b80] -----
+----- (type) char = [･], unicode = [65381], hex = [ff65] -----
+----- (type) char = [吏], unicode = [21519], hex = [540f] -----
+----- (type) char = [頭], unicode = [38957], hex = [982d] -----
+```
+
+只有字库中有的并且字库正确加载了(addApplicationFont返回不是-1)才能正常显示出来哦，否则只会显示对应字库中.notdef对应的字(空白或方块或其它)
+
+# Qt国际化
+
+QTranslator translator.load(qmFilePath);
+
+Qt通过加载.qm文件实现不同的语言切换。.qm文件由.qs文件用Qt Tools的linguist生成。代码中通过tr("要翻译的文字")标明，Qt Tools可以自动生成.qs文件，只需要把翻译填到.qs文件就好～
+
+坑就在这里。。。如果有换行，如tr("xxxx\nxxxx")，.qs文件里
+
+```
+<translation>xxxx
+xxxx</translation>
+```
+
+直接用换行表示换行，然而，linux下和windows下的换行貌似不一样，
+
+(20200703) linux下写.qs换行不生效，windows下写换行再放到linux下，换了一行，要换两行的依旧不生效。
+
+原因不想找了，不知道还能干多久。。。
+
+# 
+
 [back](/)
 
