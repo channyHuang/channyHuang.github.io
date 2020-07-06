@@ -401,18 +401,20 @@ QTranslator translator.load(qmFilePath);
 
 Qt通过加载.qm文件实现不同的语言切换。.qm文件由.qs文件用Qt Tools的linguist生成。代码中通过tr("要翻译的文字")标明，Qt Tools可以自动生成.qs文件，只需要把翻译填到.qs文件就好～
 
-坑就在这里。。。如果有换行，如tr("xxxx\nxxxx")，.qs文件里
+然后发现有个坑。。。如果有换行，如tr("xxxx\nxxxx")，.qs文件里
 
 ```
 <translation>xxxx
 xxxx</translation>
 ```
 
-直接用换行表示换行，然而，linux下和windows下的换行貌似不一样，
+linux下写.qs换行不生效，windows下写换行再放到linux下，换了一行，要换两行的依旧不生效。
 
-(20200703) linux下写.qs换行不生效，windows下写换行再放到linux下，换了一行，要换两行的依旧不生效。
+一开始以为是linux下和windows下的换行不一样导致的。后面新开了个app把这段抽出来发现并没有这个问题。呵~
 
-原因不想找了，不知道还能干多久。。。
+然后发现工作中的label用了自定义的，setWrapAnywhere处理文本换行时一并把需要的换行给处理掉掉了。。。
+
+果然，祖传代码，你永远不知道它会有多少坑。。。
 
 # 
 
