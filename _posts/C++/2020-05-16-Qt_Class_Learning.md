@@ -416,7 +416,20 @@ linux下写.qs换行不生效，windows下写换行再放到linux下，换了一
 
 果然，祖传代码，你永远不知道它会有多少坑。。。
 
-# 
+# Qt布局
+
+```
+    QVBoxLayout *rootLayout = new QVBoxLayout(this);
+    rootLayout->setEnabled(false);
+
+    QGridLayout *mainLayout = new QGridLayout(this);
+
+//Attempting to add QLayout "" to Widget "Widget", which already has a layout
+```
+
+上面这段是不能正确地设置mainLayout为主布局的。。。所以，setEnabled最好只用在子布局上。。。
+
+
 
 [back](/)
 
