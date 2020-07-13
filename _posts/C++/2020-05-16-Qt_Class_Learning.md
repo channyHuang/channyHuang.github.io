@@ -429,7 +429,9 @@ linux下写.qs换行不生效，windows下写换行再放到linux下，换了一
 
 上面这段是不能正确地设置mainLayout为主布局的。。。所以，setEnabled最好只用在子布局上。。。
 
+# 关于在Qt中使用c++新功能
 
+Qt5.9.0 + Qt Creater 4.3.1 使用c++17需要同时加上 CONFIG += c++17 和 QMAKE_CXXFLAGS += -std=c++17
 
 [back](/)
 
