@@ -433,5 +433,15 @@ linux下写.qs换行不生效，windows下写换行再放到linux下，换了一
 
 Qt5.9.0 + Qt Creater 4.3.1 使用c++17需要同时加上 CONFIG += c++17 和 QMAKE_CXXFLAGS += -std=c++17
 
+# 在Qt不同的Library中优雅地包含其它Library或App中的文件
+
+背景: 原架构中各Library互不干扰
+
+需求: 新需求中其中一个Library需要分版本处理，而版本信息定义在主App的pro文件中，并在app中的一个类Setting里面保存。所以，要么Library中也加一个版本定义并且需要和app中的保持一致；要么Library需要在自身的pro中引用app中的Setting类文件。
+
+问题: 代码不好维护，不优雅，并且违背了Library之间相互独立的原则。
+
+解决方案: 。。。想不到啊啊啊。。。
+
 [back](/)
 
