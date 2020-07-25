@@ -104,5 +104,7 @@ MainWidget中每读取一行内容就调用槽函数发送信号。从log上看�
     file.close();
 ```
 
+并且，connect的最后一个参数ConnectionType也可以影响槽的响应。按官方文档，QueuedConnection槽是运行在接收端的，DirectConnection槽是运行在发送端的。所以如果槽没响应，可能是运行端任务重或是被阻塞了。
+
 [back](/)
 

@@ -443,5 +443,30 @@ Qt5.9.0 + Qt Creater 4.3.1 使用c++17需要同时加上 CONFIG += c++17 和 QMA
 
 解决方案: 。。。想不到啊啊啊。。。
 
+# ui布局问题 
+
+如果有一个widget以当前widget为parent初始化了，那么不管它有没有被增加到当前widget的layout中，都会在当前layout占有一席之地，一般是左上方。会出现挡住其它widget然而其它widget显示正常的问题，点击无效。
+
+# 编码问题
+
+QString遇到'\0'会截断。
+
+QByteArray中间可以包含'\0'。
+
+QFile的write遇到'\0'也会截断。
+
+QDataStream遇到'\0'同样会截断。
+
+QTextStream输入QByteArray遇到'\0'不会截断。
+
+```
+QFile file(dataPath);
+file.open(QFile::WriteOnly | QFile::Truncate);
+QTextStream out(&file);
+out.setCodec(QTextCodec::codecForName("utf-8"));
+out << reply->readAll();
+file.close();
+```
+
 [back](/)
 
