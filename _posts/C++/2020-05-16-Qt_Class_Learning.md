@@ -395,6 +395,26 @@ QFontDatabase::addApplicationFont(":/fonts/NotoSansTC-Medium.otf");
 
 只有字库中有的并且字库正确加载了(addApplicationFont返回不是-1)才能正常显示出来哦，否则只会显示对应字库中.notdef对应的字(空白或方块或其它)
 
+## 和QFont显示有关的第二个问题
+
+```
+xxx* widget = new xxx(this);
+widget->setTextFont("Helvetica Neue", 28, 500);
+int width = QFontMetrics(widget->font()).width(qsString);
+```
+
+上面一段代码，从某个widget中取出里面的font并计算在该font下字符串qsString所需要的宽度，结果。。。貌似算出来的width不太对哦~
+
+猜测可能的原因，这个时候widget还没有走到渲染的一步，所以从中取出的font不是设置的那个font?
+
+把最后一句改成
+```
+int width = QFontMetrics(mkFont("Helvetica Neue", 28, 500)).width(qsString);
+```
+就正常了。。。
+
+好纠结。。。
+
 # Qt国际化
 
 QTranslator translator.load(qmFilePath);
@@ -415,6 +435,9 @@ linux下写.qs换行不生效，windows下写换行再放到linux下，换了一
 然后发现工作中的label用了自定义的，setWrapAnywhere处理文本换行时一并把需要的换行给处理掉掉了。。。
 
 果然，祖传代码，你永远不知道它会有多少坑。。。
+
+
+
 
 # Qt布局
 
@@ -467,6 +490,24 @@ out.setCodec(QTextCodec::codecForName("utf-8"));
 out << reply->readAll();
 file.close();
 ```
+
+# QScrollArea布局问题
+
+又双叒叕是祖传代码的问题
+
+因为用在指定硬件上，所以用QxxScrollArea封装了一下QScrollArea，然后就发现，当文字小于给定的高度时，setWidget之后widget底部对齐了，最后一行还扩展了高度。。。
+
+看封装只有
+```
+    setWidgetResizable(true);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+```
+然后是一些触屏处理。并且把set的widget替换成Qt自带的widget后能正常显示。
+
+那么就应该是setWidget的那个封装的widget的问题咯~猜测这个应该是和Android的渲染流程一样吧，先从下往上渲染确定父控件的大小，再从上往下渲染，这时候如果原来的子控件比父控件要小得多，那么子控件就会被扩展拉伸？？？
+
+又一个坑。。。
 
 [back](/)
 
