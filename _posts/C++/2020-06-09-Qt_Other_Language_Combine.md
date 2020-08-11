@@ -30,6 +30,12 @@ tags:
 
 load是成功的，但是里面的函数都resolve不出来哦，没有参数的也不例外。
 
+## Qt调用ocx
+
+ocx貌似是在windows上用的，需要根据ocx的ssid用Qt带的工具dumpcpp先行生成.cpp和.h文件
+
+然后.pro文件还需要加上Qt += axcontainer，然后就会出现Qt左下角的build和debug都变灰色不可点击，output提示"Project ERROR: Unknown module(s) in QT: axcontainer"，然后就发现，Qt的axcontainer只能在windows下用，在linux下用不了。。。
+
 # Qt_Source
 
 版本: Qt 5.9.0
