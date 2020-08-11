@@ -64,6 +64,7 @@ MainWidget中每读取一行内容就调用槽函数发送信号。从log上看�
 > 信号被子控件过滤掉了
 > 传递参数是自定义的类型且没有register，需要用qRegisterMetaType<类型>("名称")才能作为signal-slot的参数
 > 就是上面这种，emmm......线程没起来~~~哭晕~~~
+> 对象没有实例化
 
 为什么moveToThread后还要手工thread->start?
 
@@ -105,6 +106,30 @@ MainWidget中每读取一行内容就调用槽函数发送信号。从log上看�
 ```
 
 并且，connect的最后一个参数ConnectionType也可以影响槽的响应。按官方文档，QueuedConnection槽是运行在接收端的，DirectConnection槽是运行在发送端的。所以如果槽没响应，可能是运行端任务重或是被阻塞了。
+
+# 记录一下对象没有实例化导致的槽函数无效的情况
+
+背景：调试服务器接口获取数据，写了一个NetworkManager类，把服务器的接口都封装到这个类里面了。
+
+然后在widget里面调用
+
+```
+    NetworkManager manager;
+    QByteArray qsEncodePassword = QCryptographicHash::hash(QByteArray("12345678"), QCryptographicHash::Md5);
+    manager.login("15732100905", QString(qsEncodePassword));
+    //manager.logout();
+```
+
+结果：有返回，reply不为空，也没有error，但是槽函数就是不触发。。。
+
+修改manager为指针对象后立马生效！！！
+
+```
+    NetworkManager *manager = new NetworkManager(this);
+    QByteArray qsEncodePassword = QCryptographicHash::hash(QByteArray("12345678"), QCryptographicHash::Md5);
+    manager->login("15732100905", QString(qsEncodePassword));
+    //manager.logout();
+```
 
 [back](/)
 
