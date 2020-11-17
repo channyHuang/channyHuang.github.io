@@ -197,11 +197,7 @@ export QT_IM_MODULE=ibus
 (20201110) Qt的默认配置文件是ini，c#的默认配置文件是xml，vs中，配置文件会自动加上.config，即，
 (20201111) 修改弹出窗口的位置问题，outlook的窗口没有GetPoint等函数进行输入光标定位，只能用winapi+估算了。GetCursorPos是获取鼠标光标的位置，GetCaretPos看起来像是获取输入光标的位置。
 (20201112) 研究Advance installer创建定制安装包。
+(20201113) 研究C#的Hook，鼠标钩子和键盘钩子。
 
-
-
-
-
-
-
-163a163@
+(20201116) keyhook发现一个问题，其它窗口下输入都有log，唯独在Outlook窗口下没反应。。。
+(20201117) 
