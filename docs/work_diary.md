@@ -220,3 +220,8 @@ export QT_IM_MODULE=ibus
 (20201207) 发现新大陆：dnSpy可以在没有源码的情况下调试c#程序集^.^于是发现，grammarly不管是代码架构还是代码量，都比我们好简直不要太多~
 (20201208) NetOffice.dll可以解决outlook插件支持多版本的问题
 (20201209) 看起来vsto改com可行
+(20201210) 全部改成com addin
+(20201211) 打包问题。RegAsm.exe可以直接注册，RegAsm.exe xxx.dll /codebase 删除RegAsm.exe xxx.dll /unregister
+
+(20201214) 写开发文档
+(20201215) 
