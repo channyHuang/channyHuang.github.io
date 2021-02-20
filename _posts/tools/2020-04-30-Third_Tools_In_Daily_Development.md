@@ -46,12 +46,18 @@ tags:
 
 > [在线运行](https://www.shellcheck.net/ shell)
 
-## 
+## c/c++库 
 
 > [cJson](https://github.com/DaveGamble/cJSON)
 
-> [curl](https://github.com/curl/curl)
+一个json解析c库
 
+> [curl](https://github.com/curl/curl)
+> [curl doc](https://curl.se/)
+
+网络访问c库
+
+> [openssl](https://www.openssl.org/)
 
 [back](/)
 

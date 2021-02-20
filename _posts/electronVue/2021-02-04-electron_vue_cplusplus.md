@@ -323,3 +323,8 @@ ELECTRON_BUILDER_BINARIES_MIRROR=http://npm.taobao.org/mirrors/electron-builder-
 ```
 
 上述命令打包后的结果会把node_modules也打包进去导致打包后的整个文件夹十分庞大。。。
+
+
+# reference 
+
+[Quick Start Guide](https://electronjs.org/docs/tutorial/quick-start)
