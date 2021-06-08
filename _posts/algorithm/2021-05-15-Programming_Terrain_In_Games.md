@@ -24,30 +24,25 @@ tags:
 
 ## noise type 噪声分类
 
-[fastnoise library](https://github.com/Auburn/FastNoise)
+[**fastnoise library**](https://github.com/Auburn/FastNoise) - a noise library contains most of classical noise
 
-single noise 
-	Lattic based
-		Gradient noise
-			Perlin noise
-			Simplex noise
-			Wavelet noise
-		Value noise
-	Point based
-fractal noise
-	fbm noise
-	fride noise
-	domain wrapping noise
+* single noise 
+	* Lattic based
+		* Gradient noise
+			* [**Perlin noise**](https://mrl.cs.nyu.edu/~perlin/noise/)
+			* Simplex noise
+			* Wavelet noise
+		* Value noise
+	* Point based
+		* Worley/Cell noise - Voronoi diagram
+* [fractal noise](https://thebookofshaders.com/13/?lan=ch)
+	* fbm noise
+	* ridge noise
+	* domain wrapping noise
 
 用各种noise可以生成地形高度图，但无法生成复杂结构如山洞等
 
-### reference 
-
-[从随机数到自然界中的噪声之二-Perlin Noise](https://zhuanlan.zhihu.com/p/77628759)
-
-[分形布朗运动fbm](https://thebookofshaders.com/13/?lan=ch)
-
-[常用噪声算法](https://zhuanlan.zhihu.com/p/346844820)
+### procedure terrain 利用噪声生成地形
 
 [Making maps with noise functions](https://www.redblobgames.com/maps/terrain-from-noise/)
 
@@ -63,13 +58,14 @@ fractal noise
 
 常用于生成平滑的地形
 
-> 生成网格梯度向量
-> 曲线拟合
-> Simplex Noise的梯度函数为三阶方程，避免导数不连续问题
+[perlin noise algorithm](https://adrianb.io/2014/08/09/perlinnoise.html)
+* 生成网格梯度向量
+* 曲线拟合
+* Simplex Noise的梯度函数为三阶方程，避免导数不连续问题
 
-[三维的柏林噪声，需要算出八个顶点的梯度贡献值，然后进行插值计算](http://www.twinklingstar.cn/2015/2581/classical-perlin-noise/)
+[**Perlin noise in 3d**](http://www.twinklingstar.cn/2015/2581/classical-perlin-noise/)
 
-[Perlin噪声具体实现参考](https://www.scratchapixel.com/lessons/procedural-generation-virtual-worlds/perlin-noise-part-2/perlin-noise-terrain-mesh)
+[Perlin noise implement](https://www.scratchapixel.com/lessons/procedural-generation-virtual-worlds/perlin-noise-part-2/perlin-noise-terrain-mesh)
 
 2d perlin noise可生成高度图，3d perlin noise可生成立体图
 
@@ -123,31 +119,31 @@ fractal noise
 
 ### 3D 等值面提取/网格重建
 
-> Marching Cubes
-> Marching tetrahedra
-> Dividing Cubes
-> Dual Contouring (Hermite data)
-> Transvoxel (http://transvoxel.org/)
-> Naive Surface Nets
+* [Marching Cubes](http://paulbourke.net/geometry/polygonise/)
+* Marching tetrahedra
+* Dividing Cubes
+* Dual Contouring (Hermite data)
+* [Transvoxel](http://transvoxel.org/)
+* Naive Surface Nets
 
 # Delaunay三角化
 ## godot Voxel Tools
 
-|- VoxelTerrain
-	|- VoxelBuffer //mininum storage cell 
-		|- VoxelGeneratorNoise
-		|- SimplexNoise //generate 3d terrain with lod
-	|- VoxelMap
-		|- VoxelBlock //include voxel buffer、material、mesh etc
+* VoxelTerrain
+	* VoxelBuffer //mininum storage cell 
+		* VoxelGeneratorNoise
+		* SimplexNoise //generate 3d terrain with lod
+	* VoxelMap
+		* VoxelBlock //include voxel buffer、material、mesh etc
 	
-|- VirsulServerRaster //render
-	|- VisualServerCanvas
-	|- VisualServerViewport
-	|- VisualServerScene
+* VirsulServerRaster //render
+	* VisualServerCanvas
+	* VisualServerViewport
+	* VisualServerScene
 	
 ## 数学相关
 
-###距离分类
+### 距离分类
 
 * Euclidean 
 Use the Euclidean distance metric
@@ -163,6 +159,8 @@ Use the Minkowski distance metric.
 
 ### 数学库
 
+[CGAL](https://www.cgal.org/)
+
 [ALGLIB]
 
 [Eigen]
@@ -173,47 +171,43 @@ Use the Minkowski distance metric.
 
 ## 生态模拟
 
-> 山地：perlin + fbm
-> 沙丘：perlin + ridge
-> 平原/丘陵/极地：perlin + domain wrapping
-> 电路板：domain wrapping
-
-
-## 河流
-
-确定最小初始高度，随机河流源头，梯度下降，erosion生成流域图
-
-erosion
-
-## 植被
-
-到水源的距离确定湿度
-
-基于密度图的植被放置方法。
-
-利用一张灰度图来控制植被模型的分布。一层灰度信息只能控制一种植物的分布。
-
-density
-
-pointcloud
-
-## 道路
-
-贝塞尔曲线
-
-Catmull-Rom曲线
+* 山地：perlin + fbm
+* 沙丘：perlin + ridge
+```c++
+	//fast_noise_lite
+	//set noise type
+	noiseLite.SetNoiseType(NoiseType_Perlin);
+	noiseLite.SetFractalType(FractalType_Ridged);
+    
+    //set noise params
+    noiseLite.SetFrequency(0.01);
+    noiseLite.SetFractalGain(0.5);
+    noiseLite.SetFractalOctaves(7);
+    noiseLite.SetFractalLacunarity(1.0/1.75);
+    noiseLite.SetFractalWeightedStrength(2);
+```
+* 平原/丘陵/极地：perlin + domain wrapping
+* 电路板：domain wrapping
+* **河流**
+	* 交互：确定最小初始高度，随机河流源头，梯度下降，erosion生成流域图
+	* 非交互：
+* [植被](http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/demo.html) （温度、湿度、高度）
+	* 到水源的距离确定湿度
+	* 基于密度图的植被放置方法
+	* 三种噪声分别对应三个因素
+* 道路
+	* 贝塞尔曲线，Catmull-Rom曲线
+* 城市
 
 ## 地形平滑
 
-Gaussian filter 3d
+[Gaussian filter](https://www.geeksforgeeks.org/gaussian-filter-generation-c/)
+
+bi-linear interpolation
 
 对voxel中的data进行滤波
 
-### 2D
-
-3*3 filter
-
-bi-linear interpolation
+[voxel terrain storage](https://zeux.io/2017/03/27/voxel-terrain-storage/)
 
 ```
 ^
@@ -233,10 +227,11 @@ AB = A.h * (1.0 - px) + B.h * px;
 CD = C.h * (1.0 - px) + D.h * px;
 ABCD = AB * (1.0 - py) + CD * py;
 ```
-Gaussian filter 
-
-
 
 ## convex hull
 
 Andrew / Quickhull
+
+## raytracing
+
+[Raytracing on a grid](http://playtechs.blogspot.com/2007/03/raytracing-on-grid.html)
