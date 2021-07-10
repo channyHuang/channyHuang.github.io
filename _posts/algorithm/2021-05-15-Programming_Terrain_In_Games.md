@@ -52,6 +52,8 @@ tags:
 
 [Free Terrain 3D models](https://www.cgtrader.com/free-3d-models/terrain)
 
+[Fantasy Map Generator](https://github.com/rlguy/FantasyMapGenerator)
+
 ### Perlin Noise/Simplex Noise
 
 其中Perlin noise被广泛应用，可以用Perlin噪声生成三维噪声图，[-1,1]分布，根据每个空间点的噪声正负确定该点是否是地形的一部分（marching cubes 网格化算法）
@@ -113,6 +115,10 @@ tags:
 
 根据目标像素到最近中心点的距离确定高度，距离有Eular距离等
 
+### Diamond Square
+
+
+
 ## Voxel数据存储
 
 每个数组元素（Voxel）保存的不再是高度值，而是一个近似的距离值（iso-value）或密度值SDF，表示这个点有多大程度在土地里或暴露在空气中。
@@ -122,9 +128,10 @@ tags:
 * [Marching Cubes](http://paulbourke.net/geometry/polygonise/)
 * Marching tetrahedra
 * Dividing Cubes
-* Dual Contouring (Hermite data)
-* [Transvoxel](http://transvoxel.org/)
+* Dual Contouring (Hermite data) 根据法线最小化误差函数求得点所在的坐标，每个inside的voxel顶点对应生成一个点，法线可指定
+* [Transvoxel](http://transvoxel.org/) MC的改进
 * Naive Surface Nets
+* Poisson
 
 # Delaunay三角化
 ## godot Voxel Tools
@@ -159,7 +166,7 @@ Use the Minkowski distance metric.
 
 ### 数学库
 
-[CGAL](https://www.cgal.org/)
+[CGAL](https://www.cgal.org/) 使用LGPL和GPL协议
 
 [ALGLIB]
 
@@ -188,7 +195,7 @@ Use the Minkowski distance metric.
 ```
 * 平原/丘陵/极地：perlin + domain wrapping
 * 电路板：domain wrapping
-* **河流**
+* **河流**: Voronoi图
 	* 交互：确定最小初始高度，随机河流源头，梯度下降，erosion生成流域图
 	* 非交互：
 * [植被](http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/demo.html) （温度、湿度、高度）
@@ -199,6 +206,8 @@ Use the Minkowski distance metric.
 	* 贝塞尔曲线，Catmull-Rom曲线
 * 城市
 
+[在地图上生成蜿蜒河流的两种方法](https://www.gameres.com/862595.html)
+[Polygonal Map Generation for Games](http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/)
 ## 地形平滑
 
 [Gaussian filter](https://www.geeksforgeeks.org/gaussian-filter-generation-c/)
