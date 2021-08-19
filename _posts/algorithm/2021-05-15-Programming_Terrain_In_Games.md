@@ -244,3 +244,33 @@ Andrew / Quickhull
 ## raytracing
 
 [Raytracing on a grid](http://playtechs.blogspot.com/2007/03/raytracing-on-grid.html)
+
+
+## 同roblox的比较
+
+### 笔刷+水材质，以下terrain表示非水材质的地形
+
+* **增加/生长** 
+	* 水：先减少terrain，后增加水
+	* terrain: 可在水上定位，但忽略水，直接增加terrain
+* **减少/侵蚀** 
+	* 已有水不受影响，先减少terrain，当减少部分有水时，水不做减少，原来要减少的部分替换成水
+* **光滑**
+	* 水和terrain同等对待
+* **展平**
+	* 展平terrain，当展平部分满足一定条件时，增加水
+* **绘制**
+	* terrain能绘制成水，不可逆
+* **海平面**
+	* 在一个整体范围内增加/删除所有水
+	
+	
+## 地形lod
+
+* LOD减面
+	* 保持最外圈的网格信息，减化内圈的网格信息 [改进的Unreal4减面算法](https://zhuanlan.zhihu.com/p/46246467)
+* 边插入/删除
+	* [边删除&边插入](https://blog.csdn.net/u012234115/article/details/48055399)
+* **缝合** 前提：不同lod相接的地方有共同顶点
+	* [缝合](https://zhuanlan.zhihu.com/p/158851901)
+* [CDLOD](https://www.docin.com/touch_new/preview_new.do?id=894948728)
