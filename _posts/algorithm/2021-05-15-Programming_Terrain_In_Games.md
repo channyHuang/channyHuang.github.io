@@ -126,7 +126,7 @@ tags:
 ### 3D 等值面提取/网格重建
 
 * [Marching Cubes](http://paulbourke.net/geometry/polygonise/)
-* Marching tetrahedra
+* Marching tetrahedra (2D) - Marching Cube (3D)
 * Dividing Cubes
 * Dual Contouring (Hermite data) 根据法线最小化误差函数求得点所在的坐标，每个inside的voxel顶点对应生成一个点，法线可指定
 * [Transvoxel](http://transvoxel.org/) MC的改进
@@ -274,3 +274,8 @@ Andrew / Quickhull
 * **缝合** 前提：不同lod相接的地方有共同顶点
 	* [缝合](https://zhuanlan.zhihu.com/p/158851901)
 * [CDLOD](https://www.docin.com/touch_new/preview_new.do?id=894948728)
+
+## 网格面简化
+
+* 基于二次误差度量的网格简化
+	* 二次度量误差（QEM，quadric error metric）指的是当前顶点到其邻域所有三角面（也称关联平面）的距离平方和。
