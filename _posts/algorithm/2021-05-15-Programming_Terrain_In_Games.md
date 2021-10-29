@@ -16,11 +16,22 @@ tags:
 
 ## 概述
 
-1. 最终目标为生成全局地形vBox/vSphere，地形种类为n
-1. voronoi分成n个区域，对应n种地形
-1. 对每个区域生成对应地形
-1. 地形边界平滑处理
-1. 地形生态根据区域随机生成（erosion侵蚀，高度决定植被）
+最终目标为生成全局地形vBox，地貌种类为n，包括如下部分：
+* 基本地形生成，地形高低起伏，考虑洞穴（地形网格，否则直接用高度图即可）
+* 地貌类型，根据地形高度和不同地貌的概率确定（地形材质） 
+* 生态，主要为动植物分布
+* 其它物品
+
+基本思路： 
+1. 非机器学习
+	1. voronoi分成n个区域，对应n种地貌
+	2. 对每个区域生成对应地貌
+		1. 噪声生成主地貌
+		2. 地形边界平滑处理，噪声参数+权重
+	3. 地形生态根据区域随机生成（erosion侵蚀，高度决定植被）
+2. 机器学习
+	1. 输入点、线、面作为地形高度、生态类型参考，算法生成具体生态
+	2. 生态笔刷
 
 ## noise type 噪声分类
 
@@ -133,22 +144,13 @@ tags:
 * Naive Surface Nets
 * Poisson
 
-# Delaunay三角化
-## godot Voxel Tools
-
-* VoxelTerrain
-	* VoxelBuffer //mininum storage cell 
-		* VoxelGeneratorNoise
-		* SimplexNoise //generate 3d terrain with lod
-	* VoxelMap
-		* VoxelBlock //include voxel buffer、material、mesh etc
-	
-* VirsulServerRaster //render
-	* VisualServerCanvas
-	* VisualServerViewport
-	* VisualServerScene
+### Delaunay三角化
 	
 ## 数学相关
+
+### convex hull
+
+Andrew / Quickhull
 
 ### 距离分类
 
@@ -177,6 +179,8 @@ Use the Minkowski distance metric.
 [Math Libraries in C++](https://en.wikipedia.org/wiki/List_of_numerical_libraries#C++)
 
 ## 生态模拟
+
+1. 不同噪声生成不同地形
 
 * 山地：perlin + fbm
 * 沙丘：perlin + ridge
@@ -208,6 +212,7 @@ Use the Minkowski distance metric.
 
 [在地图上生成蜿蜒河流的两种方法](https://www.gameres.com/862595.html)
 [Polygonal Map Generation for Games](http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/)
+
 ## 地形平滑
 
 [Gaussian filter](https://www.geeksforgeeks.org/gaussian-filter-generation-c/)
@@ -237,14 +242,10 @@ CD = C.h * (1.0 - px) + D.h * px;
 ABCD = AB * (1.0 - py) + CD * py;
 ```
 
-## convex hull
-
-Andrew / Quickhull
-
-## raytracing
+## 物理相关
+### raytracing
 
 [Raytracing on a grid](http://playtechs.blogspot.com/2007/03/raytracing-on-grid.html)
-
 
 ## 同roblox的比较[Roblox-StudioTools](https://github.com/Roblox/Studio-Tools)
 
@@ -264,8 +265,8 @@ Andrew / Quickhull
 * **海平面**
 	* 在一个整体范围内增加/删除所有水
 	
-	
-## 地形lod
+## 性能优化
+### 地形lod
 
 * LOD减面
 	* 保持最外圈的网格信息，减化内圈的网格信息 [改进的Unreal4减面算法](https://zhuanlan.zhihu.com/p/46246467)
@@ -275,7 +276,7 @@ Andrew / Quickhull
 	* [缝合](https://zhuanlan.zhihu.com/p/158851901)
 * [CDLOD](https://www.docin.com/touch_new/preview_new.do?id=894948728)
 
-## 网格面简化
+### 网格面简化
 
 * 基于二次误差度量的网格简化
 	* 二次度量误差（QEM，quadric error metric）指的是当前顶点到其邻域所有三角面（也称关联平面）的距离平方和。
