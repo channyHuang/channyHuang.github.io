@@ -382,6 +382,12 @@ local allBiomes = {
 	['Water'] = false,
 }
 
+function writeFile(content)
+	local f = assert(io.open('roblox.txt', 'a+'))
+	f:wirte(content)
+	f:close()
+end
+
 function generate()
 		local mapWidth = mapWidth
 		local biomeSize = biomeSize
@@ -542,7 +548,8 @@ function generate()
 					mMapY[z] = (y == 1 and lava) or (smoothedResult <= 0 and air) or (surface and choiceSurface) or choiceFill
 					
 					--sdf and material
-					print(x, y, z, oMapY[z], mMapY[z]);
+					--print(x, y, z, oMapY[z], mMapY[z]);
+					writeFile(x, y, z, oMapY[z], mMapY[z]);
 				end
 			end
 		end

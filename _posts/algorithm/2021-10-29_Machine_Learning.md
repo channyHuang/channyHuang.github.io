@@ -88,3 +88,10 @@ ML侧重分类，DL侧重识别
 * FANN
 * OpenNN
 * Armadillo
+
+## 监督学习
+![Choose Model](./imageFormat/ml_map.png)
+
+
+# reference
+[Choose Model](https://scikit-learn.org/stable/tutorial/machine_learning_map/index.html)
