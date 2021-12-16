@@ -17,3 +17,6 @@ tags:
 ## 概述
 
 ![water_rendering](./imageFormat/water_render.jpg)
+
+## Reference 
+[RayTracing](https://github.com/RayTracing/raytracing.github.io)
