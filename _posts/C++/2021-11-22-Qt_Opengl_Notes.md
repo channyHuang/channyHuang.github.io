@@ -16,6 +16,15 @@ tags:
 
 前置技能：Qt创建窗口，Qt信号槽基本使用，图形学基本知识，shader语言
 
+环境：Qt 5.12，后期使用Qt 6.2，前期代码部分函数未修改会编译不过
+
+# 补充说明（后增）
+
+Qt 6的opengl有较大的改动
+
+1. Qt 5的pro文件不需要加QT += opengl也能正常使用opengl；而Qt 6一定要在pro文件加上QT += opengl openglwidgets才能编译过
+1. Qt 5的QOpenglContext有接口versionFunctions可以获取各个版本的QOpenGLFunctions；而Qt 6只有QOpenGLFunctions和QOpenGLExtraFunctions可以直接从QOpenglContext中获取（extraFunctions），具体版本的函数需要通过QOpenGLVersionFunctionsFactory::get<QOpenGLFunctions_X_X_Core>(this->context())获取
+
 ## Qt OpenGL 1: 创建QtOpenGL窗口
 
 ### 创建空窗口
@@ -99,7 +108,7 @@ triangle_stripe的顶点索引以两个相同数字结尾，遵循face(v1, v2, v
 
 ## Qt OpenGL 7: Light
 
-## reference 
+# reference 
 
 [super bible](https://github.com/openglsuperbible/sb7code)
 [raytracing](https://github.com/RayTracing/raytracing.github.io)
