@@ -99,5 +99,10 @@ triangle_stripe的顶点索引以两个相同数字结尾，遵循face(v1, v2, v
 
 ## Qt OpenGL 7: Light
 
+## reference 
+
+[super bible](https://github.com/openglsuperbible/sb7code)
+[raytracing](https://github.com/RayTracing/raytracing.github.io)
+[raytracing_book](https://matrix4f.com/categories/Graphic/)
 [back](/)
 
