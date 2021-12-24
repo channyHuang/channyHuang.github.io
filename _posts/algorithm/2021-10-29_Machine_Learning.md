@@ -72,7 +72,7 @@ ML侧重分类，DL侧重识别
 * numpy: 数学计算
 * matplotlib: 画图
 ### 机器学习库
-* Scikit learn(sklearn):
+* Scikit learn([sklearn](https://sklearn.apachecn.org/#/)):
 * [tensorflow](https://www.tensorflow.org/)(keras):
 * Theano: 类似于tensorflow
 * [PyTorch](https://pytorch.org/tutorials/):
