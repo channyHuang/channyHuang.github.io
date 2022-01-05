@@ -281,3 +281,5 @@ ABCD = AB * (1.0 - py) + CD * py;
 * 基于二次误差度量的网格简化
 	* 二次度量误差（QEM，quadric error metric）指的是当前顶点到其邻域所有三角面（也称关联平面）的距离平方和。
 	
+# reference
+[天美F1引擎专家：如何利用PCG技术加速大世界地形生产](https://mp.weixin.qq.com/s/G-GEXc5J-Fb8S5xAmYDI0A)
