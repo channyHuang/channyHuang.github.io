@@ -45,6 +45,21 @@ ML侧重分类，DL侧重识别
 * 池化层：下采样，降低数据维度
 * 全连接层
 
+#### Tensorflow应用
+```python
+from keras.models import Sequential
+model = Dequential
+```
+建立最简单的线性模型(Sequential)，一层层向下执行，没有分支，也没有回路
+```python
+from tensorflow.keras.layers import Convolution2D,MaxPooling2D,Flatten,Dense,Dropout
+model.add(Convolution2D(filters = 128, kernel_size = (5, 5), padding = 'Same', activation = 'relu', input_shape = (28, 28, 1)))
+model.add(MaxPooling2D(pool_size = (2,2))
+model.add(Dropout(0.25))
+model.add(Flatten())
+model.add(Dense(10, activation = 'softmax'))
+```
+
 ### RNN
 * 生成器
 * 判别器

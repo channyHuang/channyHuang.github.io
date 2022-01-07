@@ -139,10 +139,11 @@ tags:
 * [Marching Cubes](http://paulbourke.net/geometry/polygonise/)
 * Marching tetrahedra (2D) - Marching Cube (3D)
 * Dividing Cubes
-* Dual Contouring (Hermite data) 根据法线最小化误差函数求得点所在的坐标，每个inside的voxel顶点对应生成一个点，法线可指定
+* Dual Contouring (Hermite data) 根据法线最小化误差函数求得点所在的坐标，每个inside的voxel顶点对应生成一个点，法线可指定 [DC](https://www.cse.wustl.edu/~taoju/research/dualContour.pdf)
 * [Transvoxel](http://transvoxel.org/) MC的改进
-* Naive Surface Nets
+* Naive Surface Nets [SurfaceNets](https://link.springer.com/content/pdf/10.1007%2FBFb0056277.pdf)
 * Poisson
+* Dual Marching Cubes [dmc](https://www.cs.rice.edu/~jwarren/papers/dmc.pdf)
 
 ### Delaunay三角化
 	
@@ -280,6 +281,8 @@ ABCD = AB * (1.0 - py) + CD * py;
 
 * 基于二次误差度量的网格简化
 	* 二次度量误差（QEM，quadric error metric）指的是当前顶点到其邻域所有三角面（也称关联平面）的距离平方和。
+
+[Simplify Surface](https://www.ri.cmu.edu/pub_files/pub2/garland_michael_1997_1/garland_michael_1997_1.pdf)
 	
 # reference
 [天美F1引擎专家：如何利用PCG技术加速大世界地形生产](https://mp.weixin.qq.com/s/G-GEXc5J-Fb8S5xAmYDI0A)
