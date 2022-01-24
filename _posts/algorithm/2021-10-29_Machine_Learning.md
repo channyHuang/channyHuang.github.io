@@ -64,9 +64,15 @@ model.add(Dense(10, activation = 'softmax'))
 * 生成器
 * 判别器
 
+与CNN输入数据之间相互无关不同，RNN输入数据的先后顺序影响数据的权重，主要适用于文本生成、机器翻译、语音识别、生成图像描述等方面。
+
 ### GAN
 生成数据
 [GAN Zoo](https://github.com/hindupuravinash/the-gan-zoo)
+
+> 样例
+[pix2pix](https://github.com/affinelayer/pix2pix-tensorflow)
+[SPADE-Terrain](https://github.com/tpapp157/SPADE-Terrain-GAN)
 
 ## 数据处理
 ### 数据清洗

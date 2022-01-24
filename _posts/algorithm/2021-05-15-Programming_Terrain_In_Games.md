@@ -134,6 +134,9 @@ tags:
 
 每个数组元素（Voxel）保存的不再是高度值，而是一个近似的距离值（iso-value）或密度值SDF，表示这个点有多大程度在土地里或暴露在空气中。
 
+[SDF](https://github.com/fogleman/sdf.git)
+[distfunctions](https://iquilezles.org/www/articles/distfunctions/distfunctions.htm)
+
 ### 3D 等值面提取/网格重建
 
 * [Marching Cubes](http://paulbourke.net/geometry/polygonise/)
@@ -286,3 +289,4 @@ ABCD = AB * (1.0 - py) + CD * py;
 	
 # reference
 [天美F1引擎专家：如何利用PCG技术加速大世界地形生产](https://mp.weixin.qq.com/s/G-GEXc5J-Fb8S5xAmYDI0A)
+[Virtual Terrain](http://vterrain.org/)
