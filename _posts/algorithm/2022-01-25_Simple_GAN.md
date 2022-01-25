@@ -8,7 +8,7 @@ tags:
 ---
 //Description: Simple_GAN (一个简单的GAN例子)
 
-//Create Date: 2022-01-24 15:28:39
+//Create Date: 2022-01-25 15:28:39
 
 //Author: channy
 
