@@ -22,6 +22,8 @@ tags:
 ## 背景
 文本生成图像：VAE(Variational Auto-Encoder)，DRAW（Deep Recurrent Attention Writer）以及GAN(GAN-INT-CLS)等
 
+启发：[pixray](https://github.com/pixray/pixray) [pixray-demo](https://replicate.com/pixray/text2image)
+
 ## 功能拆分
 1. 根据输入的几何体名称，自动生成基于voxel的sdf数据和网格s
 
@@ -46,8 +48,7 @@ tags:
 # reference
 ## 近年text-to-image论文及代码
 * python 2.7 + pytorch
-> 2017 [StackGAN++](https://github.com/hanzhanggit/StackGAN-v2)  
-> 2018 [AttnGAN](https://github.com/taoxugit/AttnGAN) 
+> 2017 [StackGAN++](https://github.com/hanzhanggit/StackGAN-v2) [StackGAN-inception-model](https://github.com/hanzhanggit/StackGAN-inception-model)
 > [Recipe2ImageGAN](https://github.com/netanelyo/Recipe2ImageGAN)
 * python 2.7 + tensorflow 0.12
 > 2017 [StackGAN](https://github.com/hanzhanggit/StackGAN)  
@@ -57,15 +58,15 @@ tags:
 > 2019 [DM-GAN](https://github.com/MinfengZhu/DM-GAN)
 * python 2.7
 > 2016 [text2image](https://github.com/mansimov/text2image)
-* tensorflow 1.0
+* python 3 + tensorflow 1.0
 > 2016 [text-to-image](https://github.com/zsdonghao/text-to-image)
 * pytorch + CuDNN
 > 2016 [Learning What and Where to Draw](https://github.com/reedscot/nips2016)
 * python + Caffe
 > 2017 [Plug and Play Generative Networks](https://github.com/Evolving-AI-Lab/ppgn)
-* python 3.6 + pytorch 1.0
+* python 3+ + pytorch 1.0+
+> 2018 [AttnGAN](https://github.com/davidstap/AttnGAN) 
 > 2020 [DF-GAN](https://github.com/tobran/DF-GAN)
-* python 3.7 + pytorch 1.1
 > 2019 [ControlGAN](https://github.com/mrlibw/ControlGAN)  
 > 2020 [ManiGAN](https://github.com/mrlibw/ManiGAN) 基于ControlGAN的改进
 
@@ -79,6 +80,9 @@ tags:
 * python 2/3 + pytorch
 > 2018 [Z-GAN](https://github.com/vlkniaz/Z_GAN)
 
+## 地形有关的GAN
+[PoE-GAN](https://deepimagination.cc/PoE-GAN/)
+
 # 附录一：binvox文件基本结构
 binvox文件由ASCII的文件头和二进制的数据组成
 ```binvox头
@@ -91,3 +95,18 @@ data
 其中，"#binvox 1"指定版本号，"dim"指定体素网格的size，"translate"和"scale"用于正则化对应的变换，"data"标志文件头结束，往下都是数据。
 二进制数据中包含多对数据，每对数据(pair)的首个byte是当前pair的具体数值0或1（1表示该voxel被填充），第二个byte是当前数值被重复多少次[1,255]。  
 即：binvox是把原voxel的数据生成一个一维的数组，并将重复的点压缩后得到的结果
+
+[**binvox-rw-py**](https://github.com/dimatura/binvox-rw-py)
+
+# 附录二：mesh-to-sdf
+[mesh-voxelization](https://github.com/FairyPig/mesh-voxelization)
+
+# 附录三：工具类
+[pytorch-DCGAN](https://pytorch.apachecn.org/#/docs/1.7/22)
+[python-library-binary](https://www.lfd.uci.edu/~gohlke/pythonlibs/)
+[keras](https://keras.io/examples/)
+* 中文python分词工具
+> [jieba](https://github.com/fxsjy/jieba)
+> [pkuseg](https://github.com/lancopku/pkuseg-python)
+> [FoolNLTK](https://github.com/rockyzhengwu/FoolNLTK)
+> [THULAC](https://github.com/thunlp/THULAC-Python)
