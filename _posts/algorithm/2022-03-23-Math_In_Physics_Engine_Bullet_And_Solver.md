@@ -1,3 +1,17 @@
+---
+layout: default
+title: Math In Physics Engine Bullet And Solver
+categories:
+- Game
+tags:
+- Game
+---
+//Description: Math In Physics Engine Bullet And Solver, 物理引擎库Bullet中的数学和求解器
+
+//Create Date: 2022-03-23 15:32:39
+
+//Author: channy
+
 <head>
     <script type="text/x-mathjax-config">
     MathJax.Hub.Config({ TeX: { equationNumbers: { autoNumber: "all" } } });
@@ -14,20 +28,6 @@
     <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript">
     </script>
 </head>
-
----
-layout: default
-title: Math In Physics Engine Bullet And Solver
-categories:
-- Game
-tags:
-- Game
----
-//Description: Math In Physics Engine Bullet And Solver, 物理引擎库Bullet中的数学和求解器
-
-//Create Date: 2022-03-23 15:32:39
-
-//Author: channy
 
 # 概述 
 物理引擎库Bullet中的数学和求解器。以bullet3为例。
