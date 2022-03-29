@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Physics_About_Constraint_Equation.md
+title: Physics_About_Constraint_Equation
 categories:
 - Game
 tags:
@@ -18,7 +18,7 @@ tags:
 # 基本物理变量
 | 线性 | 旋转 |
 | --- | --- | --- |
-| 质量：m = F / a | 转动惯量：单质点 I = m r^2, 刚体 I = \int \rho r^2 dV, 其中r是每个微元到转轴的距离 |
+| 质量：$$ m = F / a $$ | 转动惯量：单质点 I = m r^2, 刚体 I = \int \rho r^2 dV, 其中r是每个微元到转轴的距离 |
 | 加速度：a = dv / dt = d^2x / dt^2 | 角加速度：\beta = dw / dt = d^w(\psi) / dt^2 , a = r \beta | 
 | 速度：v = \delta(s) / \delta(t) | 角速度：w = d(\psi) / dt |
 | 动量(momentum)：P = m v | 角动量：L = r x p = r x (m v) = r x (\omega x (m r)) = m r^2 \omega = I \omega |
