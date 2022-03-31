@@ -29,6 +29,8 @@ tags:
 
 //Author: channy
 
+[toc]
+
 # 概述 
 物理引擎库Bullet中的数学和求解器。以bullet3为例。
 
@@ -108,6 +110,56 @@ q_i / d_is = min{q_i / d_is, d_is > 0}
 GS方法是SOR方法的特例
 松弛因子(relaxation factor)
 选择适当的松弛因子能使收敛的Gauss-Seidel迭代法获得加速收敛的效果
+
+## PGS求解器
+### 碰撞接触约束方程推导
+要解决碰撞约束，最直接的想法就是两者不再继续碰撞  
+则碰撞点和碰撞分离法线之间的关系 (P_b - P_a) * n >= 0 (在分离法线上的投影大于0)  
+
+C为质心，r为到碰撞点的距离，(C_b + r_b - C_a - r_a) * n >= 0, 对于时间微分，得 (V_b + w_b x r_b - V_a - w_a x r_a) * n >= 0 即为约束不等式 
+
+### 具体推导过程
+
+当刚体A与刚体B在某点接触时,接触点有约束方程
+![约束方程](./imageFormat/physics_1.png)
+其中x为刚体的质心坐标，R为刚体的旋转矩阵,r为接触点相对质心的距离。
+
+我们希望在碰撞后相对速度在法线方向的投影大于等于0。于是对上述方程对时间求导
+![约束方程求导](./imageFormat/physics_2.png)
+
+我们可以根据角速度的定义得到旋转矩阵的求导结果。
+
+将和速度有关的变量提取作为向量得到
+![约束方程求导变形](./imageFormat/physics_3.png)
+
+其中可以利用
+![角速度公式](./imageFormat/physics_4.png)
+这个公式来将角速度项从方程中提出来
+
+将右边的速度项记作V左手项为J有
+![约束方程简记](./imageFormat/physics_5.png)
+其中b为了方便我们将外因引入方程所预留的一个变量
+
+现在我们需要对系统施加一个冲量让方程能维持值等于0的状态。
+
+我们将对A的冲量，A的冲量矩，B的冲量，B的冲量矩像之前那样排成一个向量记成P，P就是我们待求的量。
+
+注意到在求法线方向的约束时，冲量的方向应该与法线方向相同。P的实际自由度只有1。因此，我们可以记成
+![冲量不做功](./imageFormat/physics_6.png)
+
+为了方便我们计算冲量，我们需要将质量排布成矩阵的形式：
+![质量矩阵](./imageFormat/physics_7.png)
+
+其中矩阵中的M为元素大小均为对应刚体质量的对角矩阵。而I为对应刚体的转动惯量。
+
+将上述式子带入约束方程得到
+![约束方程最终形式](./imageFormat/physics_8.png)
+
+由于计算结果是标量，我们可以简单的写成
+![约束方程求解对象](./imageFormat/physics_9.png)
+
+当b=0时，这个式子的形式和经典完全非弹性碰撞求解得到的结果是一样的，在某种程度上也验证了这个式子的正确性。
+
 ## bullet3 中的 MLCP 求解器 solveMLCP 
 btMLCPSolverInterface.solveMLCP
 
@@ -136,6 +188,119 @@ btMLCPSolverInterface.solveMLCP
 			* GaussJordanEliminationStep Gauss-Jordan消元法
 	z0 = max{-q_i}
 * btPathSolver //未启用，缺少头文件 
+
+## solver前奏
+* btMLCPSolver 继承于btSequentialImpulseConstraintSolver，重写了三步曲
+	* solveGroupCacheFriendlySetup 设置A、x和b
+		* createMLCP/createMLCPFast
+	* solveGroupCacheFriendlyIterations
+		* solveMLCP 具体LCP求解
+
+## bullet3 中的约束求解器 solveGroup 求解器三步曲  
+btConstraintSolver.solveGroup  
+
+* solveGroup (btDiscreteDynamicsWorld::processIsland调用) PGS 方法来处理分析所有的约束
+	* solveGroupCacheFriendlySetup 三类nonContact、contact、friction分开求解
+		* setupSolverFunctions 设置后续求解器的三个函数，三个函数类似，都是求冲量，返回 **deltaImpulse * (1. / c.m_jacDiagABInv);**
+			* gResolveSingleConstraintRowGeneric_scalar_reference PGS/SI内部求解单行约束，同时应用上下界
+				* internalApplyImpulse 根据求得的单位时间内冲量更新物体单位时间内的速度和角速度
+			* gResolveSingleConstraintRowLowerLimit_scalar_reference 同上，只应用下界
+			* gResolveSplitPenetrationImpulse_scalar_reference 受btSolverConstraint的m_rhsPenetration控制下要么返回0，要么只应用下界，同上一个函数
+		* convertBodies 计算每个body的torque impulse。陀螺力矩。角速度更新主要应用了冲量矩(moment of impulse)/角冲量(angular impulse)定理。主要有以下3步，最后更新刚体角速度
+			* getOrInitSolverBody
+				* initSolverBody 根据碰撞体设置btSolverBody的系数默认值，角速度线速度等。1): 根据冲量矩定理计算角动量的变化，这里乘了逆惯性张量，得出的是dt时间段内角速度的变化量，计算外力矩引起的角速度变化， m_externalTorqueImpulse 实际是角速度变化量；
+			* computeGyroscopicForceExplicit (btRigidBody) 
+			* computeGyroscopicImpulseImplicit_World 以世界坐标系为参考
+			* computeGyroscopicImpulseImplicit_Body 以自身坐标系为参考。2) 计算陀螺力矩引起的角速度变化并加到m_externalTorqueImpulse 上；gyroForce实际是角速度变化量；
+		* convertJoints 对每个约束，创建Jacobian矩阵，及其它数据，J*v = c + cfm * lambda。非接触的
+			* buildJacobian (btTypedConstraint)
+			* convertJoint
+				* getInfo2 (btTypedConstraint，cfm、damping等系数)
+		* convertContacts 对每个manifold,更新摩擦系数等参数
+			* convertContact 接触约束中可能有滑动摩擦和滚动摩擦   
+				* setupContactConstraint 对应m_tmpSolverContactConstraintPool
+				* addTorsionalFrictionConstraint
+					* setupTorsionalFrictionConstraint 对应m_tmpSolverContactRollingFrictionConstraintPool
+				* applyAnisotropicFriction
+				* addFrictionConstraint
+					* setupFrictionConstraint 对应对应m_tmpSolverContactConstraintPool
+				* setFrictionConstraintImpulse
+	* solveGroupCacheFriendlyIterations 支持SSE2/SSE4/FMA3指令集
+		* solveGroupCacheFriendlySplitImpulseIterations
+			* resolveSplitPenetrationImpulse
+				* gResolveSplitPenetrationImpulse_scalar_reference 计算施加冲量
+		* solveSingleIteration 单次迭代，有Random_order
+			* solveConstraintObsolete (只 btConeTwistConstraint 才有具体实现)
+			* resolveSingleConstraintRowLowerLimit
+			* resolveSingleConstraintRowGeneric
+				* gResolveSingleConstraintRowGeneric_scalar_reference
+	* solveGroupCacheFriendlyFinish 回写计算结果
+		* writeBackContacts 回写冲量到btManifoldPoint
+		* writeBackJoints 回写施加力和惯量到btJointFeedback
+		* writeBackBodies 回写速度到btRigidBody
+
+
+## Bullet3 中的约束求解器
+基本约束8种，基类 btTypedConstraint 
+
+1. btConeTwistConstraint 圆锥体扭曲
+1. btContactConstraint
+1. btGearConstraint 
+1. btGeneric6DofConstraint -> btUniversalConstraint/btGeneric6DofSpring2Constraint -> btFixedConstraint/btHinge2Constraint
+1. btHingeConstraint -> btHingeAccumulatedAngleConstraint 铰链约束
+1. btPoint2PointConstraint 点约束
+1. btSliderConstraint 滑块约束
+
+bullet中的rope使用的是btSoftBody，使用多段
+
+ Accept penetration
+ Remember the past
+ Apply impulses early and often
+ Pursue the true impulse
+ Update position last
+
+
+基类 btConstraintSolver
+```c++
+class btConstraintSolver
+{
+public:
+	virtual ~btConstraintSolver() {}
+
+	virtual void prepareSolve(int /* numBodies */, int /* numManifolds */) { ; }
+
+	///solve a group of constraints
+	virtual btScalar solveGroup(btCollisionObject** bodies, int numBodies, btPersistentManifold** manifold, int numManifolds, btTypedConstraint** constraints, int numConstraints, const btContactSolverInfo& info, class btIDebugDraw* debugDrawer, btDispatcher* dispatcher) = 0;
+
+	virtual void allSolved(const btContactSolverInfo& /* info */, class btIDebugDraw* /* debugDrawer */) { ; }
+
+	///clear internal cached data and reset random seed
+	virtual void reset() = 0;
+
+	virtual btConstraintSolverType getSolverType() const = 0;
+};
+```
+默认求解器 btSequentialImpulseConstraintSolver，另一个直接继承基类的求解器btConstraintSolverPoolMt
+
+* btSequentialImpulseConstraintSolver  
+	* setupSolverFunctions 
+	* prepareSolve & allSolved (btDiscreteDynamicsWorld::solveConstraints调用，bullet3中所有solver都没有重写)
+	* solveGroup 求解三部曲 
+
+继承 btSequentialImpulseConstraintSolver 的 Solver  
+* btSequentialImpulseConstraintSolverMt -> MySequentialImpulseConstraintSolverMt
+* btMultiBodyConstraintSolver -> btMultiBodyMLCPConstraintSolver & btDeformableMultiBodyConstraintSolver
+	* solveGroupCacheFriendlyIterations
+		* solveMLCP MCLP求解器求解，求解失败转父类的 solveGroupCacheFriendlyIterations
+* btNNCGConstraintSolver 只在基类的基础上重写了三步曲具体实现
+* btMLCPSolver
+	* solveGroupCacheFriendlyIterations
+		* solveMLCP
+
+* b3GpuRigidBodyPipeline
+	* b3PgsJacobiSolver/b3GpuPgsContactSolver/b3GpuJacobiContactSolver
+		* solveContacts
+			* solveGroup 求解三部曲  
 
 # 参考文献
 [Physics-Based Animation](https://www.researchgate.net/profile/Kenny-Erleben/publication/247181209_Physics-Based_Animation/links/5e1b2ed04585159aa4cb43d8/Physics-Based-Animation.pdf)

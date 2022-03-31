@@ -1,3 +1,20 @@
+<head>
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({ TeX: { equationNumbers: { autoNumber: "all" } } });
+    </script>
+
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({tex2jax: {
+             inlineMath: [ ['$','$'],["$$","$$"], ["\\(","\\)"] ],
+             processEscapes: true
+           }
+         });
+    </script>
+
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript">
+    </script>
+</head>
+
 ---
 layout: default
 title: Physics_About_Constraint_Equation
@@ -11,6 +28,8 @@ tags:
 //Create Date: 2022-03-22 20:32:39
 
 //Author: channy
+
+[toc]
 
 # 概述 
 游戏中物理约束式子的由来，以bullet3为例。
