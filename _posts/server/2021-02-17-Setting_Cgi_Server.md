@@ -74,5 +74,5 @@ sudo /etc/init.d/apache2 restart
 
 don't forget to change the permission of target files
 
-[back](/)
+[back](./)
 

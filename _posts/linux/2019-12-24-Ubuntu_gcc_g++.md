@@ -14,7 +14,7 @@ tags:
 //Author: channy
 
 # Ubuntu 18.04安装gcc、g++ 4.8
-
+```
 sudo apt-get install gcc-4.8 g++-4.8
 
 sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 100
@@ -22,3 +22,4 @@ sudo update-alternatives --config gcc
 
 sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 100
 sudo update-alternatives --config g++
+```

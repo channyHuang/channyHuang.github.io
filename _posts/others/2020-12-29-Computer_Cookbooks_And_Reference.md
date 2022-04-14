@@ -34,5 +34,5 @@ tags:
 
 > [OI Wiki](https://oi-wiki.org/)
 
-[back](/)
+[back](./)
 

@@ -80,5 +80,5 @@ sudo service apache2 reload
 
 也不难嘛，还以为技术多高深。。。
 
-[back](/)
+[back](./)
 

@@ -62,5 +62,5 @@ tags:
 各种小工具
 > [toolnb](http://www.toolnb.com/)
 
-[back](/)
+[back](./)
 

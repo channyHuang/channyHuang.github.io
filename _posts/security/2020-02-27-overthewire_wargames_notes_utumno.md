@@ -43,5 +43,5 @@ utumno0@utumno:/utumno$ ./utumno0_hard
 Read me! :P
 ```
 
-[back](/)
+[back](./)
 

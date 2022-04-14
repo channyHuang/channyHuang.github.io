@@ -173,5 +173,5 @@ export PATH=$ORACLE_HOME/bin:$PATH
 
 [中文参考](https://blog.csdn.net/once_pluto/article/details/83385150)
 
-[back](/)
+[back](./)
 

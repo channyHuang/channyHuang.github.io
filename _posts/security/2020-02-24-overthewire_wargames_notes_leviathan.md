@@ -213,5 +213,5 @@ $ cat /etc/leviathan_pass/leviathan7
 ahy7MaeBo9
 ```
 
-[back](/)
+[back](./)
 

@@ -193,5 +193,5 @@ c1: call pp
 sysctl -w kernel.randomize_va_space=2
 ```
 
-[back](/)
+[back](./)
 
