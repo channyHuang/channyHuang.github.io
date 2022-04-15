@@ -28,13 +28,14 @@ tags:
 用voxel体素表示地形数据，每个voxel有occupancy和materail两个数据，其中occupancy表示该voxel中地形占有率，material表示材质
 
 ## 地形生成 [roblox-terrain-generation.lua](file:///roblox-terrain-generation.lua)
-	### 地貌
+### 地貌
+使用了Perlin噪声，多层叠加。各种不同的地貌通过调整Perlin噪声的参数可得。
 	
 ## 地形笔刷
-	### 增加
-	
-## 网格化
+roblox的笔刷使用的不是sdf而是occupancy
 
+## 网格化
+roblox的网格化使用surfacenet算法
 
 //roblox-terrain-generation.lua
 ```lua
