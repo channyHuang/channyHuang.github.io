@@ -108,6 +108,52 @@ triangle_stripe的顶点索引以两个相同数字结尾，遵循face(v1, v2, v
 
 ## Qt OpenGL 7: Light
 
+发现一个神奇的现象，同样的代码运行有时能显示，有时一片黑。
+
+如果显示一片黑，尝试修改vshader.glsl中的
+```
+gl_Position = proj_matrix * mv_matrix * vec4(posVertex * 0.5f, 1.0f);
+```
+其中把0.5改成0.3运行有显示，再改回0.5运行又有显示了。。。原因暂未知
+
+## Qt OpenGL 8: load_obj_file
+
+意外遇到错误
+```
+error C5514: 'varying' is deprecated and removed from this profile, use 'in/out' instead
+```
+GL3.0 中废弃了 attribute 和 varying, 统一使用 in/out
+
+```
+global variable gl_FragColor is removed after version 420
+```
+GL3.0 中废弃了 gl_FragColor， 需要手工声明
+```
+out vec4 pre_gl_FragColor;
+
+void main(void)
+{
+    //gl_FragColor = texture2D(texture, v_texcoord);
+    pre_gl_FragColor = texture2D(texture, v_texcoord);
+}
+```
+
+
+| --- | --- | --- |
+| attribute | 一般是指vertex attribute, 仅用在VertexShader | glBindAttribLocation, glGetAttribLocation |
+| varying | 在Shader间传递，光栅化 |  | 
+| uniform | 不可更改变量 | glGetUniformLocation |
+| layout | 设置属性 | |
+| --- | --- | --- |
+
+## Qt OpengGL 9: skybox
+
+天空盒，即一个长文体/立方体，游戏常用
+
+## Qt OpengGL 10: Camera
+
+键盘事件需要在QGLWidget的构造函数中加上setFocusPolicy(Qt::ClickFocus);
+
 # reference 
 
 [super bible](https://github.com/openglsuperbible/sb7code)

@@ -302,8 +302,29 @@ public:
 		* solveContacts
 			* solveGroup 求解三部曲  
 
+# bullet的rayTest
+Blockman::rayTestOnScreen
+PhysicsWorld::rayTest(...,Callback)
+btCollisionWorld::rayTest
+BroadphaseCollisionDetector::rayTest(...,btSingleRayCallback,...)
+btDbvtBroadphase::rayTest
+btDbvt::rayTestInternal(...,BroadphaseRayTester)
+btSingleRayCallback::process
+btCollisionWorld::rayTestSingle
+btCollisionWorld::rayTestSingleInternal(..., 
+btBvhTriangleMeshShape::performRaycast(BridgeTriangleRaycastCallback,...)
+btQuantizedBvh::reportRayOverlappingNodex
+btQuantizedBvh::reportBoxCastOverlappingNodex
+btQuantizedBvh::walkStacklessQuantizedTreeAgainstRay
+btTriangleRaycastCallback::processTriangle
+BridgeTriangleRaycastCallback::reportHit
+
 # 参考文献
 [Physics-Based Animation](https://www.researchgate.net/profile/Kenny-Erleben/publication/247181209_Physics-Based_Animation/links/5e1b2ed04585159aa4cb43d8/Physics-Based-Animation.pdf)
 [Lemke-Howson Algorithm](https://web.stanford.edu/~saberi/lecture4.pdf)
 [Iterative Dynamics with Temporal Coherence](https://box2d.org/files/ErinCatto_IterativeDynamics_GDC2005.pdf)
 [Practical methods of optimization] by Fletcher R.
+
+[LCP Algorithms for Collision Detection Using CUDA](https://developer.nvidia.com/gpugems/gpugems3/part-v-physics-simulation/chapter-33-lcp-algorithms-collision-detection-using-cuda)
+
+[Physx 部分文档翻译](https://www.zhihu.com/people/li-jia-jun-1-44/posts)

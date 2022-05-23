@@ -51,6 +51,14 @@ tags:
 
 > 刚体平动中有动量守恒，刚体转动中对应角动量守恒
 
+Contact stiffness k_p and damping k_d for rigid body contacts as defined by ODE (ODE uses erp and cfm but there is a mapping between erp/cfm and stiffness/damping)
+
+$ ERP = h k_p / (h k_p + k_d) $
+
+$ CFM = 1 / (h k_p + k_d) $
+
+where h is the step size.
+
 # 部分物理参数说明  
 1. linear Damping 线性阻尼, 0 到 1 之间 
 1. angular Damping 旋转阻尼 
