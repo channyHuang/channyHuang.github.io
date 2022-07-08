@@ -156,8 +156,9 @@ void main(void)
 
 # reference 
 
-[super bible](https://github.com/openglsuperbible/sb7code)
-[raytracing](https://github.com/RayTracing/raytracing.github.io)
-[raytracing_book](https://matrix4f.com/categories/Graphic/)
+[super bible](https://github.com/openglsuperbible/sb7code)  
+[raytracing](https://github.com/RayTracing/raytracing.github.io)  
+[raytracing_book](https://matrix4f.com/categories/Graphic/)  
+[<<实时渲染>>部分翻译](https://zhuanlan.zhihu.com/p/406606440?utm_source=ZHShareTargetIDMore&utm_medium=social&utm_oi=892299674520780800)  
 [back](/)
 

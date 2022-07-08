@@ -25,8 +25,23 @@ tags:
 基本思路： 
 1. 非机器学习
 	1. voronoi分成n个区域，对应n种地貌
+	1. 根据输入的biome_size，把整块地形近似分割成biome_size方块，每个方块随机使用不同的地貌
 	2. 对每个区域生成对应地貌
 		1. 噪声生成主地貌
+			* x-z遍历，目标单位立方体中，与其相邻的9个立方体（包括其本身）各自使用噪声产生一个数值（占有率），一个地貌index，同时记录其与目标立方体中随机点的距离
+			* 对上面9个立方体各自生成权重参数
+			* 在y即高度上，根据当前高度与总高度比值，排除上下固定地形（空气和地基），根据地貌修正占有率，及地表面和地里面的材质
+				* 水平面
+				* 平原：草地 + 石头 + 水
+				* 沼泽：草地 + 泥 + 浆 + 水
+				* 山地：草地 + 泥
+				* 沙丘：沙 + 沙石
+				* 熔岩：岩浆 + 岩浆岩 + 石头
+				* 冰川：雪 + 冰
+				* 峡谷：泥 + 水 + 浆
+				* 龟裂：voronoi图
+			* 根据ridge噪声生成洞穴，即判断当前立方体是否为洞穴，是则占有率置0
+			* 根据地貌和高度设置温度，根据地貌设置湿度
 		2. 地形边界平滑处理，噪声参数+权重
 	3. 地形生态根据区域随机生成（erosion侵蚀，高度决定植被）
 2. 机器学习
@@ -38,15 +53,15 @@ tags:
 [**fastnoise library**](https://github.com/Auburn/FastNoise) - a noise library contains most of classical noise
 
 * single noise 
-	* Lattic based
+	* Lattic based 基于晶格的方法
 		* Gradient noise
 			* [**Perlin noise**](https://mrl.cs.nyu.edu/~perlin/noise/)
 			* Simplex noise
 			* Wavelet noise
 		* Value noise
-	* Point based
+	* Point based 基于点的方法
 		* Worley/Cell noise - Voronoi diagram
-* [fractal noise](https://thebookofshaders.com/13/?lan=ch)
+* [fractal noise](https://thebookofshaders.com/13/?lan=ch) 频率+振幅
 	* fbm noise
 	* ridge noise
 	* domain wrapping noise
@@ -254,13 +269,29 @@ ABCD = AB * (1.0 - py) + CD * py;
 ## 同roblox的比较[Roblox-StudioTools](https://github.com/Roblox/Studio-Tools)
 
 ### 笔刷+水材质，以下terrain表示非水材质的地形
-
+#### 属性
+笔刷形状：圆平面、正方形平面、球体、立方体、圆柱体......
+笔刷大小：1不一定有效，因为一个单位立方体最多只生成一个点，一个点不足以表示复杂多面体
+材质：自动材质
+锚点：鼠标打到地形表面的点处于形状的位置
+锁定平面：是否根据地形表面的法线确定笔刷平面是垂直于法线还是保持鼠标刚点下时所在的平面不变
+锁定方向：增长/侵蚀特有
+强度：
+#### 操作
 * **增加/生长** 
-	* 水：先减少terrain，后增加水
+	* 如果笔刷大小比较小（<=2），稍微放大笔刷（+0.5），否则按原大小笔刷改变细微，肉眼可能看不出来
+	* 根据形状计算形状内外的单位立方体的占有率occupancy
+	* 如果是自动材质，根据笔刷方向，反向选择对应立方体的材质
+	* 如果当前已有地形，比较占有率，新占有率大则更新原占有率；如果当前没有地形，赋值占有率和材质
+	* 如果忽略水：先减少terrain，后在减少的位置上顺延增加水
 	* terrain: 可在水上定位，但忽略水，直接增加terrain
 * **减少/侵蚀** 
+	* 如果笔刷大小比较小（<=2），稍微放大笔刷（+0.5），否则按原大小笔刷改变细微，肉眼可能看不出来
+	* 根据形状计算形状内外的单位立方体的占有率occupancy
+	* 如果当前已有地形，直接更新占有率和材质（空气），如果当前没有地形，比较占有率，新占有率小则更新原占有率
 	* 已有水不受影响，先减少terrain，当减少部分有水时，水不做减少，原来要减少的部分替换成水
 * **光滑**
+	* 取当前单位立方体和周围8个立方体的占有率，作平均
 	* 水和terrain同等对待
 * **展平**
 	* 展平terrain，当展平部分满足一定条件时，增加水
