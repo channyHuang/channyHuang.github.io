@@ -48,7 +48,7 @@ tags:
 	1. 输入点、线、面作为地形高度、生态类型参考，算法生成具体生态
 	2. 生态笔刷
 
-## noise type 噪声分类
+## Noise type 噪声分类
 
 [**fastnoise library**](https://github.com/Auburn/FastNoise) - a noise library contains most of classical noise
 
