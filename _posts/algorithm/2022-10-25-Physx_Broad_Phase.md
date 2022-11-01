@@ -53,7 +53,7 @@ mBroadPhase.update 输入参数BroadPhaseUpdateData中包含了add/remove/update
 	}
 ```
 
-## ABP  
+## ABP  （Automatic Box Pruning）
 * BroadPhaseABP.update
 	* setUpdateData 有优化点：可能存在不必要的copy
 		* removeObjects 对remove中的每一个handle，调用ABP.removeObject。其中handle虽然是ShapeHandle，实际上是BoundHandle
@@ -82,7 +82,8 @@ mBroadPhase.update 输入参数BroadPhaseUpdateData中包含了add/remove/update
 		* ABP.finalize
 			* ABP_PairManager.computeCreatedDeletedPairs copy新增和删除的Pairs到BroadPhaseABP.mCreated/mDeleted，处理碰撞开始/持续/分离期。没有标记新增和更新的，除了可能是删除的pair外，还可能是sleeping的pair。MBP与ABP的不同点在于多了一个decodeHandle_Index获取实际index的步骤。除了persistentPairs，只有此处会调用PairManager.removePair
 
-## SAP
+## SAP （Sweeping Plane Algorithm）
+[SAP](./imageFormat/SAP.png)
 * BroadPhaseSap.update
 	* SapUpdateWorkTask
 		* update
@@ -96,7 +97,13 @@ mBroadPhase.update 输入参数BroadPhaseUpdateData中包含了add/remove/update
 				* performBoxPruningNewOld
 			* ComputeCreatedDeletedPairsLists
 
-## MBP  
+1. 每一帧的碰撞检测相互独立，没有利用好帧的连续性，算法复杂度高。
+2. 投影轴的选取影响性能
+
+## MBP  （Multi Box Pruning）
+[MBP](./imageFormat/MSAP.png)
+把场景分成多个区域（region），每个区域上实现SAP（即M-SAP）/BP，考虑边界物体
+
 BroadPhaseMBP.update
 	* setUpdateData 输入同上
 		* removeObjects 对removed中的每一个handle索引，调用MBP.removeObject。这里的mMapping数组，是从handle到MBP_Handle的映射。MBP_Handle为PxU32类型，最后一位是isStatic标志，倒数第2位是flipFlop标志，其它存储objectIndex,即MBP.mMBP_Objects中的索引。
