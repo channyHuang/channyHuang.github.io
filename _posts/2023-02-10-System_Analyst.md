@@ -8,6 +8,10 @@ tags：
 
 [toc]
 
+***
+<font color = Orange>综合知识</font>   
+***
+
 # 操作系统
 ## 进程通信方式：PV信号量  
 <font color = AliceBlue> m个进程n个资源，则PV $\in$ [-m + n， n]
@@ -536,3 +540,16 @@ $NPV = \sum Ci / (1 + i)^t$
 
 # 补充点
 ## 域名查询
+
+***
+<font color = Orange>案例分析</font>
+***
+
+# 图
+## PERT图（Program Evaluation and Review Technique)
+* 关键路径
+* 任务依赖关系
+* 松弛时间
+## Gantt图（甘特图）
+* 开始结束时间
+* 任务并行关系
