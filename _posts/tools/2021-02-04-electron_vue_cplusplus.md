@@ -2,7 +2,7 @@
 layout: default
 title: Electron_Vue_CPlusPlus
 categories:
-- js
+- Tools
 tags:
 - js
 ---

@@ -2,7 +2,7 @@
 layout: default
 title: Notes_Template
 categories:
-- C++
+- Notes
 tags:
 - Notes
 ---

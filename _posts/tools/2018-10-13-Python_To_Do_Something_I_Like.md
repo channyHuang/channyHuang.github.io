@@ -2,7 +2,7 @@
 layout: default
 title: Python_To_Do_Something_I_Like
 categories:
-- Python
+- Tools
 tags:
 - Python
 ---
