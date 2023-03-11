@@ -1,10 +1,12 @@
 ---
 layout: default
-title: 
+title: 第一次接私活的一点经验教训
 categories:
+- Notes
 tags:
+- Notes
 ---
-//Description: Notes, Others
+//Description: 记录第一次接私活的一点经验教训
 
 * current article content
 {:toc}

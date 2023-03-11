@@ -1,8 +1,10 @@
 ---
-layout： default
-title： 系统分析师笔记
-categories：
-tags：
+layout: default
+title: System Analyst 系统分析师笔记
+categories:
+- Notes
+tags:
+- Notes
 ---
 //Description： 记录系统分析中的一些概念和方法，备考软考系统分析师。主要参考书籍《系统分析师》（2010），辅助参考书籍《网络规划设计师》，其中后者用于补充前者所没有的知识点，如软件著作权、新技术等。部分内容大学课程中学过，如《计算机体系结构》、《数据库》、《操作系统》等。整个笔记共分两部分：第一部分为知识点总结，第二部分为笔记及经验。
 
