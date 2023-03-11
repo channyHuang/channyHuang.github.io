@@ -12,7 +12,7 @@ tags:
 
 //Author: channy
 
-# Questions In Interview (C Plus & Android)
+# Questions In Interview (C Plus & Android) 
 # 面试中遇到的一些问题 (C Plus & Android)
 
 ## C Plus
@@ -234,5 +234,14 @@ tags:
 工具：LeakCanary
 
 ## Others
+1. 给两棵树A和B,判断一棵树是否为另一棵树的子树，如A是B的子树返回1，B是A的子树返回2，否则返回0
+
+1. 大数运算
+
+ps: 效率效率效率
+
+## Server
+
+1. 服务器负载，如何分析负载问题
 
 [back](./)

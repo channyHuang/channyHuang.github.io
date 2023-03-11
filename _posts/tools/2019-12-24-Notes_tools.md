@@ -1,10 +1,10 @@
 ---
 layout: default
-totle: 2019-12-24_Notes_Tools.md
+totle: Tools Collection
 categories:
-- Language
+- Tools
 tags:
-- Language
+- Tools
 ---
 //Description: 工具笔记，以及收藏的一些综合性网页等信息。包括工具和数据类、书籍或其它PDF类、其它类
 
@@ -43,6 +43,36 @@ tags:
 1. [英文书籍电子版](http://gen.lib.rus.ec/)
 
 1. [软考系统分析师真题](https://www.gkzenti.cn/paper?cls=软考&province=高级_系统分析师)
+
+# 软件类
+## 插件类
+* google-access-helper
+* markdown-plus-plus
+## 装机必备
+* git
+* vim
+* notepad++
+* xshell, xftp
+* everything
+* accessport 串口调试小助手 vspd虚拟串口
+* dependency viewdll
+* easyMD5 MD5校验
+## 工具网站
+
+* [在线流程图](https://www.edrawmax.cn/online/)
+* [模拟手写](http://www.beautifulcarrot.com/)
+* [pdf工具](https://smallpdf.com/cn)
+* [在线运行](https://www.shellcheck.net/ shell)
+
+# c/c++库 
+* [cJson](https://github.com/DaveGamble/cJSON)
+一个json解析c库
+* [curl](https://github.com/curl/curl)
+* [curl doc](https://curl.se/)
+网络访问c库
+* [openssl](https://www.openssl.org/)
+各种小工具
+* [toolnb](http://www.toolnb.com/)
 
 # 其它类
 

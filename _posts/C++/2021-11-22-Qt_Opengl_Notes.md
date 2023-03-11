@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Qt_Opengl_Notes
+title: t+Opengl学习笔记
 categories:
-- C++
+- Lib
 tags:
-- C++
+- Lib
 ---
-//Description: Qt学习笔记，关于OpenGL，基于Qt 5.15.2
+//Description: Qt+Opengl学习笔记，关于OpenGL，基于Qt 5.15.2
 
 //Create Date: 2021-11-22 11:04:19
 
@@ -24,6 +24,14 @@ Qt 6的opengl有较大的改动
 
 1. Qt 5的pro文件不需要加QT += opengl也能正常使用opengl；而Qt 6一定要在pro文件加上QT += opengl openglwidgets才能编译过
 1. Qt 5的QOpenglContext有接口versionFunctions可以获取各个版本的QOpenGLFunctions；而Qt 6只有QOpenGLFunctions和QOpenGLExtraFunctions可以直接从QOpenglContext中获取（extraFunctions），具体版本的函数需要通过QOpenGLVersionFunctionsFactory::get<QOpenGLFunctions_X_X_Core>(this->context())获取
+
+## Opengl Error
+关于glut错误：
+error C2381: 'exit' : redefinition; __declspec(noreturn) differs C:\Program Files\Microsoft Visual Studio 8\VC\include\GL/glut.h(146) : see declaration of 'exit'
+
+
+解决方法：
+Properties -> C/C++ -> Preprocessor -> Preprocessor Definitions 添加 GLUT_BUILDING_LIB。
 
 ## Qt OpenGL 1: 创建QtOpenGL窗口
 
