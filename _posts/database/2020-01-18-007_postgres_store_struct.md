@@ -2,9 +2,9 @@
 layout: default
 title: 007_postgres_store_struct
 categories:
-- C++
+- Database
 tags:
-- C++
+- Database
 ---
 //Description:
 

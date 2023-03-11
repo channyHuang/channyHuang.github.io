@@ -2,9 +2,9 @@
 layout: default
 title: 009_postgres_function_return_type
 categories:
-- C++
+- Database
 tags:
-- C++
+- Database
 ---
 //Description: pg和oracle对比，function参数
 

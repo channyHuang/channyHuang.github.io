@@ -2,7 +2,8 @@
 layout: default
 title: Physx Broad Phase
 categories:
-- Game
+- Algorithm
+- Lib
 tags:
 - Game
 ---

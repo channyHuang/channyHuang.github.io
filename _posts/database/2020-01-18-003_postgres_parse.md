@@ -2,9 +2,9 @@
 layout: default
 title: 003_postgres_parse
 categories:
-- C++
+- Database
 tags:
-- C++
+- Database
 ---
 //Description:
 

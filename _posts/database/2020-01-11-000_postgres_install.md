@@ -2,9 +2,9 @@
 layout: default
 title: 000_postgres_install
 categories:
-- C++
+- Database
 tags:
-- C++
+- Database
 ---
 //Description: postgres和AntDB源码安装过程中遇到的问题
 

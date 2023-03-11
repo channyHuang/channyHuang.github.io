@@ -2,9 +2,9 @@
 layout: default
 title: 010_postgres_others
 categories:
-- C++
+- Database
 tags:
-- C++
+- Database
 ---
 //Description:
 

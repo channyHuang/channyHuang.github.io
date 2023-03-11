@@ -2,9 +2,9 @@
 layout: default
 title: 004_postgres_plan
 categories:
-- C++
+- Database
 tags:
-- C++
+- Database
 ---
 //Description:
 

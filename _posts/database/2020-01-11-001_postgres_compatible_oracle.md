@@ -2,9 +2,9 @@
 layout: default
 title: 001_postgres_compatible_oracle
 categories:
-- C++
+- Database
 tags:
-- C++
+- Database
 ---
 //Description:
 

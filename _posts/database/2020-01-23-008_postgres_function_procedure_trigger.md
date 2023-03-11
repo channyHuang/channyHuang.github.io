@@ -2,9 +2,9 @@
 layout: default
 title: 008_postgres_function_procedure_trigger
 categories:
-- C++
+- Database
 tags:
-- C++
+- Database
 ---
 //Description: function/procedure/trigger
 

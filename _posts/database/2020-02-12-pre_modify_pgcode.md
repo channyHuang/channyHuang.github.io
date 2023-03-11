@@ -1,3 +1,21 @@
+---
+layout: default
+title: Pre-modify-pgcode
+categories:
+- Database
+tags:
+- Database
+---
+//Description: Pre-modify-pgcode
+
+//Create Date: 2020-02-12 17:46:30
+
+//Author: channy
+
+[toc]
+
+# Pre-modify-pgcode
+```shell
 channy@channy-VirtualBox:~/Documents/gitCode/postgresql-12.1/src$ git diff backend/commands/functioncmds.c
 diff --git a/backend/commands/functioncmds.c b/backend/commands/functioncmds.c
 index 40f1f9a..6f35fc8 100644
@@ -47,3 +65,4 @@ index af63fe1..f7de066 100644
                         ereport(ERROR,
                                         (errcode(ERRCODE_DATATYPE_MISMATCH),
 chan
+```

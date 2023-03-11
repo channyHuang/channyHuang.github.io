@@ -2,8 +2,9 @@
 layout: default
 title: Notes_Japanese_N3
 categories:
-- Japanese
+- Language
 tags:
+- Language
 - Japanese
 ---
 //Description:

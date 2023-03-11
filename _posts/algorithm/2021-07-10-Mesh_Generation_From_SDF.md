@@ -2,7 +2,7 @@
 layout: default
 title: Mesh_Generation_From_SDF.md
 categories:
-- Game
+- Algorithm
 tags:
 - Game
 ---

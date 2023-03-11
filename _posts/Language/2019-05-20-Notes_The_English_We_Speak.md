@@ -2,10 +2,10 @@
 layout: default
 title: Notes_The_English_We_Speak
 categories:
-- English
+- Language
 tags: 
+- Language
 - English
-- Learning
 ---
 //Description: One of my favourite podcast: The english we speak. But one day, I can not touch it anymore. Maybe it is blocked by goverment (don't be surprise, google, facebook and some other sites are all blocked in my country...) 
 

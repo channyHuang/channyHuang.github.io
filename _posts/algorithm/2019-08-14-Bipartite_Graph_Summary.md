@@ -2,7 +2,7 @@
 layout: default
 title: Bipartite_Graph_Summary.md
 categories:
-- OJ
+- Algorithm
 tags:
 - OJ
 ---

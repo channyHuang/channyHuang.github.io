@@ -2,11 +2,11 @@
 layout: default
 title: Path Planning 路径规划
 categories:
-- Game
+- Algorithm
 tags:
 - Game
 ---
-//Description: 【未完待续】初步了现有的路径规划算法，一般分为两大类：基于搜索的和基于采样的。基于搜索的比较入门的有DFS/BFS/Dijkstra/A*等，基于采样的比较入门的有RTT等。
+//Description: 现有的路径规划算法，一般分为两大类：基于搜索的和基于采样的。基于搜索的比较入门的有DFS/BFS/Dijkstra/A*等，基于采样的比较入门的有RTT等。
 
 //Create Date: 2023-02-28 20:40:39
 

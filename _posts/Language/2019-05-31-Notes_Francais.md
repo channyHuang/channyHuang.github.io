@@ -1,11 +1,11 @@
 ---
 layout: default
-title: Notes_Francais
+title: Francais
 categories:
-- Francais
+- Language
 tags: 
+- Language
 - Francais
-- Learning
 ---
 //Description: learning francais, some notes
 

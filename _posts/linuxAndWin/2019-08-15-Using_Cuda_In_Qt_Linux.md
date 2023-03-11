@@ -2,9 +2,11 @@
 layout: default
 title: Using_Cuda_In_Qt_Linux
 categories:
-- C++
+- Linux
 tags:
-- C++
+- Linux
+- Qt
+- Cuda
 ---
 //Description: 一时心血来潮想学cuda了，Ubuntu下结合Qt，网上的教程真的。。。错误有点多～
 

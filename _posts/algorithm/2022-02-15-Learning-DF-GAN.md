@@ -2,7 +2,7 @@
 layout: default
 title: Learning_DF_GAN.md
 categories:
-- Game
+- Algorithm
 tags:
 - Game
 ---

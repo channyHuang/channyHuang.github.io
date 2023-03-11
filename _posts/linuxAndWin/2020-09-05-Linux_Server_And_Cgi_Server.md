@@ -2,7 +2,7 @@
 layout: default
 title: Linux_Server/Cgi_Server
 categories:
-- Server
+- Linux
 tags:
 - Server
 - Linux

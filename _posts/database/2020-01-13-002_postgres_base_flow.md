@@ -2,9 +2,9 @@
 layout: default
 title: 002_postgres_base_flow
 categories:
-- C++
+- Database
 tags:
-- C++
+- Database
 ---
 //Description: 初识parsetree
 

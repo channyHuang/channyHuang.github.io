@@ -2,7 +2,7 @@
 layout: default
 title: Simple_GAN.md
 categories:
-- Game
+- Algorithm
 tags:
 - Game
 ---

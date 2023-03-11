@@ -2,7 +2,7 @@
 layout: default
 title: Generative_Adversarial_Networks.md
 categories:
-- Game
+- Algorithm
 tags:
 - Game
 ---

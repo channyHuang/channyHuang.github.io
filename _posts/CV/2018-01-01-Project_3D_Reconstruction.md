@@ -2,7 +2,8 @@
 layout: default
 title: Project - 3D Reconstruction
 categories:
-- Computer Vision
+- Algorithm
+- Lib
 tags:
 - Computer Vision
 - Project

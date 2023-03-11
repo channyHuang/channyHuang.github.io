@@ -5,6 +5,7 @@ categories:
 - Language
 tags:
 - Language
+- Japanese
 ---
 //Description: 日语N4方法笔记
 

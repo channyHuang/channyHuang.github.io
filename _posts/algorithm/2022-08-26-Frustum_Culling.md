@@ -2,7 +2,7 @@
 layout: default
 title: Frustum Culling
 categories:
-- Game
+- Algorithm
 tags:
 - Game
 ---
