@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Notes_Learning_Others_Code.md
+title: Define In C++
 categories:
 - C++
 tags:

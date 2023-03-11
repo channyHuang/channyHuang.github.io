@@ -2,7 +2,7 @@
 layout: default
 title: Qt_Interview_Questions
 categories:
-- C++
+- Notes
 tags:
 - C++
 ---

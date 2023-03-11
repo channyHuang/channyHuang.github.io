@@ -1,6 +1,6 @@
 ---
 layout: default
-title: t+Opengl学习笔记
+title: Qt+Opengl学习笔记
 categories:
 - Lib
 tags:
