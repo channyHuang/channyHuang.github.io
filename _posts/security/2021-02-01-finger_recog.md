@@ -2,9 +2,9 @@
 layout: default
 title: Finger Recog
 categories:
-- C++
+- Security
 tags:
-- C++
+- Security
 ---
 //Description: 指纹识别
 

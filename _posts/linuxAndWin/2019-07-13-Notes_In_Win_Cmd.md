@@ -55,5 +55,17 @@ If change version in qt .pro file, and use DEFINES to define this version value,
 ## 在运行vs2012时，出现所有项目都无法加载的情况
 只需要到vs2012的安装目录，运行devenv /resetuserdata 即可，在此记录，以备后用。
 
+# some_interesting_codes
+
+```
+document.body.contentEditable='true';
+```
+
+操作步骤：
+
+1. 网页F12
+2. 面板上选中Console，输入上面的代码，回车
+3. 整个页面可以任意编辑
+
 [back](./)
 

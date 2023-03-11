@@ -2,9 +2,9 @@
 layout: default
 title: overthewire_wargamees_notes_krypton
 categories:
-- C++
+- Security
 tags:
-- C++
+- Security
 ---
 //Description:
 

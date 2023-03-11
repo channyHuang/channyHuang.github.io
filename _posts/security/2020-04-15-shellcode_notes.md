@@ -2,9 +2,9 @@
 layout: default
 title: shellcode_notes
 categories:
-- C++
+- Security
 tags:
-- C++
+- Security
 ---
 //Description: how to write shellcode. 搜索到的基本上是x86的，少数x64的在自己的机器上也不管用，只有根据自己机器的实际情况自行写一遍。
 
