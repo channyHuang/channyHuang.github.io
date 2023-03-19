@@ -102,5 +102,19 @@ bool Dijkstra(Point &st) {
 ## Anytime RRT*
 ## Batch Informed Trees (BIT*)
 
+# 特征提取
+Transform-LSTM
+
+# 协同规划
+## 粒子群算法
+## 布谷鸟算法
+# 多智能体强化学习算法
+## Q-Learning
+## DQN
+## DDPG
+## MADDPG
+
+## [MAPPO](https://github.com/marlbenchmark/on-policy)
+
 # 参考资料
 1. [路径规划的Python基本实现](https://github.com/zhm-real/PathPlanning)
