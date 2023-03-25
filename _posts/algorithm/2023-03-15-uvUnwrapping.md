@@ -6,7 +6,7 @@ categories:
 tags:
 - Game
 ---
-//Description: 自动展uv的算法分析
+//Description: 自动展uv的算法分析。自动展uv一般采用组合或变分（variational）方法，是一个数值优化问题。即裁剪切割网格模型，使得展开后的扭曲度最小化。
 
 //Create Date: 2023-03-15 20:40:39
 
@@ -27,4 +27,3 @@ tags:
 
 
 # 参考资料
-1. []()

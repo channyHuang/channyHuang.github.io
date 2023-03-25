@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Path Planning 路径规划
+title: Path Planning And Reinforment Learning 路径规划和强化算法
 categories:
 - Algorithm
 tags:
 - Game
 ---
-//Description: 现有的路径规划算法，一般分为两大类：基于搜索的和基于采样的。基于搜索的比较入门的有DFS/BFS/Dijkstra/A*等，基于采样的比较入门的有RTT等。其它的规划算法有多智能体强化算法等。
+//Description: 现有的路径规划算法，一般分为两大类：基于搜索的和基于采样的。基于搜索的比较入门的有DFS/BFS/Dijkstra/A*等，基于采样的比较入门的有RTT等。其它的规划算法有多智能体强化算法如Q-Learning、DQN、DPG、Actor-Critic、DDPG、PPO等。
 
 //Create Date: 2023-02-28 20:40:39
 
@@ -108,61 +108,80 @@ Transform-LSTM
 # 协同规划
 ## 粒子群算法
 ## 布谷鸟算法
+
 # 多智能体强化学习算法
-state-action模型。在状态s下对动作a进行决策。  
-策略函数$\pi: s -> a$  
-回报函数$R(s,a)$  
-折旧因子$\gamma$  
-值函数$Q(s,a)$  
-学习率$\alpha$  
+强化学习算法，即在某一状态下，依据某一策略选择动作和环境交互，得到下一步状态，再根据新状态计算收益，优化策略。  
+## 符号表
+| 符号 | 含义 | 说明 |
+| :---: | :--- | :--- |
+| s | 状态 | state |
+| a | 动作 | action |
+| $\pi: s \rightarrow a$ | 策略函数 | $\pi(\theta)$, 在状态s下对动作a进行决策。  |
+| $Q(s,a)$ | 动作效用函数 | |
+| $R(s,a)$ | 回报函数 | reward |
+| $V(s)$ | 状态效用函数 | |
+| $\gamma$ | 折旧因子 | |
+| $\alpha$ | 学习率 | |
+
+off-policy: 是指行为策略和目标策略不是同一个策略，即智能体可以通过离线学习自己或别人的策略，来指导自己的行为；  
+on-policy: 行为策略和目标策略是同一个策略。  
+
 目标策略（target policy）：智能体要学习的策略  
 行为策略（behavior policy）：智能体与环境交互的策略，即用于生成行为的策略  
-Off-policy: 是指行为策略和目标策略不是同一个策略，即智能体可以通过离线学习自己或别人的策略，来指导自己的行为；
-on-policy: 行为策略和目标策略是同一个策略。  
-TD (Temporal Difference): 时序差分
-Monte Carlo: 蒙特卡洛
-## Q-Learning
+
+## 方法
+* TD (Temporal Difference): 时序差分  
+* Monte Carlo: 蒙特卡洛
+
+## 强化学习算法
+state-action模型。 
+总回报函数$$G(\tau) = \sum_{t=0}^{T} r(s_t, a_t, s_{t+1})$$  
+折扣回报函数$$G(\tau) = \sum_{t=0}^{T} \gamma_t r_{t+1}$$
+
+### Q-Learning (离散状态，离散动作)
 1. 初始化Q表。
 2. 对当前状态s，根据Q表使用贪心策略选择使Q达到最大值的动作a，或以$\epsilon$的概率进行探索，以$1-\epsilon$的概率贪心。
 3. 根据选择的动作a计算reward
 4. 更新Q表
 $$Q_{new}(s,a) = Q(s,a) + \alpha (R(s,a) + \gamma max Q^{'}(s^{'},a^{'}) - Q(s,a))$$
 ，返回2.直到Q表收敛。
-适用于离散状态，离散动作。
-## DQN (Deep Q-Network)
+### DQN (Deep Q-Network) (连续状态，离散动作)
 在Q-Learning的基础上，使用神经网络预测逼近值函数$Q(s,a) = f(s,a,\theta)$。深度神经网络是监督学习，需要标签，标签Q值$R_{t+1} + \gamma max Q(S_{t+1}, a, \theta)$。采用经验回放D，提高数据利用率。
-适用连续状态，离散动作。
 ### Double DQN, Dueling DQN, D3QN, Noisy DQN...
-## DPG (Deterministic Policy Gradient)
-在Q-Learning的基础上，假设策略服从特殊分布如正态分布，使用神经网络预测策略函数$\pi: s -> a$，估计Q
-值，直接对价值函数求导。
+### DPG (Deterministic Policy Gradient) 
+在Q-Learning的基础上，假设策略服从特殊分布如正态分布，使用神经网络预测策略函数$\pi: s \rightarrow a$，估计Q值，直接对价值函数求导。
 $$\nabla_{\theta} J(\theta) = E_{\tau ~ \pi_{\theta}}[(\sum \nabla_{\theta} log {\pi_{\theta} (a|s)}) (\sum r(s,a))]$$
 on-policy。
-## Actor-Critic = PG + DQN
+### Actor-Critic = PG + DQN
 使用actor和critic两个神经网络，其中actor输入状态，输出策略，用于选择动作；critic输入状态，计算每个动作的reward。
 适用于连续状态，连续动作。
-## PPO (Proximal Policy Optimization) = Actor-Critic + DQN
+### PPO (Proximal Policy Optimization) = Actor-Critic + DQN
 使用Important-sampling重要性采样技术，输出策略，即概率分布密度函数。  
 on-policy。
-## DDPG (Deep DPG)
+### DDPG (Deep DPG)
 使用4个神经网络：actor、critic、targetActor、targetCritic。Actor直接输出动作。Critic估计Q函数。
-## MADDPG 和 MADDPG
+### MADDPG 和 MADDPG
 每个智能体有自己的神经网络。
 
 ![Deep Regent Learning](./../../images/algorithm/drl.jpg)
 
 # 参考资料
-## [MAPPO](https://github.com/marlbenchmark/on-policy)
+1. [MAPPO](https://github.com/marlbenchmark/on-policy)
+1. [强化学习](https://www.cnblogs.com/kailugaji/p/15354491.html)
 1. [路径规划的Python基本实现](https://github.com/zhm-real/PathPlanning)
 1. [如何选择深度强化学习算法？](https://zhuanlan.zhihu.com/p/342919579?utm_id=0)
 
 # 附录
 ## 神经网络NN
-![Network Layer](./../../images/algorithm/layer)
-> 输入层即输入数据，如智能体中的状态$\overrightarrow{s_i} = {x_i, y_i, z_i}$，输出层即输出数据，如智能体中的动作a。  
+![Network Layer](./../../images/algorithm/layer.jpg)  
+输入层的维度由输入数据X决定，输出层的维度由输出数据Y决定。  
 隐藏层的层数、宽度都是NN中可设参数。  
-如第一层的数据$l_{1j} = \sum_i w_{1ij} * s_i$为输入数据的线性组合。
-权重$w_{ijk}$用于拟合。  
-激活函数有：sgn符号函数、tanh等。非线性函数。  
-偏置bias。  
+第一层的数据$l_{1j} = \sum_i w_{1ij} * x_i + b_1$为输入数据的线性组合。其中权重$w_{ijk}$和偏置bias用于拟合。   
+激活函数有：阶跃函数sgn(x) (<0 -> 0; >0 -> 1)、sigmoid函数($1/(1+e^{-x})$)、ReLU函数(<0 -> 0; >0 -> x)。非线性函数，线性组合+激活函数可以表示几乎所有的函数。  
+输出正规化$p_i = e^i/( \sum_j e^j)$，即softmax。
+交叉商损失（Cross Entropy Error）
 loss函数$loss = \sum_i (y_i - y)^2$。
+$\Delta \omega_i = \eta (y - y^{'}) x_i$, 更新$\omega_i = \omega_i + \Delta \omega_i$其中$\eta$为学习速率。
+### BP神经网络和RBF神经网络
+BP神经网络是多层NN，激活函数为sigmoid函数。全局逼近。
+RBF神经网络的作用函数是高斯基函数$h_j = exp(-{||x - c_j||}^2/(2b_j^2))$.局部逼近。
