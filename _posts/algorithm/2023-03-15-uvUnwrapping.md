@@ -25,5 +25,22 @@ tags:
 
 其中LSCM和ARAP可以参考[libigl](https://libigl.github.io/)库，VSC是在BFF上进行改进的算法。
 
+## Xatlas库原理  
+一般分为三大步骤：处理网格数据、计算charts和打包charts。
+```c++
+xatlas::AddMesh
+xatlas::ComputeCharts
+xatlas::PackCharts
+```
+计算charts时开启线程，对每个chartGroup调用computeCharts
+```c++
+runMeshComputeChartsTask -> runChartGroupComputeChartsTask -> 
+```
+
+```c++
+ChartGroup.computeCharts
+	runCreateAndParameterizeChartTask
+```
 
 # 参考资料
+[xatlas](https://github.com/jpcy/xatlas)
