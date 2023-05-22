@@ -73,6 +73,10 @@ tags:
 ## hole filling
 ## mesh smooth
 
+# NeRF
+[CityNeRF](https://github.com/city-super/BungeeNeRF)
+[awesome-NeRF](https://github.com/awesome-NeRF/awesome-NeRF)
+
 # 附录1: 编译遇到的问题
 * 使用CGAL过程中转Debug编译，报
 ```
