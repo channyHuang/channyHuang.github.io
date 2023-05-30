@@ -14,6 +14,17 @@ tags:
 
 # Python_To_Do_Something_I_Like
 
+## 离线安装python的库及依赖库
+背景：公司的电脑不允许连外网  
+环境：需要一台和目标机器相同配置的能联网的机器  
+方案：
+```python
+pip download -d ./path pyinstaller -i https://pypi.mirrors.ustc.edu.cn/simple/
+# or
+pip download -r requirement.txt
+```
+其中-d是目标下载存放路径，-i是下载源地址。download会下载目标包和相关依赖包。
+
 ## 分割mp3
 ```python
 from pydub import AudioSegment
