@@ -21,6 +21,9 @@ ERROR: 0:1: '' :  version '130' is not supported
 ```
 
 # osg基本操作
+## assimp
+assimp并不属于osg。只因为渲染显示一般需要加载模型，而assimp是个还不错的选择。
+## osg使用高版本glsl
 osgViewer：显示窗口
 osgDB：读取纹理等资源，但默认支持的图片格式不包含jpg和png，需要编译时加上第三方的库。默认支持bmp。
 osg
