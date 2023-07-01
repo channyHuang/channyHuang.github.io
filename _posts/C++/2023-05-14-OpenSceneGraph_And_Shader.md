@@ -1,6 +1,6 @@
 ---
 layout: default
-title: OSG - OpenSceneGraph
+title: OSG - OpenSceneGraph And Shader
 categories:
 - C++
 tags:
@@ -49,3 +49,6 @@ opengl和glsl版本对应
 //  ES 3.0    300       "#version 300 es"   = WebGL 2.0
 //----------------------------------------
 ```
+
+# 参考资料
+[Shader Cookbook](https://github.com/PacktPublishing/OpenGL-4-Shading-Language-Cookbook-Third-Edition)
