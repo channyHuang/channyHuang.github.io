@@ -1,4 +1,5 @@
----
+-
+--
 layout: default
 title: PointCloud_Reconstruction
 categories:
@@ -92,8 +93,43 @@ tags:
 ***
 
 # NeRF
-[CityNeRF](https://github.com/city-super/BungeeNeRF)  
-[awesome-NeRF](https://github.com/awesome-NeRF/awesome-NeRF)
+$$(\theta, \phi, r, g, b) -> (x, y, z, a)$$
+[instant-ngp](https://github.com/NVlabs/instant-ngp)  
+根据输入的多角度RGB图像和对应的摄像机参数，建立两个MLP分别求解三维空间中网格点的alpha和RGB值
+
+## MLP多层感知器基础
+
+### Loss 损失函数 L(Y, f(x))
+衡量估计值地f(x)和真实值Y之间的误差，即代价函数（无监督）或误差函数（有监督）。forward后计算Loss进行backward。
+> Huber 损失函数 $\frac{1}{2} |Y - f(x)|^2, |Y - f(x)| < \delta; \delta |Y - f(x)| - \frac{1}{2} {\delta}^2$  
+> L1 损失函数 $\sum | Y - f(x) | $  
+> L2 损失函数 $\sqrt{ \frac{1}{n} \sum |Y - f(x)|^2 }$  
+> MSE 圴方误差函数 $\frac{1}{n} \sum |Y - f(x)|^2$  
+
+### Optimizer 优化器
+backward过程中，指引参数更新使得损失函数最小化
+> GD 梯度下降
+> Adam、
+> AdaGrad 自适应学习率
+> RMSProp 
+
+### Learning rate 学习率  
+参数更新 $w_n = w_0 - \delta w^{'}_0 $，
+> 轮数衰减：一定步长后学习率减半  
+> 指数衰减：学习率按训练轮数增长指数插值递减等  
+> 分数衰减：$ \delta_n  = \frac{\delta_0}{1 + kt}$
+
+### Activation 激活层
+把神经网络中上下层的线性组合关系增加非线性变换
+> ReLU 修正线性单元（Rectified Linear Unit）  
+> Sigmoid $\frac {1} {1 + e^{-x}} $  
+> Tanh 双曲正切激活函数
+
+### EMA 指数移动平均（Exponential Moving Average）
+取最后n步的平均，能使得模型更加的鲁棒
+
+### Decay 学习率衰减因子
+Exponential / Logarithmic
 
 ***
 <font color = red> 其它笔记 </font>
