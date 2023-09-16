@@ -689,16 +689,41 @@ Mesh saved: 1438889 vertices, 2879855 faces (7s652ms)
 
 # Source
 ## ESIKF filter
-* service_VIO_update
- * vio_preintegration
-  * imu_preintegration
- * Global_map::selection_points_for_projection 
-  * Image_frame::project_3d_point_in_this_img // project 3d points to image
- * Rgbmap_tracker::track_img // optical-flow 
- * Rgbmap_tracker::remove_outlier_using_ransac_pnp // PnP Ransac
-
-* service_LIO_update
- * ImuProcess::Process // 
+* service_LIO_update // g_camera_lidar_queue
+ * ImuProcess::Process // calc g_lio_state by imu integration
+  * ImuProcess::lic_point_cloud_undistort
+  * ImuProcess::lic_state_propagate
+   * ImuProcess::imu_preintegration
+ * KD_TREE::Build 
+ // PCA, Lidar_offset_to_IMU
  * Global_map::append_points_to_global_map // add points to voxel
-## pose graph optimize
-Perspective-n-Point (PnP) 
+
+* image_callback
+ * service_process_img_buffer // new thread, deal with compact image
+ * process_image // store init img_pose to m_queue_image_with_pose
+  * service_pub_rgb_maps // new thread, publish Global_map color points 
+  * service_VIO_update // modified img_pose
+   * Global_map::selection_points_for_projection // select voxel hit points
+    * Image_frame::project_3d_point_in_this_img // project 3d points to image
+   * vio_preintegration // calc image pose by imu integration
+    * imu_preintegration
+   * Rgbmap_tracker::track_img // track m_queue_image_with_pose, optical-flow 
+   * Rgbmap_tracker::remove_outlier_using_ransac_pnp // PnP Ransac, using opencv   * R3LIVE::vio_esikf 
+   * R3LIVE::vio_photometric
+   // save final pose to g_lio_state
+   * Rgbmap_tracker::update_and_append_track_pts
+  * Image_frame::image_equalize // image processing
+## reconstruct
+Offline_map_recorder // points with color, image view
+* reconstruct_mesh
+ * r3live_map_to_mvs_scene // parse input to points, colors, image views, K, pose, etc
+ * ReconstructMesh
+  * CGAL::spatial_sort // sort input points by spatial sort 
+  // Delaunay trianglation
+  // Calc weights
+  // max flow graph cut
+  // remove invalid edges
+  * Mesh::FixNonManifold
+ * Mesh::Clean // hole filling, smooth
+* texture_mesh // rgb = average of knn points rgb 
+ * build_pcl_kdtree 

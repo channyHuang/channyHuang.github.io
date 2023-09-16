@@ -177,7 +177,7 @@ DBMS运行的基本工作单位是事务，事务是用户定义的一个数据�
 > 基本多维分析操作有钻取、切片和切块、旋转等。
 ## 数据仓库
 数据仓库的真正关键是数据的存储和管理。数据仓库的组织管理方式决定了它有别于传统数据库，同时也决定了其对外部数据的表现形式。要决定采用什么产品和技术来建立数据仓库的核心，则需要从数据仓库的技术特点着手分析。针对现有各业务系统的数据，进行抽取、清理，并有效集成，按照主题进行组织，整个过程可以简称为<font color = red>抽取、转换和加载(Extraction-Transformation-Loading，ETL)过程</font>。
-## 数据挖掘技术
+## <font color=red>数据挖掘技术</font>(论，架构)
 * 空间数据挖掘（Spatial Data Mining，SDM）
 * 多媒体数据挖掘（Multimedia Data Mining， MDM）
 * 文本数据挖掘（Text Data Mining，SDM）
