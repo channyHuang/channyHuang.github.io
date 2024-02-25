@@ -17,6 +17,10 @@ CMake 在查找其它库时在目标目录下的cmake中寻找查找信息。
 
 路径信息通过各个库的.cmake文件说明中查找。如OpenCV在OpenCVConfig.cmake中设置了OpenCV_INCLUDE_DIRS变量，osg在OpenSceneGraphConfig.cmake中设置了OSG_INCLUDE_DIR等。
 
+```
+cmake -G"MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=%cd%/install -DCMAKE_C_COMPILER=D:/Qt/Qt5.14.2/Tools/mingw730_64/bin/gcc.exe -DCMAKE_CXX_COMPILER=D:/Qt/Qt5.14.2/Tools/mingw730_64/bin/c++.exe -DCMAKE_MAKE_PROGRAM=D:/Qt/Qt5.14.2/Tools/mingw730_64/bin/mingw32-make.exe ../cmake
+```
+cmake使用mingw编译
 ## OpenSceneGraph
 OpenSceneGraph -> install -> set System Path OSG_DIR -> use find_package(OpenSceneGraph)
 
