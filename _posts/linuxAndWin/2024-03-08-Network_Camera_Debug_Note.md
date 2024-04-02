@@ -126,3 +126,20 @@ while cap.isOpened():
         cv2.imshow('source', frame)
         cv2.waitKey(1)
 ```
+
+# 报GStreamer没有"nvv4l2decoder"和"nvvidconv"插件错误
+意外有了一台Ubuntu 20.04 x86_64的机器，在机器上按上述步骤跑，发现在使用GStreamer获取网络摄像头的rtsp流时，
+```sh
+gst-launch-1.0 rtspsrc location=rtsp://192.168.1.88:554/user=admin&password=admin&xxx ! rtph264depay ! h264parse ! nvv4l2decoder ! nvvidconv ! autovideosink
+```
+会报GStreamer没有"nvv4l2decoder"和"nvvidconv"插件的错误。
+```
+WARNING: erroneous pipeline: no element "nvv4l2decoder"
+WARNING: erroneous pipeline: no element "nvvidconv"
+```
+排除掉多版本冲突、编译安装没编译完整等问题后，在官网的plugin中查找竟然没找到报错的这两个名称。最后发现这两个是DeepStream才有的，不是GStreamer本身的。
+
+不确定新机器的显卡是否支持DeepStream，只好先尝试把"nvv4l2decoder"和"nvvidconv"换成`avdec_h264`，然后能够正常获取摄像机的视频流。
+```
+gst-launch-1.0 rtspsrc location='rtsp://192.168.1.88:554/user=admin&password=admin&xxx' ! rtph264depay ! h264parse ! avdec_h264 ! autovideosink
+```
