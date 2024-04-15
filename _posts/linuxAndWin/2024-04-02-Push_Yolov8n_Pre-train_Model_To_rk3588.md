@@ -7,7 +7,7 @@ tags:
 - Server
 - Linux
 ---
-//Description: 记录把Yolov8n预训练的模型push到rk3588的板子上进行目标检测的整个过程，其中遇到原始模型无法jit.load、模型转换后检测错误、板子上安装SDK失败等问题，最终通过改用load、分析error list抛弃部分模型、检查版本一致性解决。写于2024年4月初。
+//Description: 记录把Yolov8n预训练的模型push到rk3588的板子上进行目标检测的整个过程，其中遇到原始模型无法jit.load、模型转换后检测错误、板子上安装SDK失败等问题，最终通过改用load、分析error list抛弃部分模型、检查版本一致性解决。写于2024年4月初，SDK文档参考了v2.0.0beta0版本，板子实际运行安装的SDK是1.6.0版本。
 
 //Create Date: 2024-04-02 10:14:28
 
@@ -58,6 +58,9 @@ E inference: The runtime has not been initialized, please call init_runtime firs
 ```
 上网搜索发现缺少`constants.pkl`大概率是导出模型的时候设置的只导出权重还是导出整个网络导致的，不方便重新训练导出，故直接改用Yolov8自带的格式转换函数先行转换到`onnx`模型，见附录１。
 
+后续查看RKNPU的2.0版官方文档发现文档的常见问题中也有说明：
+> 目前只支持'torch.jit.trace()'导出的模型。'torch.save()'接口仅保存权重参数字典,缺乏网络结构信息,无法被正常导入并转成 RKNN 模型
+
 # step 2: PC上查看onnx模型的检测结果
 见附录2。检测图像中有多个目标，能够正常检测到其中两个目标。
 
@@ -70,7 +73,7 @@ E RKNN: [11:55:46.914] REGTASK: The bit width of field value exceeds the limit, 
 ```
 模型转换报错`REGTASK: The bit width of field value exceeds the limit`，但依然会输出转换后的rknn文件。
 
-上网搜索有说加`simplify=False`参数的，有让增加混合量化的，尝试后均没有解决报错问题，模型转换过程中依旧会报上面的错误。又搜索到说该报错不影响的，暂时
+上网搜索有说加`simplify=False`参数的，有让增加混合量化的，尝试后均没有解决报错问题，模型转换过程中依旧会报上面的错误。又搜索到说该报错不影响的，没找到解决方案，暂时搁置。
 ## Q: detect failed
 最初`output`参数没有设置，直接使用的默认值。结果发现检测失败，没有任何检测结果。
 
@@ -112,6 +115,28 @@ outputs = rknn_lite.inference(inputs=[img])
 rknn_lite.release()
 ```
 详细可见附录3。
+
+板子上的RKNNLite接口(python版)一共只有7个：
+```python
+# 初始化
+rknn_lite =　RKNNLite(verbose=True, verbose_file='./inference.log') 
+# 加载模型
+ret = rknn_lite.load_rknn('./resnet_18.rknn')
+# 初始化运行时环境
+ret = rknn_lite.init_runtime(core_mask=RKNNLite.NPU_CORE_AUTO)
+# 模型推理
+outputs = rknn_lite.inference(inputs=[img])
+# 查询 SDK 版本
+sdk_version = rknn_lite.get_sdk_version()
+# 查询模型可运行平台
+rknn_lite.list_support_target_platform(rknn_model=’mobilenet_v1.r
+knn’)
+# 释放资源
+rknn_lite.release()
+```
+看样子性能什么的还是需要PC或连板，貌似不能直接在板上调用接口获取性能信息。
+
+文档中写了PC（模拟器和板端）的性能评估，但经测试只有精度分析`rknn.accuracy_analysis()`能在模拟器中进行，性能评估`rknn.eval_perf()`和内存评估`rknn.eval_memory()`都需要连板。
 
 ***
 <font color=red>附录</font>
