@@ -1,5 +1,4 @@
--
---
+---
 layout: default
 title: Yolo Learning Notes
 categories:
@@ -41,3 +40,6 @@ tags:
 ## ELAN
 ## YoloF
 ## FCOS
+
+# Others
+## Yolov8: CSPDarkNet + SPPF
