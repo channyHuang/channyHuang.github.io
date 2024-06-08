@@ -42,6 +42,11 @@ sudo modprobe 8188gu
 sudo usb_modeswitch -KW -v 0bda -p 1a2b
 ```
 
+命令行连接网络
+```sh
+nmcli dev wifi connect xxx-wifiname password xxx-password
+```
+
 # smbda设置共享文件夹
 1. 创建共享文件夹`sharewithdevices`
 ```sh
@@ -53,7 +58,7 @@ sudo useradd smbuser -s /usr/sbin/nologin
 ```
 3. 修改共享文件夹`sharewithdevices`的owner为共享用户`smbuser`
 ```sh
-sudo chmown smbuser:smbuser ./sharewithdevices/
+sudo chown smbuser:smbuser ./sharewithdevices/
 ```
 4. 为共享用户`smbuser`创建登录密码
 ```sh
@@ -73,6 +78,12 @@ sudo vim /etc/samba/smb.conf
     browsable=yes
     public=yes
     writable=yes
+```
+
+iOS支持
+```sh
+[global]
+   vfs objects = acl_xattr catia fruit streams_xattr
 ```
 6. 重启服务
 ```sh
