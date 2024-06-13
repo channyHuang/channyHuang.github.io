@@ -90,3 +90,8 @@ iOS支持
 sudo service smbd restart
 sudo service nmbd restart
 ```
+
+# 取消录屏30s时间限制
+```sh
+gsettings set org.gnome.settings-daemon.plugins.media-keys max-screencast-length 0
+```

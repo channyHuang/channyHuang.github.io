@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Yolov8n Opt In rk3588 (3)
+title: Push Yolov8n Pre-train Model To rk3588 (4)
 categories:
 - Linux
 tags:

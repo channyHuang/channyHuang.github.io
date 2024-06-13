@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Yolov8n Opt In rk3588 (1)
+title: Push Yolov8n Pre-train Model To rk3588 (2)
 categories:
 - Linux
 tags:
@@ -14,6 +14,13 @@ tags:
 //Author: channy
 
 [toc]
+
+# 使用RKNN的官网代码进行模型转换
+[ultralytics_yolov8](https://github.com/ultralytics/ultralytics_yolov8)
+
+使用Yolov8的官网代码转换模型会遇到各种问题，换用RKNN的官网代码转换能够避免，因其在转换过程中做了其它处理。
+
+把`pt`模型转换成`onnx`后，再使用`rknn_model_zoo`中example对应的yolo版本进行`onnx`到`rknn`的转换。
 
 # 剪枝
 `model_pruning`设置为True剪枝，然而对小模型没有明显效果。
@@ -31,6 +38,7 @@ tags:
     ret = rknn.build(do_quantization = True, dataset = './dataset.txt', rknn_batch_size = None)
 ```
 当`quant_img_RGB2BGR`为False时，error_analysis的误差上升到几百+，改成True后依旧几百上千+。
+
 ## 混合量化
 ```python
     # step 1
@@ -181,6 +189,7 @@ INFO: When evaluating memory usage, we need consider
 the size of model, current model size is: 11.79 MiB       
 ======================================================
 ```
+
 ## `rknn.eval_perf()`报错
 在执行性能评估时发生
 `invalid literal for int() with base 10: 'cat: /sys/class/devfreq/dmc/cur_freq: 没有那个文件或目录'`
