@@ -34,6 +34,9 @@ sudo vim /etc/default/grub
 sudo update-grub
 ```
 
+一定要确定删除内核文件后默认的开机内核存在且grub文件更新成功，否则容易出现再开机时进不了系统、进不了桌面等问题。  
+<font color=red>包括`sudo apt-get upgrade`也是不能随意运行，有可能出现更新后因驱动不兼容等原因导致的进不了系统问题。</font>
+
 # 无线网卡Wifi
 大部分网卡都需要安装甚至自行编译驱动
 ```sh
@@ -42,7 +45,7 @@ sudo modprobe 8188gu
 sudo usb_modeswitch -KW -v 0bda -p 1a2b
 ```
 
-命令行连接网络
+命令行连接网络，当进不了桌面时救急用：
 ```sh
 nmcli dev wifi connect xxx-wifiname password xxx-password
 ```

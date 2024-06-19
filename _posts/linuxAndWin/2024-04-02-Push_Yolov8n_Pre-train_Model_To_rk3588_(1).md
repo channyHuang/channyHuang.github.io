@@ -114,7 +114,11 @@ E RKNN: [11:55:46.914] REGTASK: The bit width of field value exceeds the limit, 
 ```
 
 使用netron查看原`onnx`文件的网络结构
+```sh
+sudo snap install netron
 
+
+```
 ![onnx_net](./../../images/onnx_net.png)
 
 在`rknn.load_onnx(...)`中设置`outputs`参数舍弃误差太大的层。
