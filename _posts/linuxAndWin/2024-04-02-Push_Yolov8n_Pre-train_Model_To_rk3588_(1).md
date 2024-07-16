@@ -161,8 +161,7 @@ outputs = rknn_lite.inference(inputs=[img])
 # 查询 SDK 版本
 sdk_version = rknn_lite.get_sdk_version()
 # 查询模型可运行平台
-rknn_lite.list_support_target_platform(rknn_model=’mobilenet_v1.r
-knn’)
+rknn_lite.list_support_target_platform(rknn_model=’mobilenet_v1.rknn’)
 # 释放资源
 rknn_lite.release()
 ```

@@ -6,7 +6,7 @@ categories:
 tags:
 - Computer Vision
 ---
-//Description: Yolo目标检测网络学习笔记。记录在学习Yolo过程中遇到的问题。Yolo网络分为三部分：主干网络、颈部网络和检测头。主干网络VGG->ResNet->DarkNet->MobileNet->ShuffleNet用于提取出图像中的特征信息.颈部网络SPP->SDD->FPN.检测头MLP->CNN->DETR.
+//Description: Yolo目标检测网络学习笔记。记录在学习Yolo过程中遇到的问题。Yolo网络分为三部分：主干网络、颈部网络和检测头。主干网络VGG->ResNet->DarkNet->MobileNet->ShuffleNet用于提取出图像中的特征信息。颈部网络SPP->SDD->FPN。检测头MLP->CNN->DETR。
 
 //Create Date: 2024-04-03 09:38:39
 
@@ -16,6 +16,7 @@ tags:
 
 # Basic
 ## 主干网络
+用于提取出图像中的特征信息
 * VGG (Fast R-CNN、SSD)
 * ResNet
 * DarkNet
@@ -27,6 +28,7 @@ tags:
 
 # Yolo
 ## Yolov1: googlenet + SPP + MLP
+把图像分割成SxS的网格进行检测
 * IoU
 * MLP参数多
 ## Yolov2: DarkNet-19 + SDD + CNN
