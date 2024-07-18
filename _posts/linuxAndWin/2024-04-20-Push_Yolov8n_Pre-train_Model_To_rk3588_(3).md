@@ -56,6 +56,27 @@ tags:
 ## 多模型串并联
 使用两个模型，其中一个模型识别大目标，另一个识别小目标。考虑到多线程开的3个线程占满了3个核，故先考虑模型串联。尝试发现串联前后帧率相近，均为20+，npu占用率每个核都从18%上升到38%。
 
+# Conv -> ConvExSwish
+从`.onnx`到`.rknn`的模型对比，Conv+Sigmoid+Mul合并成了ConvExSwish
+
+# 多Batch使用
+模型转换时[ultralytics_yolov8](https://github.com/ultralytics/ultralytics_yolov8)的`default.yaml`里的`batch: 16`在`mode: export`下并没有生效，生成的`.onnx`文件使用`netron`查看还是(1,3,w,h)
+
+在`rknn.build`的`rknn_batch_size=3`设置后，使用`netron`查看`.rknn`模型还是(1,3,w,h)
+```python
+ret = rknn.build(do_quantization=do_quant, dataset=DATASET_PATH, rknn_batch_size = 3)
+```
+但此时若使用`init_runtime`设置单核
+```python
+rknn.init_runtime(core_mask=RKNNLite.NPU_CORE_0)
+```
+控制台会报
+```sh
+core mask = 4 is invalid for batch size: 3, fall back to CORE_AUTO mode
+```
+
+Python下推理时间也不一样，同样只输入1帧图像的情况下，batch=3时单推理接口用时1.5s，batch=1时单推理接口用时0.5s，有明显差别。
+
 # 附录1：图像分割成640倍数计算offset
 ```python
 import math

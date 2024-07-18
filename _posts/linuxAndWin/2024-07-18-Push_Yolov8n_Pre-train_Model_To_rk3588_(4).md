@@ -182,6 +182,64 @@ ID   OpType           DataType Target InputShape                               O
 ## dynamic shape
 动态shape需要NPU驱动0.9.2或以上，而NPU驱动是直接在固件上的，即升级NPU驱动需要直接刷新固件。
 
+使用`ultralytics_yolov8`进行模型转换时，动态shape可以修改`exporter.py`如下，得到动态shape模型。
+```python
+# exporter.py
+    @try_export
+    def export_rknn(self, prefix=colorstr('RKNN:')):
+        """YOLOv8 RKNN model export."""
+        LOGGER.info(f'\n{prefix} starting export with torch {torch.__version__}...')
+
+        # ts = torch.jit.trace(self.model, self.im, strict=False)
+        # f = str(self.file).replace(self.file.suffix, f'_rknnopt.torchscript')
+        # torch.jit.save(ts, str(f))
+
+        dynamic = self.args.dynamic
+        if dynamic:
+            dynamic = {'images': {0: 'batch', 2: 'height', 3: 'width'}}  # shape(1,3,640,640)
+            # if isinstance(self.model, SegmentationModel):
+            #     dynamic['output0'] = {0: 'batch', 2: 'anchors'}  # shape(1, 116, 8400)
+            #     dynamic['output1'] = {0: 'batch', 2: 'mask_height', 3: 'mask_width'}  # shape(1,32,160,160)
+            # elif isinstance(self.model, DetectionModel):
+            #     dynamic['374'] = {0: 'batch', 2: 'anchors'}  # shape(1, 84, 8400)
+
+        f = str(self.file).replace(self.file.suffix, f'.onnx')
+        opset_version = self.args.opset or get_latest_opset()
+        torch.onnx.export(
+            self.model,
+            self.im[0:1,:,:,:],
+            f,
+            verbose=False,
+            opset_version=opset_version,
+            do_constant_folding=True,  # WARNING: DNN inference with torch>=1.12 may require do_constant_folding=False
+            input_names=['images'],
+            dynamic_axes=dynamic if self.args.dynamic == True else None)
+
+        LOGGER.info(f'\n{prefix} feed {f} to RKNN-Toolkit or RKNN-Toolkit2 to generate RKNN model.\n' 
+                    'Refer https://github.com/airockchip/rknn_model_zoo/tree/main/models/CV/object_detection/yolo')
+        return f, None
+```
+
+再在使用`rknn_model_zoo`转换成`rknn`的`convert.py`中增加具体支持的shape
+```python
+    dynamic_input = [
+        [[1,3,1920,1920]],    # set 1: [input0_256]
+        [[1,3,1920,1088]],    # set 2: [input0_160]
+        [[1,3,640,640]],    # set 3: [input0_224]
+    ]
+
+    # Pre-process config
+    print('--> Config model')
+    rknn.config(mean_values=[128, 128, 128], std_values=[128, 128, 128], 
+                quant_img_RGB2BGR=True, 
+                quantized_dtype = 'asymmetric_quantized-8', quantized_method = 'layer', quantized_algorithm = 'mmse', optimization_level = 3,
+                target_platform='rk3588', 
+                model_pruning = True,
+                dynamic_input=dynamic_input)
+    print('done')
+```
+最终生成支持`dynamic_input`多种shape的`rknn`模型。
+
 ## 自定义算子
 对自定义的算子，至rknn的SDK2.0.0版本时只支持onnx模型。主要操作为定义算子运算，然后注册算子即可。
 ### 定义算子运算
@@ -239,6 +297,23 @@ int compute_custom_sigmoid_float32(rknn_custom_op_context* op_ctx, rknn_custom_o
 
 ## 模型稀疏化推理
 yolov8转换失败。
+
+然后发现rknn.config设置sparse_infer=True会报错：rk3588不支持sparse_infer。后发现文档中也有写明：模型稀疏化推理只支持rk3576。。。
+```sh
+I rknn-toolkit2 version: 2.0.0b0+9bab5682
+--> Config model
+E config: rk3588 does not support sparse inference, ignore this parameter!
+I ===================== WARN(0) =====================
+E rknn-toolkit2 version: 2.0.0b0+9bab5682
+Traceback (most recent call last):
+  File "convert.py", line 45, in <module>
+    rknn.config(mean_values=[[0, 0, 0]], std_values=[
+  File "/home/channy/.local/lib/python3.8/site-packages/rknn/api/rknn.py", line 128, in config
+    return self.rknn_base.config(args)
+  File "rknn/api/rknn_base.py", line 1124, in rknn.api.rknn_base.RKNNBase.config
+  File "rknn/api/rknn_log.py", line 92, in rknn.api.rknn_log.RKNNLog.e
+ValueError: rk3588 does not support sparse inference, ignore this parameter!
+```
 
 # 附录1：根据自己的模型修改后处理函数
 ```c++
