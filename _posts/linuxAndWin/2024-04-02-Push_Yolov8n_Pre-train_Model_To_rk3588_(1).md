@@ -7,7 +7,7 @@ tags:
 - Server
 - Linux
 ---
-//Description: 记录把Yolov8n预训练的模型push到rk3588的板子上进行目标检测的整个过程，其中遇到原始模型无法jit.load、模型转换后检测错误、板子上安装SDK失败等问题，最终通过改用load、分析error list抛弃部分模型、检查版本一致性解决。写于2024年4月初，SDK文档参考了v2.0.0beta0版本，板子实际运行安装的SDK是1.6.0版本。
+//Description: 模型转换。记录把Yolov8n预训练的模型push到rk3588的板子上进行目标检测的整个过程，其中遇到原始模型无法jit.load、模型转换后检测错误、板子上安装SDK失败等问题，最终通过改用load、分析error list抛弃部分模型、检查版本一致性解决。写于2024年4月初，SDK文档参考了v2.0.0beta0版本，板子实际运行安装的SDK是1.6.0版本。后发现更建议用SDK的官网转换而不是Yolov8的官网转换方法，同时记录了模型转换过程中的剪枝、量化、混合量化等操作；同时pt转onnx的方式有问题，应该使用SDK官网的转换方式并设置imgsz而不是使用Yolov8官网的转换方式。
 
 //Create Date: 2024-04-02 10:14:28
 
@@ -72,7 +72,7 @@ E inference: The runtime has not been initialized, please call init_runtime firs
 检测图像中有多个目标，能够正常检测到其中两个目标。
 
 # step 3: 在PC上转换成rknn模型并模拟检测
-> <font color=red>这里遇到的错误后面发现都是因为使用Yolov8的官网转换模型的缘故，其实正确的操作应该是使用rknn的SDK的官网进行模型转换。下一篇笔记再细说，这里先记下遇到过的错误。</font>
+> <font color=red>这里遇到的错误后面发现都是因为使用Yolov8的官网转换模型的缘故，其实正确的操作应该是使用rknn的SDK的官网进行模型转换。后面再细说，这里先记下遇到过的错误。</font>
 
 使用官网模型报`failed to config argb mode layer`错误，因为模型中有rk3588不支持的算子Softmax导致，需要在训练生成模型时修改成其它如tanh之类的。
 
@@ -116,8 +116,6 @@ E RKNN: [11:55:46.914] REGTASK: The bit width of field value exceeds the limit, 
 使用netron查看原`onnx`文件的网络结构
 ```sh
 sudo snap install netron
-
-
 ```
 ![onnx_net](./../../images/onnx_net.png)
 
@@ -146,7 +144,6 @@ outputs = rknn_lite.inference(inputs=[img])
 # do something same as in PC
 rknn_lite.release()
 ```
-详细可见附录3。
 
 板子上的RKNNLite接口(python版)一共只有7个：
 ```python
@@ -169,75 +166,158 @@ rknn_lite.release()
 
 文档中写了PC（模拟器和板端）的性能评估，但经测试只有精度分析`rknn.accuracy_analysis()`能在模拟器中进行，性能评估`rknn.eval_perf()`和内存评估`rknn.eval_memory()`都需要连板。
 
-# 其它记录
-## 查看npu占用
-```sh
-sudo cat /sys/kernel/debug/rknpu/load
-```
-## 国内源
-```
-阿里云： http://mirrors.aliyun.com/pypi/simple/
-中国科技大学： https://pypi.mirrors.ustc.edu.cn/simple/
-豆瓣： http://pypi.douban.com/simple/
-清华大学： https://pypi.tuna.tsinghua.edu.cn/simple/
-中国科学技术大学： http://pypi.mirrors.ustc.edu.cn/simple/
-https://mirror.baidu.com/pypi/simple
-```
-## pip3 install 后使用sudo python3 xxx.py出现找不到对应的module
-如果sudo启动时报 'ModuleNotFoundError: No module named rknnlite'
-*  可能1：没安装RKNN的SDK
-*  可能2：安装时没有用 sudo，因为sudo用户和普通用户的python包查找路径不完全一样，不想花时间用sudo重新安装的话，可做如下操作  
-1. 分别查看sudo下和普通环境下Python的Path
-```sh
-firefly@kylinos:~$ sudo python3
-输入密码
-Python 3.8.10 (default, Jan 23 2024, 01:35:54) 
-[GCC 9.3.0] on linux
-Type "help", "copyright", "credits" or "license" for more information.
->>> import sys
->>> sys.path
-['', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/usr/local/lib/python3.8/dist-packages', '/usr/lib/python3/dist-packages']
-```
-```sh
-firefly@kylinos:~$ python3
-Python 3.8.10 (default, Jan 23 2024, 01:35:54) 
-[GCC 9.3.0] on linux
-Type "help", "copyright", "credits" or "license" for more information.
->>> import sys
->>> sys.path
-['', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/firefly/.local/lib/python3.8/site-packages', '/usr/local/lib/python3.8/dist-packages', '/usr/lib/python3/dist-packages']
-```
-2. 将普通环境下的库链接到sudo Python下  
 
-在Python的dist-packages下创建*.pth文件
-```sh
-firefly@kylinos:~$ cd /usr/local/lib/python3.8/dist-packages
-firefly@kylinos:/usr/local/lib/python3.8/dist-packages$ sudo touch rknn_py38_path.pth
-```
-并在创建的*.pth文件中加入上面查看到的普通环境下的`sys.path`  
+# 使用RKNN的官网代码进行模型转换
+[ultralytics_yolov8](https://github.com/ultralytics/ultralytics_yolov8)
 
-*.pth文件
+使用Yolov8的官网代码转换模型会遇到各种问题，换用RKNN的官网代码转换能够避免，因其在转换过程中做了其它处理。
+
+把`pt`模型转换成`onnx`后，再使用`rknn_model_zoo`中example对应的yolo版本进行`onnx`到`rknn`的转换。
+
+## ONNX转成RKNN报'failed to config argb mode layer'错误
+在试验过程中遇到在用Yolov8的`export`函数直接转成`onnx`后再转`RKNN`报`failed to config argb mode layer`错误。
+
+```sh
+I rknn building ...
+E RKNN: [15:36:41.876] failed to config argb mode layer!
+Aborted (core dumped)
 ```
-/usr/lib/python38.zip
-/usr/lib/python3.8
-/usr/lib/python3.8/lib-dynload
-/home/firefly/.local/lib/python3.8/site-packages
-/usr/local/lib/python3.8/dist-packages
-/usr/lib/python3/dist-packages
-```
-3. 此时使用sudo也可以运行不再报找不到Module错误
-## onnxruntime在cpu/gpu下跑
+
 ```python
-import onnxruntime
-print(onnxruntime.get_device())
-ort_session = onnxruntime.InferenceSession('../model/v8n.onnx', provides = ['CUDAExecutionProvider'])
-print(ort_session.get_providers())
+def pt2onnx(path = '../model/v8n_relu.pt', sim = True):
+    model = YOLO(path)
+    res = model.export(format="onnx", simplify = sim)#, opset = 19) 
 ```
 
+上网搜索发现使用[ultralytics_yolov8](https://github.com/airockchip/ultralytics_yolov8.git)里面的`exporter.py`从`pt`转到`onnx`再转`rknn`能转成功。看描述应该是算子相关问题。
+
+接着发现之前耗时大的真正原因是`pt`转`onnx`的转换方式也有问题，用Yolov8官网的转换方式是保持了输入尺寸即1920x1920的，分辨率大导致耗时大；用SDK官网的转换方式默认参数imgsz＝640，转换后才能达到和demo相当的水平。但从1920转换到640会伴随精度丢失，因为1920的输入图像会经过缩放后再推理。
+
+# 剪枝
+`model_pruning`设置为True剪枝，然而对小模型没有明显效果。
+```python
+    rknn.config(mean_values=[128, 128, 128], std_values=[128, 128, 128], 
+                quant_img_RGB2BGR = True, 
+                quantized_dtype = 'asymmetric_quantized-8', quantized_method = 'layer', quantized_algorithm = 'mmse', optimization_level = 3,
+                target_platform = 'rk3588',
+                model_pruning = True)
 ```
-// output
-GPU
-['CPUExecutionProvider']
+
+# 量化
+量化方法channel/layer，量化算法normal/mmse/kl_divergence
+```python
+    ret = rknn.build(do_quantization = True, dataset = './dataset.txt', rknn_batch_size = None)
 ```
-# ffmpeg
-../configure --prefix=$PWD/install --disable-x86asm --enable-static --enable-shared
+当`quant_img_RGB2BGR`为False时，error_analysis的误差上升到几百+，改成True后依旧几百上千+。
+
+但量化确实能够在一定程度上提高效率，1920x1920的模型推理未量化约0.4s每帧，量化后可以减小到0.3s每帧。
+
+## 混合量化
+```python
+    # step 1
+    if True:
+        model_path = '../model/v8n.onnx'
+        rknn = RKNN(verbose = True)
+        rknn.config(mean_values=[128, 128, 128], std_values=[128, 128, 128], 
+                    quant_img_RGB2BGR = True, 
+                    quantized_dtype = 'asymmetric_quantized-8', quantized_method = 'channel', quantized_algorithm = 'normal', optimization_level = 3,
+                    target_platform = 'rk3588',
+                    model_pruning = True)
+        ret = rknn.load_onnx(model = model_path)
+        ret = rknn.hybrid_quantization_step1(dataset = './dataset.txt', proposal = False)
+        rknn.release()
+    # step 2
+    rknn = RKNN(verbose = True)
+    ret = rknn.hybrid_quantization_step2(model_input = './v8n.model',
+                                         data_input='./v8n.data',
+                                         model_quantization_cfg='./v8n.quantization.cfg')
+    ret = rknn.export_rknn('./v8n.rknn')
+    ret = rknn.accuracy_analysis(inputs = ['../model/test.jpg'], output_dir = None)
+    start_time = time.time()
+    origin_img = cv2.imread('../model/test.jpg')
+    origin_img_rz = cv2.resize(origin_img, IMG_SIZE)
+    img_height, img_width = origin_img.shape[:2]
+    img = cv2.cvtColor(origin_img, cv2.COLOR_BGR2RGB)
+    img = cv2.resize(img, IMG_SIZE)
+    image_data = np.array(img) / 255.0
+    image_data = np.transpose(image_data, (0, 1, 2))
+    image_data = np.expand_dims(image_data, axis = 0).astype(np.float16)
+    
+    ret = rknn.init_runtime()
+    outputs = rknn.inference(inputs = [img])
+
+    boxes, classes, scores = post_process(outputs)
+    xyxyboxes = []
+    for b in boxes:
+        xyxyboxes.append(xywh2xyxy(b[0], b[1], b[2], b[3]))
+    draw(origin_img_rz, xyxyboxes, scores, classes)
+
+    cur_time = time.time()
+    spend_time = "{:.2f}  s".format((cur_time - start_time))
+    cv2.putText(origin_img_rz, spend_time, (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+    cv2.imshow('res', cv2.resize(origin_img_rz, (750, 750)))
+    #cv2.imwrite('test_res.jpg', cv2.resize(origin_img_rz, (750, 750)))
+    cv2.waitKey(10000)
+    cv2.destroyAllWindows()
+```
+量化完后发现使用自己的模型完全识别不到目标。。。
+
+# Python自定义算子
+## 模型准备
+```python
+import onnx
+
+path = '../model/yolov8n.onnx'
+model = onnx.load(path)
+
+for node in model.graph.node:
+    if node.op_type == 'Softmax':
+        node.op_type = 'cstSoftmax'
+
+onnx.save(model, 'yolov8n_custom.onnx')
+```
+## 定义算子运算
+自定义算子类，主要包含`shape_infer`和`compute`两个函数
+```python
+import numpy as np
+from rknn.api.custom_op import get_node_attr
+
+class cstSoftmax:
+    op_type = 'cstSoftmax'
+    def shape_infer(self, node, in_shapes, in_dtypes):
+        out_shapes = in_shapes.copy()
+        out_dtypes = in_dtypes.copy()
+        return out_shapes, out_dtypes
+    def compute(self, node, inputs):
+        x = inputs[0]
+        axis = get_node_attr(node, 'axis')
+        x_max = np.max(x, axis = axis, keepdims = True)
+        tmp = np.exp(x - x_max)
+        s = np.sum(tmp, axis = axis, keepdims = True)
+        outputs = [tmp / s]
+        return outputs
+```
+## 转换成rknn
+在`config`和`load`之间注册自定义算子`reg_custom_op`
+```python
+rknn = RKNN(verbose = True)
+    rknn.config(mean_values=[127.5, 127.5, 127.5], std_values=[127.5, 127.5, 127.5], 
+                quant_img_RGB2BGR = True, target_platform = 'rk3588')
+    ret = rknn.reg_custom_op(cstSoftmax())
+    if ret != 0:
+        print('Register op failed!')
+        exit(ret)
+    ret = rknn.load_onnx(model = 'yolov8n_custom.onnx')
+    if ret != 0:
+        print('Load model failed!')
+        exit(ret)
+    ret = rknn.build(do_quantization = False)
+    if ret != 0:
+        print('Build model failed!')
+        exit(ret)
+    ret = rknn.export_rknn(export_path = './yolov8n_custom.rknn', simplify = False, cpp_gen_cfg = False)
+    ret = rknn.load_rknn('yolov8n_custom.rknn')
+    ret = rknn.init_runtime(target = None, perf_debug = False, eval_mem = True, async_mode = False)#, core_mask = RKNN.NPU_CORE_0_1_2)
+    # inference here ...
+    image_inference(args, rknn)
+```

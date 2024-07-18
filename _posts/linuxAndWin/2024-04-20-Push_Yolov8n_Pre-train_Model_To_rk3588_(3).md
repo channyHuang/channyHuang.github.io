@@ -7,7 +7,7 @@ tags:
 - Server
 - Linux
 ---
-//Description: 记录yolov8n部署到rk3588后的优化，从原先的单核npu跑修改成使用线程池开3个线程3个核一起跑，本地视频的识别帧率从原来的14+提升到40+，但网络摄像头的识别帧率依旧在15+，最终发现和摄像头支持的最高帧率及当前设置的帧率有关系。另外发现rknn_model_zoo对图像的处理没有考虑非16倍长宽的图像，也没有考虑内存大于4G时的rga函数imfill的使用，对此进行了修改。
+//Description: 优化。记录yolov8n部署到rk3588后的优化，从原先的单核npu跑修改成使用线程池开3个线程3个核一起跑，本地视频的识别帧率从原来的14+提升到40+，但网络摄像头的识别帧率依旧在15+，最终发现和摄像头支持的最高帧率及当前设置的帧率有关系。
 
 //Create Date: 2024-04-20 10:14:28
 
@@ -31,95 +31,6 @@ tags:
 1. [threadpool](https://github.com/channyHuang/rk3588DeployNoteAndCode/tree/main/threadpool)
 2. [threadpool_board](https://github.com/channyHuang/rk3588DeployNoteAndCode/tree/main/threadpool_board)
 
-# C++输入不同尺寸图像报错
-模型输入尺寸是640x640的。
-## 1. 报`src unsupport width stride 750`错误
-输入图像尺寸是750x750时报错，原因为rga只支持16位对齐的数据，把图像先resize为736x736的，该错误消失。
-
-也就是说，rknn_model_zoo里面是没有对输入图像尺寸非16的倍数这种情况做处理的。
-```sh
-$ ./rknn_yolov8_demo ../model/v8n_640.rknn ../model/test.jpg
-
-Error on improcess STATUS=-1
-RGA error message: Unsupported function: src unsupport width stride 750, rgb888 width stride should be 16 aligned!
-
-// convert_image_rga in image_utils.c 
-```
-
-修改方法可以在convert_image_rga函数中improcess之前增加非16倍数的图像做裁剪或填充处理，类似长宽尺寸不相等时的填充处理部分。具体代码可以使用rga的scale相关的函数，这样可以在3588上加速。
-
-## 2. rga输出一堆类似错误的信息
-输入图像尺寸是2880x1616时不算报错，但在首帧识别结束运行第二帧的时候，会停止在improcess之前不往下走，有点像死锁的现象。
-```sh
-$ ./rknn_yolov8_demo ../model/v8n_640.rknn ./out.jpg
-
-fill dst image (x y w h)=(0 0 640 640) with color=0x72727272
- RgaCollorFill(1819) RGA_COLORFILL fail: Invalid argument
- RgaCollorFill(1820) RGA_COLORFILL fail: Invalid argument
-69 im2d_rga_impl rga_task_submit(2171): Failed to call RockChipRga interface, please use 'dmesg' command to view driver error log.
-69 im2d_rga_impl rga_dump_channel_info(1500): src_channel: 
-  rect[x,y,w,h] = [0, 0, 0, 0]
-  image[w,h,ws,hs,f] = [0, 0, 0, 0, rgba8888]
-  buffer[handle,fd,va,pa] = [0, 0, 0, 0]
-  color_space = 0x0, global_alpha = 0x0, rd_mode = 0x0
-
-69 im2d_rga_impl rga_dump_channel_info(1500): dst_channel: 
-  rect[x,y,w,h] = [0, 0, 640, 640]
-  image[w,h,ws,hs,f] = [640, 640, 640, 640, rgb888]
-  buffer[handle,fd,va,pa] = [154, 0, 0, 0]
-  color_space = 0x0, global_alpha = 0xff, rd_mode = 0x1
-
-69 im2d_rga_impl rga_dump_opt(1550): opt version[0x0]:
-
-69 im2d_rga_impl rga_dump_opt(1551): set_core[0x0], priority[0]
-
-69 im2d_rga_impl rga_dump_opt(1554): color[0x72727272] 
-69 im2d_rga_impl rga_dump_opt(1563): 
-
-69 im2d_rga_impl rga_task_submit(2180): acquir_fence[-1], release_fence_ptr[0x0], usage[0x280000]
-
-// 使用线程读取摄像头几帧(<30帧)后，停在此处
-```
-
-关于报错中的`RgaCollorFill(1819) RGA_COLORFILL fail: Invalid argument`并不是网上一些文章说的rga3不支持imfill函数，实际是支持的。应该和内存分配有关系，改成用`dma_buf_alloc`分配该错误消失。
-
-```c++
-// image_utils.h
-    int set_image_dma_buf_alloc(image_buffer_t* img);
-// image_utils.cpp
-    int set_image_dma_buf_alloc(image_buffer_t* img) {
-        int ret = dma_buf_alloc(DMA_HEAP_DMA32_UNCACHE_PATCH, img->size, &img->fd, (void **)&img->virt_addr);
-        return ret;
-    }
-// yolov8.cc
-    // Pre Process
-    dst_img.width = app_ctx->model_width;
-    dst_img.height = app_ctx->model_height;
-    dst_img.format = IMAGE_FORMAT_RGB888;
-    dst_img.size = get_image_size(&dst_img);
-    if (dst_img.virt_addr == nullptr) {
-        //dst_img.virt_addr = (unsigned char *)malloc(dst_img.size);
-        set_image_dma_buf_alloc(&dst_img);
-    }
-    if (dst_img.virt_addr == NULL)
-    {
-        printf("malloc buffer size:%d fail!\n", dst_img.size);
-        return -1;
-    }
-    ......
-out:
-    if (dst_img.virt_addr != NULL)
-    {
-        //free(dst_img.virt_addr);
-        image_dma_buf_free(&dst_img);
-        dst_img.virt_addr = NULL;
-    }
-```
-
-但使用线程读取摄像头几帧(<30帧)后停止不前的现象还有，确认进到improcess函数一直停在里面没有跑完该函数。
-
-最后发现是`dma_buf_alloc`没有对应的free导致，加上free后还需要注意free并不会把`virt_addr`设回空，需要自行置空。另外报dma allocate fail分配失败也是类似的错误，`dma_buf_alloc`一定要有对应的`dma_buf_free`，就跟c++的`new/delete`和`malloc/free`对应一样，否则会有内存泄漏。
-
 # 背景问题
 ## 问题1：超大图像识别不实时
 经过前面的尝试，知道了模型的输入尺寸1920和640对帧率有明显的影响。考虑到超大尺寸的图像直接识别达不到实时需求，故对图像进行分割。
@@ -133,20 +44,17 @@ out:
 
 源码片段见附录。
 
+| 分割数量 | 模型尺寸 | fps(py) |
+|:---:|:---:|:---:|
+| 4 | 1920x1920 | 0.85 | 
+| 4 | 1920x1088 | 1.41 |
+
+| 尺寸 | 阈值 | 总目标 | 正确数(占比) | 错误数(占比) | 漏检数(占比) | fps(py) |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+1440x1440 | 0.63 | 11951 | 10534(0.88) | 584(0.04) | 1417(0.12) | 3.23/6.36 |
+
 ## 多模型串并联
 使用两个模型，其中一个模型识别大目标，另一个识别小目标。考虑到多线程开的3个线程占满了3个核，故先考虑模型串联。尝试发现串联前后帧率相近，均为20+，npu占用率每个核都从18%上升到38%。
-
-# 其它C++问题记录
-## dynamic shape
-动态shape需要NPU驱动0.9.2或以上，而NPU驱动是直接在固件上的，即升级NPU驱动需要直接刷新固件。
-
-## zero copy API
-零拷贝`rknn_create_mem`和`rknn_set_io_mem`，直接用`rknn_model_zoo`样例中的`yolov8_rv1106_1103.cc`理论上也可以，但实际测试发现强信赖于目标个数的设置，有时会检测不到目标。具体原因暂未知。
-
-且从实验上看，零拷贝和不用零拷贝在rk3588上的帧率差别不大甚至零拷贝的帧率略有下降。具体原因暂未知。
-
-## 模型稀疏化推理
-yolov8转换失败。
 
 # 附录1：图像分割成640倍数计算offset
 ```python
