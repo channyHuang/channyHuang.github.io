@@ -179,6 +179,11 @@ ID   OpType           DataType Target InputShape                               O
 ......
 ```
 
+### 激活函数sigmod和relu在多核设置下的差异
+按SDK文档的说明，在rknn下只有部分算子才能同时多核跑，如Conv、Add等，而有些算子暂时(v2.0.0beta0)还不支持多核，只能在单核上跑。
+
+在转换过程中，Conv+sigmod会合并成ConvExSwitch算子，Conv+Relu会合并成ConvRelu，从性能统计结果上看，Conv和ConvRelu是支持多核的，但ConvExSwitch是不支持多核的。也就是说，从帧率上看其它条件相同的情况下，激活函数为Relu的模型会比sigmod的模型帧率要高(+1左右)。识别正确率微降，约从0.978降到0.972的程度。
+
 ## dynamic shape
 动态shape需要NPU驱动0.9.2或以上，而NPU驱动是直接在固件上的，即升级NPU驱动需要直接刷新固件。
 
@@ -294,6 +299,8 @@ int compute_custom_sigmoid_float32(rknn_custom_op_context* op_ctx, rknn_custom_o
     rknn_set_batch_core_num(ctx, 3);
 ```
 设置多Batch后查看npu占用率能明显看到3个核都非空闲，有一定效果。
+
+但是同一模型在转换到rknn的过程中用batch=3和batch=1的用时对比，batch=1一张图约0.2~0.3，batch=3三张图约0.7~0.9，从时间看同一batch内的多张图像是串行推理，对帧率并没有提升作用。
 
 ## 模型稀疏化推理
 yolov8转换失败。
