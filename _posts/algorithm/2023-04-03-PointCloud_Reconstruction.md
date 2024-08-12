@@ -266,6 +266,36 @@ TextureMesh.exe -w D:\dataset\lab\Parking -i scene_dense_mesh.mvs
 3. Dense pointcloud -> delaunay reconstruction -> mesh clean -> hole filling
 4. Texture projection: face view selection + generate texture pic
 
+---> DensifyPointClouds
+Scene::DenseReconstruction
+    Scene::ComputeDepthMaps
+        DepthMapsData::SelectViews 根据面积、角度、覆盖度对每一张图像选择相邻视图
+        Scene::DenseReconstructionEstimate
+            DepthMapsData::InitViews
+                DepthMapsData::InitDepthMap 根据可用的稀疏点初始化深度图
+                    MVS::TriangulatePoints2DepthMap Delaunay三角化
+            DepthMapsData::EstimateDepthMap
+                DepthMapsData::ScoreDepthMapTmp 计算深度图像每个像素点的深度值置信度存储到confMap0中
+                    DepthEstimator::ScorePixel 根据深度和法线计算像素NCC 
+                        DepthEstimator::ScorePixelImage 计算图像中像素的NCC得分
+                DepthMapsData::EstimateDepthMapTmp 
+                    DepthEstimator::ProcessPixel
+
+$$
+NCC(A, B) = \frac{\sum (A – \bar{A}) \cdot (B – \bar{B})}{\sqrt{\sum (A – \bar{A})^2} \cdot \sqrt{\sum(B – \bar{B})^2}} 
+$$
+
+SGM 半全局算法
+PatchMatch
+
+局部：SAD、SSD、NCC/ZNCC, Census-Transform、Mutual Information、PatchMatch
+全局：graph cut, Belief Propagation, Dynamic Programming
+半全局：SGM
+
+TOF, Structured Light
+
+Scene::ReconstructMesh Delaunay三角化，计算每条边的权重，graph-cut分割提取网格。
+
 ## colmap2nerf steps
 可能会生成多个mode1， 可使用model_merger合并，但不一定成功。只有当两个model间有相同图像时才能合并。
 ```sh
