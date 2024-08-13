@@ -7,7 +7,7 @@ tags:
 - Linux
 - Command
 ---
-//Description: Notes when coding in linux。记录Linux下常用的命令。
+//Description: Notes when coding in linux。记录Linux下常用的命令。及常用的docker命令。
 
 //Create Date: 2018-10-06 10:25:19
 
