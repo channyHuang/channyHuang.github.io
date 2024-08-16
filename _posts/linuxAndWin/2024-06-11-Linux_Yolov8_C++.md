@@ -84,3 +84,44 @@ docker run -it ubuntu：20.04 bash
 
 4. 使用docker跑ubuntu镜像并在其中跑docker的ros镜像
 发现docker里面是不允许再跑docker的。
+
+# SLAM在NPU上的优化 
+## [VINS-Mono]基本流程
+1. rosbag play YOUR_PATH_TO_DATASET/MH_01_easy.bag
+根据时间戳
+
+2. roslaunch vins_estimator euroc.launch  
+
+2.1 feature_tracker
+* readIntrinsicParameter 读取摄像机内参
+* img_callback // 当图像时间戳间隔过大或早于当前时间时发送重置消息，使用cv::createCLAHE计算图像直方图，得到特征点，发送特征点消息到vins_estimator和rviz显示
+   * FeatureTracker::readImage // cv::calcOpticalFlowPyrLK光流跟踪，cv::findFundamentalMat计算基本矩阵  
+
+2.2 vins_estimator
+* imu_callback
+  * predict // $s_{t+1} = s_t + v_t * t + 0.5 * a * t * t$
+* feature_callback // 检测的特征点
+* restart_callback // 重置imu，重新开始积分 
+* relocalization_callback // 监听pose_graph发送的match_points消息，根据关键帧特征点快速重定位
+* process 主线程，imu积分，sfm重建，ceres求解，pub消息 
+  * getMeasurements 等够estimator.td时间的imu数据，和feature数据打包
+  * processIMU // 同predict?
+  * setReloFrame // 当需要重定位时使用
+  * processImage
+    * getCorresponding // 对两帧图像的特征点进行匹配
+    * solveOdometry // 
+      * FeatureManager::triangulate // 使用svd分解求每个特征值的深度
+      * optimization // 使用ceres库求解  
+
+2.3 pose_graph
+* PoseGraph
+  * optimize4DoF
+* imu_forward_callback // 从vins_estimator中接收odometry消息
+* vio_callback // 从vins_estimator中接收odometry消息，发送key_odometrys给rviz显示
+* image_callback // image_buf，给process提供数据，给显示发消息
+* pose_callback // pose_buf，给process提供数据
+* point_callback // point_buf，给process提供数据
+* process // 创建KeyFrame，回环检测，或重定位
+
+3. roslaunch vins_estimator vins_rviz.launch
+显示

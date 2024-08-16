@@ -216,4 +216,10 @@ roscore
 rosrun rviz rviz
 ```
 
+```sh
+sudo vim ~/.bashrc
+# 注释掉
+# export QT_QPA_PLATFORM='offscreen'
+```
+
 [back](./)
