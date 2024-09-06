@@ -300,9 +300,9 @@ Scene::ReconstructMesh Delaunay三角化，计算每条边的权重，graph-cut�
 可能会生成多个mode1， 可使用model_merger合并，但不一定成功。只有当两个model间有相同图像时才能合并。
 ```sh
 # 输出稀疏重建model结果为txt格式
-COLMAP.bat model_converter --input_path colmap_sparse/O --output_path colmap_text --output_type TXT
+COLMAP.bat model_converter --input_path colmap_sparse/0 --output_path colmap_text --output_type TXT
 # 模型合并
-COLMAP.bat model_merger --input_path1 colmap_sparse/O --input_path2 colmap_sparse1 --output_path colmap_sparse/01
+COLMAP.bat model_merger --input_path1 colmap_sparse/0 --input_path2 colmap_sparse1 --output_path colmap_sparse/01
 
 COLMAP.bat bundle_adjuster --input_path colmap_sparse/01 --output_path colmap_sparse/01new
 # 转化成nerf格式

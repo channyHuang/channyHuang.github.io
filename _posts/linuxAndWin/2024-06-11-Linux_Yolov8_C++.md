@@ -94,15 +94,15 @@ docker run -it ubuntu：20.04 bash
 
 2.1 feature_tracker
 * readIntrinsicParameter 读取摄像机内参
-* img_callback // 当图像时间戳间隔过大或早于当前时间时发送重置消息，使用cv::createCLAHE计算图像直方图，得到特征点，发送特征点消息到vins_estimator和rviz显示
-   * FeatureTracker::readImage // cv::calcOpticalFlowPyrLK光流跟踪，cv::findFundamentalMat计算基本矩阵  
+* img_callback // 当图像时间戳间隔过大或早于当前时间时发送重置消息restart，使用cv::createCLAHE计算图像直方图，得到特征点，发送特征点消息到vins_estimator和rviz显示
+  * FeatureTracker::readImage // cv::calcOpticalFlowPyrLK光流跟踪，cv::findFundamentalMat计算基本矩阵  
 
 2.2 vins_estimator
 * imu_callback
   * predict // $s_{t+1} = s_t + v_t * t + 0.5 * a * t * t$
 * feature_callback // 检测的特征点
 * restart_callback // 重置imu，重新开始积分 
-* relocalization_callback // 监听pose_graph发送的match_points消息，根据关键帧特征点快速重定位
+* relocalization_callback // 监听pose_graph发送的match_points消息，根据关键帧特征点快速重定位（回环检测）
 * process 主线程，imu积分，sfm重建，ceres求解，pub消息 
   * getMeasurements 等够estimator.td时间的imu数据，和feature数据打包
   * processIMU // 同predict?
@@ -125,3 +125,59 @@ docker run -it ubuntu：20.04 bash
 
 3. roslaunch vins_estimator vins_rviz.launch
 显示
+
+## 优化方向
+### 矩阵计算改成npu
+但npu的矩阵运算
+$$A_{MxK} * B_{KxN} = C_{MxN}$$
+只支持K是32的倍数，N是16的倍数。
+
+经实验，当矩阵维度太大时(128x128x128?)会出现内存错误而导致矩阵运算失败。
+
+且从时间统计上看，同样的数据，使用npu耗时并没有比使用cpu耗时有减少。
+### 使用OpenCL加速图像特征点检测
+默认的Kylin系统用apt安装的opencv不带opencl，需要重新勾选上opencl重新编译opencv。
+
+但从多帧检测的统计结果看，对500帧图像检测特征点并计算总时长，opencl仅比cpu少用1秒。
+
+```c++
+#include <iostream>
+#include <opencv2/opencv.hpp>
+#include <opencv2/core/ocl.hpp>
+
+int main() {
+    // 检查是否有可用的 OpenCL（用于 GPU 加速）
+    if (!cv::ocl::haveOpenCL()) {
+        std::cout << "OpenCL is not available." << std::endl;
+        return -1;
+    }
+
+    // 设置 OpenCL 为可用状态
+    cv::ocl::setUseOpenCL(true);
+
+    // 读取图像
+    cv::Mat image = cv::imread("your_image.jpg");
+    if (image.empty()) {
+        std::cout << "Could not read the image." << std::endl;
+        return -1;
+    }
+
+    // 创建特征点检测器
+    cv::Ptr<cv::Feature2D> detector = cv::ORB::create();
+
+    // 检测特征点
+    std::vector<cv::KeyPoint> keypoints;
+    cv::Mat descriptors;
+    detector->detectAndCompute(image, cv::noArray(), keypoints, descriptors);
+
+    // 绘制特征点
+    cv::Mat outputImage;
+    cv::drawKeypoints(image, keypoints, outputImage, cv::Scalar::all(-1), cv::DrawMatchesFlags::DEFAULT);
+
+    // 显示结果
+    cv::imshow("Image with Keypoints", outputImage);
+    cv::waitKey(0);
+
+    return 0;
+}
+```
