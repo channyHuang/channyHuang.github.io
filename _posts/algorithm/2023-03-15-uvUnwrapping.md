@@ -62,18 +62,24 @@ $$\begin {aligned} \left. \begin {aligned} \Delta u = K - e^{2u}\tilde {K} \; on
 使用此公式，可以根据缩放系数u计算出参数化后网格边界顶点处的测地曲率，根据边界的测地曲率计算出参数化后网格边界的顶点坐标；当边界确定之后，根据拉普拉斯-泊松方程或拉普拉斯-纽曼方程求解内部顶点坐标。
 
 ## Variational Surface Cutting (2018)
+在三角面片上使用Eulerian numerical integrator（欧拉数值积分）
 
 ## ABF (Angle Based Flattening)
 
 ## ARAP (As rigid as possible)
+对二维网格进行形变，通过计算三角网格顶点$\{v_0,v_1,v_2\}$的相对坐标$\{x_{01},y_{01}\}$使得$v_2 = v_0 + x_{01}v_0v_1 + y_{01}R_{90}v_0v_1$，最小化变化前后的误差函数$E=\sum_{i=1,2,3} {|v_i^{desired} - v_i^{'}|}^2$，最后问题转化为求解可以表示成稀疏矩阵的方程组。
 
 ## Xatlas库原理  
 一般分为三大步骤：处理网格数据、计算charts和打包charts。
 ```c++
+// 整理顶点信息和面片信息：根据连通计算mesh数
 xatlas::AddMesh
+// 计算charts: Planar类型为根据面的法向量点积是否接近1进行分chart
 xatlas::ComputeCharts
+// 打包charts
 xatlas::PackCharts
 ```
+
 计算charts时开启线程，对每个chartGroup调用computeCharts。其中一个mesh对应一个chartGroup。
 ```c++
 runMeshComputeChartsTask -> runChartGroupComputeChartsTask -> 

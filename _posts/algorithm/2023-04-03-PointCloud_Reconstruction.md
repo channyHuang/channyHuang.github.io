@@ -202,6 +202,7 @@ ffmpeg.exe -i "D:/dataset/lab/IMG_0080.MOV" -vcodec libx264 -s 1920x1080 -crf 0 
 ```
 
 ## colmap
+### 使用
 ```sh
 # 特征点检测，SIFT特征
 COLMAP.bat feature_extractor --ImageReader.camera_model OPENCV --ImageReader.camera_params "" --SiftExtraction.estimate_affine_shape=true --SiftExtraction.domain_size_pooling=true --ImageReader.single_camera 1 --database_path colmap.db --image_path "./images"
@@ -234,12 +235,14 @@ COLMAP.bat stereo_fusion --workspace_path ./dense --workspace_format COLMAP --in
 # colmap的mesh功能相对还有很大的改进空间
 ```
 
-1. feature detection: SiftGPU
+### 基本步骤和原理
+1. feature detection: SiftGPU，胜在快速、具有尺度不变性。但对于kNN特征点距离的匹配效果其实并不算特别好。当特征点检测失败或匹配错误多导致匹配错乱时，都会导致摄像机参数计算失败。
 2. feature matching: Exhaustive、Sequential、VocabTree、Transitive
 * exhaustive_matcher 全局匹配
 * sequential_matcher 序列匹配
 * spatial_matcher 
 * vocab_tree_matcher 
+如果想要更好的匹配效果，可以尝试块匹配、光流跟踪等其它匹配算法，但时间和空间占用可能都会比Sift多。
 3. mapper: incremental/global
 输出sparse文件夹，包含摄像机参数和稀疏点云
 * mapper
@@ -248,10 +251,43 @@ COLMAP.bat stereo_fusion --workspace_path ./dense --workspace_format COLMAP --in
 可能会生成多个model，可使用model_merger合并，但不一定成功
 5. mesh reconstruction -> PoissonRecon
 6. texture
+#### 使用SQLite3存储中间过程
+在scene/database中，使用SQLite3创建.db文件，并创建一系列表存储摄像机内参数、图像信息、特征点、特征描述、匹配信息等等。
+| 表格名称 | 属性 | 说明 | 
+|:---:|:---:|:---:|
+| cameras | camera_id, model, width, height, params, prior_focal_length | |
+| images | image_id, name, camera_id | |
+| pose_priors | image_id, position, coordinate_system | |
+| keypoints | image_id, rows, cols, data | | 
+| descriptors | image_id, rows, cols, data | |
+| matches | pair_id, rows, cols, data | |
+| two_view_geometries | pair_id, rows, cols, data, config, F, E, H, qvec, tvec | | 
+
+同时还有cache机制，如果cache中已经有结果，则不会再检测或匹配
+#### 
+```c++
+CreateFeatureExtractorController
+  FeatureExtractorController
+    SiftFeatureExtractorThread  // 从job队列中取image_data，并把检测到的key和des赋值到image_data
+      CreateSiftFeatureExtractor
+        SiftGPUFeatureExtractor.Extract  // SiftGpu的RunSIFT
+CreateSequentialFeatureMatcher
+  GenericFeatureMatcher (Thread)
+    FeatureMatcherController
+      FeatureMatcherWorker  // SiftGPU的GetSiftMatch
+IncrementalMapperController::Run
+  Reconstruct
+    ReconstructSubModel
+      InitializeReconstruction
+        IncrementalMapper::FindInitialImagePair
+          FindFirstInitialImage // 初始化，对图像按能找到匹配点的数量排序，选择初始重建图像
+          EstimateInitialTwoViewGeometry // 得到初始的三维点云和[R,t]
+      FindNextImages // 根据可恢复的三维点数量选择后续图像
+```
 
 ## OpenMVS
 ```sh
-# 把colmap计算得到的摄像机参数转换成mvs的格式
+# 把colmap计算得到的摄像机参数转换成mvs的格式，有bug为-i不能直接接./，曲线运行-i ./../cur_folder/
 InterfaceCOLMAP.exe  -w D:\dataset\lab\Parking -i D:\dataset\lab\Parking
 
 DensifyPointCloud.exe -w D:\dataset\lab\Parking -i scene.mvs
