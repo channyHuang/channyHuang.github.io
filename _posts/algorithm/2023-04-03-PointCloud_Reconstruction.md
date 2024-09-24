@@ -302,6 +302,7 @@ TextureMesh.exe -w D:\dataset\lab\Parking -i scene_dense_mesh.mvs
 3. Dense pointcloud -> delaunay reconstruction -> mesh clean -> hole filling
 4. Texture projection: face view selection + generate texture pic
 
+```c++
 ---> DensifyPointClouds
 Scene::DenseReconstruction
     Scene::ComputeDepthMaps
@@ -316,6 +317,54 @@ Scene::DenseReconstruction
                         DepthEstimator::ScorePixelImage 计算图像中像素的NCC得分
                 DepthMapsData::EstimateDepthMapTmp 
                     DepthEstimator::ProcessPixel
+
+FaceViewSelection // 计算网格中每个三角面对应的最佳图像
+  ListCameraFaces　// 对图像进行GaussianBlur后使用八叉树，对每张图像，把所有三角面投影到图像中，记录每个三角面对应每张图像的quality、color等信息
+  // 使用boost建立邻接图，
+  // LBP算法，label对应idxView+1
+  // 对同一label(同一张图)且相邻的两个面，放在同一个texturePatches里面
+GenerateTexture // 对于每个patch中的每个三角面，根据label映射到对应图像中计算texcoord，并计算整个patch在图像中对应的rect
+  Camera.ProjectPointP // 计算aabb
+  // 对patch两两对比，去除被包含的patch
+  RectsBinPack::ComputeTextureSize // 计算纹理需要图像的长宽
+  MaxRectsBinPack.Insert　// uv二维装箱算法bin packing algorithms，使用nRectPackingHeuristic控制使用的算法，nRectPackingHeuristic/100 - MaxRects/Skyline/Guillotine；nRectPackingHeuristic%100　- BottomLeft/MinWasteFit/Last
+  // 有计算冗余,当纹理图像剩余rect被进一步分割后，会重新计算patch在每个剩余rect中的长宽score，算是以时间换空间
+  // 如果重建出来的模型比较大的话，如网格重建出来的二进制ply文件有300+M，此时直接使用TextureMesh计算纹理在这一步会非常非常非常耗时，比较建议的方法是分割成小网格
+```
+
+### 对网格模型分片
+```c++
+void splitMesh(Scene &scene) {
+	Mesh::Box box = scene.mesh.GetAABB();
+	VERBOSE("Mesh Bound: (%f,%f,%f) - (%f,%f,%f)", box.ptMin.x(), box.ptMin.y(), box.ptMin.z(), box.ptMax.x(), box.ptMax.y(), box.ptMax.z());
+	int gap = 5;
+	int fMinX = std::floor(box.ptMin.x() / gap) * gap;
+	int fMinY = std::floor(box.ptMin.y() / gap) * gap;
+	int fMinZ = std::floor(box.ptMin.z() / gap) * gap;
+	int nCountX = std::ceil((box.ptMax.x() - fMinX) / gap);
+	int nCountY = std::ceil((box.ptMax.y() - fMinY) / gap);
+	int nCountZ = std::ceil((box.ptMax.z() - fMinZ) / gap);
+	VERBOSE("Chunk %d-%d-%d", nCountX, nCountY, nCountZ);
+	Mesh::FacesChunkArr chunks(nCountX * nCountY * nCountZ);
+	// std::vector<Mesh::FaceIdxArr> vChunks(nCountX * nCountY * nCountZ);
+	FOREACH(idxFace, scene.mesh.faces) {
+		const Mesh::Face& facet = scene.mesh.faces[idxFace];
+		for (int v=0; v<3; ++v) {
+			const Mesh::Vertex& vertex = scene.mesh.vertices[facet[v]];
+			int nIdxX = std::floor((vertex.x - fMinX) / gap);
+			int nIdxY = std::floor((vertex.y - fMinY) / gap);
+			int nIdxZ = std::floor((vertex.z - fMinZ) / gap);
+			int idx = nIdxX + nIdxY * nCountX + nIdxZ * nCountX * nCountY;
+			chunks[idx].faces.push_back(idxFace);
+			if (chunks[idx].name.IsEmpty()) {
+				chunks[idx].name = String::FormatString("%02d-%02d-%02d", nIdxX, nIdxY, nIdxZ);
+			}
+		}
+	}
+	VERBOSE("save...");
+	scene.mesh.Save(chunks, g_strWorkingFolder + "/mesh.ply");
+}
+```
 
 $$
 NCC(A, B) = \frac{\sum (A – \bar{A}) \cdot (B – \bar{B})}{\sqrt{\sum (A – \bar{A})^2} \cdot \sqrt{\sum(B – \bar{B})^2}} 
@@ -336,7 +385,7 @@ Scene::ReconstructMesh Delaunay三角化，计算每条边的权重，graph-cut�
 可能会生成多个mode1， 可使用model_merger合并，但不一定成功。只有当两个model间有相同图像时才能合并。
 ```sh
 # 输出稀疏重建model结果为txt格式
-COLMAP.bat model_converter --input_path colmap_sparse/0 --output_path colmap_text --output_type TXT
+COLMAP.bat model_converter --input_path colmap_sparse/0 --output_path sparse --output_type TXT
 # 模型合并
 COLMAP.bat model_merger --input_path1 colmap_sparse/0 --input_path2 colmap_sparse1 --output_path colmap_sparse/01
 

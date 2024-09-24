@@ -15,6 +15,9 @@ tags:
 
 [toc]
 
+# RK3588固件
+固件中主要包含有根系统文件rootfs.img、内核boot.img、uboot.img，其中系统由rootfs.img决定，从ubuntu到麒麟等。理论上内核应该和根系统文件相对应，如果不对应的话如内核使用ubuntu镜像中的，根系统文件使用麒麟镜像中的，则板子可能正常启动，基本功能正常，但会有小bug如部分设置界面不出现等。　
+
 # Linux kernel
 一般内核文件主要包括header、image和modules三个文件
 [kernel 5.15](https://kernel.ubuntu.com/mainline/v5.15/)
