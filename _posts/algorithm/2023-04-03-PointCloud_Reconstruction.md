@@ -444,6 +444,9 @@ vs中，可properties(属性) -> Configuration Properties(配置属性) -> C/C++
 cmake .. -DCMAKE_CUDA_COMPILER=/usr/local/cuda-12.5/bin/nvcc
 ```
 
+# 附录3: 重建参考GroundTruth
+轿车长宽高：4.8m * 1.8m * 1.5m
+
 # 参考库
 [cgal](https://github.com/CGAL/cgal.git)  
 [glfw](https://github.com/glfw/glfw)  
