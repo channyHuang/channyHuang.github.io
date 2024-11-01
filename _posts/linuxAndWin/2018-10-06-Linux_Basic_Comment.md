@@ -126,7 +126,7 @@ osrf/ros      noetic-desktop-full   5a2576cc4b0d   4 weeks ago     3.44GB
 hello-world   latest                d2c94e258dcb   15 months ago   13.3kB
 
 # 创建容器并进行文件映射
-$ docker run --name docker_ros_name -it -v /home/channy/Documents/thirdlibs/ros_workspace:/home osrf/ros:noetic-desktop-full
+$ docker run --name docker_ros_name -it --privileged -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/channy/Documents/thirdlibs/ros_workspace:/home osrf/ros:noetic-desktop-full
 # 查看已有容器的名称等信息
 $ docker ps -a
 CONTAINER ID   IMAGE                          COMMAND                  CREATED              STATUS          PORTS     NAMES
@@ -191,6 +191,7 @@ This plugin does not support propagateSizeHints()
 ```sh
 export XDG_RUNTIME_DIR=/usr/lib/
 ```
+或另开一个窗口运行`roscore`
 
 ```sh
 root@4d57cc0d4f6d:/# rviz
@@ -220,6 +221,13 @@ rosrun rviz rviz
 sudo vim ~/.bashrc
 # 注释掉
 # export QT_QPA_PLATFORM='offscreen'
+```
+
+```c++
+[ WARN] [1728954796.966489514]: OGRE EXCEPTION(3:RenderingAPIException): Invalid parentWindowHandle (wrong server or screen) in GLXWindow::create at /build/ogre-1.9-kiU5_5/ogre-1.9-1.9.0+dfsg1/RenderSystems/GL/src/GLX/OgreGLXWindow.cpp (line 240)
+rviz::RenderSystem: error creating render window: OGRE EXCEPTION(3:RenderingAPIException): Invalid parentWindowHandle (wrong server or screen) in GLXWindow::create at /build/ogre-1.9-kiU5_5/ogre-1.9-1.9.0+dfsg1/RenderSystems/GL/src/GLX/OgreGLXWindow.cpp (line 240)
+[ERROR] [1728954796.966513470]: Unable to create the rendering window after 100 tries.
+Segmentation fault (core dumped)
 ```
 
 [back](./)

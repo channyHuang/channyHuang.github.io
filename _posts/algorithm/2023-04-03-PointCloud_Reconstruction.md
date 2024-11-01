@@ -14,88 +14,113 @@ tags:
 
 [toc]
 
-# <font color = red> 传统方法 </font>
-点云表面重建一般步骤有：
-1. 删除外围噪声点Outlier，即点云分割
-1. 点云简化
-1. 点云光滑化
-1. 法向量估计
-1. 重建三维网格
-1. 后处理，如补洞等
-
-# Outlier removal
-## Statistical Outlier Removal filter
-针对点云中的每一个点，搜索最近的k个邻近点组成邻近点集${P_i}$，计算该点到邻近点集合中每个点的距离的均值和标准差；如果该点在预先设置的标准差范围内，则保留该点否则去掉。
-## Radius Outlier removal
-设定一个搜索半径，判断目标点在设定半径范围内的相邻点数目，设定阈值范围
-## Conditional removal
-自定义一个过滤的condition，对目标点云进行特定点的移除
-## passthrough
-直通滤波（passthrough filter)操作相对粗暴，针对自定义的点的类型，对 X、Y、Z、R、G、B…等等各纬度进行内外点的界定
+# <font color = red> 传统点云表面重建基本流程 </font>
+以使用CGAL进行简单实现为例，一般步骤有：
+## 1. Outlier removal  
+  删除外围噪声点Outlier，即点云分割
+  * **Statistical Outlier Removal filter**  
+  针对点云中的每一个点，搜索最近的k个邻近点组成邻近点集${P_i}$，计算该点到邻近点集合中每个点的距离的均值和标准差；如果该点在预先设置的标准差范围内，则保留该点否则去掉。
+  * **Radius Outlier removal**  
+  设定一个搜索半径，判断目标点在设定半径范围内的相邻点数目，设定阈值范围
+  * **Conditional removal**  
+  自定义一个过滤的condition，对目标点云进行特定点的移除
+  * **passthrough**  
+  直通滤波（passthrough filter)操作相对粗暴，针对自定义的点的类型，对 X、Y、Z、R、G、B…等等各纬度进行内外点的界定
 
 <font color = cyan> 对于无规律的点云，上述算法效果并不理想。特别是对于杂乱且密度不一致的点云，外围点剔除效果并不好，甚至不如聚类后取最大的类。 </font>
 
-# Simplify
-各种滤波，包括高斯滤波、体素滤波、均值滤波等等。
-## Grid Simplify
+## 2. Simplify  
+点云简化。各种滤波，包括高斯滤波、体素滤波、均值滤波等等。
+* **Grid Simplify**  
 把点云空间分割成单位立方体，对每个单位立方体内的点只取其中一个（随机、重心等），其它点舍弃。
-## WLOP Simplify (Weighted Locally Opti-mal Projection)
-
-## Hirarchy Simplify
+* **WLOP Simplify (Weighted Locally Opti-mal Projection)**  
+* **Hirarchy Simplify**  
 对点云中的点计算聚类重心，
 
 <font color = cyan> 点云简化目标是为了减少不必要的计算量，但有可能以降低精确度为代价。在精确度没达到的前提下，不建议使用。 </font>
 
-# Smooth
-## JET Smooth
-## Bilateral Smooth
+## 3. Smooth  
+点云光滑化
+* **JET Smooth**  
+* **Bilateral Smooth**  
 
 <font color = cyan> 肉眼看不出明显区别。 </font>
 
-# Normal Estimation
-## JET 
+## 4. Normal Estimation  
+法向量估计  
+* **JET**   
 不估计朝向
-## PCA
-不估计朝向
-## MST
+* **PCA**  
+不估计朝向 
+* **MST**  
 最小生成树算法。在有法向量的基础上修正法向量朝向
-## VCM
+* **VCM**
 利用扫描点的特征--视线估计法向量朝向
+
 最小二乘法 (MLS)，2阶多项式
 
 <font color = cyan> CGAL中有上面四种算法，但从实际计算结果看，各种组合都没有VcgLib中的法向量估计算法好。 </font>
 
-# Reconstruction 重建三维网格
-## Possion重建（2006）
+## 5. Reconstruction   
+重建三维网格
+* **Possion重建（2006）**  
 需要法向量作为输入，保证重建生成的曲面封闭。不对输入点云进行插值，重建的曲面严格经过输入点。  
 通过拟合隐式函数确定网格面。设目标曲面函数$F(x)$，使得$F(x)$在每个点$p$处的梯度值即为该点的法向量$n$，即最小化误差函数$min {|F - \nabla n|}^2$  
 
 <font color = cyan> Possion重建在2020年有论文发表有新改进，对误差函数增加了一项，且增加了包围盒，能够避免为了封闭强行扩展表面的问题。 </font>
 
-## Advancing Front surface reconstruction
+* **Advancing Front surface reconstruction**  
 先把点云空间进行Delaunay三角剖分，然后根据法向量使用优先队列选择最适合的面逐步扩展直到所有面连接。
-## Scale Space
+* **Scale Space**  
 对点云进行缩放，如使用平滑滤波器进行平滑得到弱化了细节的点云，从而得到两个不同细节的网格，再根据初始点云对网格进行插值，逐步逼近点云。
-## 其它算法
+* **其它算法**  
 凸包重建、凹包重建
 
-# Post Processing
-## hole filling
-## mesh smooth
+## 6. Post Processing  
+后处理，如补洞等
+* **hole filling**  
+* **mesh smooth** 
 
-# <font color = red> 神经网络方法 </font>
-# nerf
+# <font color = red> 神经网络重建原理方法 </font>
 $$(\theta, \phi, r, g, b) -> (x, y, z, a)$$
 根据输入的多角度RGB图像和对应的摄像机参数，建立两个MLP分别求解三维空间中网格点的alpha和RGB值
-## [instant-ngp](https://github.com/NVlabs/instant-ngp) 
+## MLP多层感知器基础
+### Loss 损失函数 L(Y, f(x))
+衡量估计值地f(x)和真实值Y之间的误差，即代价函数（无监督）或误差函数（有监督）。forward后计算Loss进行backward。
+> Huber 损失函数 $\frac{1}{2} |Y - f(x)|^2, |Y - f(x)| < \delta; \delta |Y - f(x)| - \frac{1}{2} {\delta}^2$  
+> L1 损失函数 $\sum | Y - f(x) | $  
+> L2 损失函数 $\sqrt{ \frac{1}{n} \sum |Y - f(x)|^2 }$  
+> MSE 圴方误差函数 $\frac{1}{n} \sum |Y - f(x)|^2$  
+### Optimizer 优化器
+backward过程中，指引参数更新使得损失函数最小化
+> GD 梯度下降  
+> Adam、  
+> AdaGrad 自适应学习率  
+> RMSProp 
+### Learning rate 学习率  
+参数更新 $w_n = w_0 - \delta w^{'}_0 $，
+> 轮数衰减：一定步长后学习率减半  
+> 指数衰减：学习率按训练轮数增长指数插值递减等  
+> 分数衰减：$ \delta_n  = \frac{\delta_0}{1 + kt}$
+### Activation 激活层
+把神经网络中上下层的线性组合关系增加非线性变换
+> ReLU 修正线性单元（Rectified Linear Unit）  
+> Sigmoid $\frac {1} {1 + e^{-x}} $  
+> Tanh 双曲正切激活函数
+### EMA 指数移动平均（Exponential Moving Average）
+取最后n步的平均，能使得模型更加的鲁棒
+### Decay 学习率衰减因子
+Exponential / Logarithmic
+
+## nerf: [instant-ngp](https://github.com/NVlabs/instant-ngp) 
 * 输入数据：多角度RGB图像序列。每幅图像对应的传感器位姿[3x4矩阵]（拍摄时每幅图像对应的传感器位姿相对于首幅图像或前一幅图像对应的传感器位姿的参数--旋转R[3x3]和平移t[3x1]）
 * 预处理：每幅图像对应的摄像机参数
 * 输出：点云数据
-### instant-ngp具体步骤
-1. 把可能的整个目标区域划分成多个单位立方体网格，整数点为网格顶点
-1. 根据输入数据使用Nerf训练每个网格顶点的可见度alpha：(u,v,r,g,b)->(x,y,z,alpha)
-1. 根据输入数据使用Nerf训练每个网格顶点的RGB颜色值
-1. 根据SDF生成模型网格
+* 具体步骤
+  1. 把可能的整个目标区域划分成多个单位立方体网格，整数点为网格顶点
+  1. 根据输入数据使用Nerf训练每个网格顶点的可见度alpha：(u,v,r,g,b)->(x,y,z,alpha)
+  1. 根据输入数据使用Nerf训练每个网格顶点的RGB颜色值
+  1. 根据SDF生成模型网格
 ### instant-ngp翰入数据对结果的影响分桥
 1. 图像数量
 在角度包含360度全方位的情况下，更多的图像数量对结果没有明显影响
@@ -103,6 +128,8 @@ $$(\theta, \phi, r, g, b) -> (x, y, z, a)$$
 把原分辨率3080x2160的图像降成1920x1080，对结果没有明显影响
 1. 图像清晰度
 直接影响到结果的精确度
+### colmap2nerf 计算摄像机参数
+可使用colmap稀疏重建计算，再通过./scripts/colmap2nerf.py进行格式转换
 ### instant-ngp源码说明
 * load_nerf 读取输入数据返回NerfDataset，支持的图像格式有
 ```c++
@@ -110,6 +137,7 @@ $$(\theta, \phi, r, g, b) -> (x, y, z, a)$$
 		"png", "jpg", "jpeg", "bmp", "gif", "tga", "pic", "pnm", "psd", "exr",
 	};
 ```
+```c++
 Testbed::train_and_render
   Testbed::train(1<<18)
     training_prep_nerf: 更新density的MLP
@@ -155,47 +183,56 @@ Testbed {GLTexture} {CudaRenderBuffer}
     SurfaceProvider 接口
     - CudaSurface2D cuda的array数据载体和surface数据描述
     - GLTexture {CUDAMapping 与cpu交互} 与opengl交互
-
-### colmap2nerf 计算摄像机参数
-可使用colmap稀疏重建计算，再通过./scripts/colmap2nerf.py进行格式转换
-
-### video2picture
-```sh
-ffmpeg.exe -i "D:/dataset/lab/IMG_0080.MOV" -qscale:v 1 -qmin 1 -vf "fps=30.0" "D:/dataset/lab/images"/s04d.jpg
 ```
 
-## MLP多层感知器基础
-### Loss 损失函数 L(Y, f(x))
-衡量估计值地f(x)和真实值Y之间的误差，即代价函数（无监督）或误差函数（有监督）。forward后计算Loss进行backward。
-> Huber 损失函数 $\frac{1}{2} |Y - f(x)|^2, |Y - f(x)| < \delta; \delta |Y - f(x)| - \frac{1}{2} {\delta}^2$  
-> L1 损失函数 $\sum | Y - f(x) | $  
-> L2 损失函数 $\sqrt{ \frac{1}{n} \sum |Y - f(x)|^2 }$  
-> MSE 圴方误差函数 $\frac{1}{n} \sum |Y - f(x)|^2$  
-### Optimizer 优化器
-backward过程中，指引参数更新使得损失函数最小化
-> GD 梯度下降  
-> Adam、  
-> AdaGrad 自适应学习率  
-> RMSProp 
-### Learning rate 学习率  
-参数更新 $w_n = w_0 - \delta w^{'}_0 $，
-> 轮数衰减：一定步长后学习率减半  
-> 指数衰减：学习率按训练轮数增长指数插值递减等  
-> 分数衰减：$ \delta_n  = \frac{\delta_0}{1 + kt}$
-### Activation 激活层
-把神经网络中上下层的线性组合关系增加非线性变换
-> ReLU 修正线性单元（Rectified Linear Unit）  
-> Sigmoid $\frac {1} {1 + e^{-x}} $  
-> Tanh 双曲正切激活函数
-### EMA 指数移动平均（Exponential Moving Average）
-取最后n步的平均，能使得模型更加的鲁棒
-### Decay 学习率衰减因子
-Exponential / Logarithmic
+# <font color = red> 其它相关算法及原理 </font>
+## Algorithms
+### ICP 点云配准
+$$ (R, t) -> min \sum_i^{n} |p_i - (R * p_i^{'} + t)|^2 $$
+1. KNN查找最近点
+2. 求解AX=B (QR分解或LU分解等)
 
 # <font color = red> 其它笔记 </font>
-# 附录1: 现有开源代码使用
+# 附录1: 部分项目阅读笔记  
+## puma 
+点云Poisson重建。滑动窗口机制，每n帧点云组成局部点云，对每帧点云和当前n-1的局部点云进行icp匹配，然后对局部点云Poisson重建生成局部网格，并去除掉点云密度小于一定阈值的点和面，再去除重叠点云和重叠网格合成到全局网格中。
+主要使用了open3d库。
+icp有gicp、p2p、p2l等算法。深度越大，细节越多，重建时间也越长，资源消耗也越多。
+## Bungee-nerf
+使用多尺寸nerf，由远及近。baseblock和resblock对应训练和测试两个网络
+## On Surface Prior
+使用两个神经网络学习SDF和ODF。SDF使用ODF学到的表面先验预测点云中的SDF。即，对于点云G周围的采样点q,投影到G成点p，投影的长度和方向分别由在q点的SDF和梯度决定；由p的KNN组成局部区域t，ODF判断p是否在区域t上，如果不在，反向传播惩罚SDF网络，同时鼓励SDF网络产生最短投影距离。
+## Neus-nerf
+将渲染重建优化与SDF网络训练关联，联合优化。传统Nerf只合成新视角，对网格化效果不理想，游离噪声点多。DVR、IDR需要mask屏蔽背景。IDR算法虽然用于表面重建，但使用的还是传统的表面渲染，对表面深度会变化的物理不鲁棒。Neus改进了权重函数和体密度函数。权重函数需要满足两个条件：无偏差性——对射线$p(t)$，当$f(p(t^{*})) = 0$也就是$t^{*}$ 是SDF函数的零水平集表面点时，权重应在 $p(t^{*})$ 处有局部最大值；遮挡适应性——射线r上如果有相异的两点有相同的SDF值，则距离视点近的点具有更大的权重。
+重点在于重建，总体Pipeline和Nerf大相径庭，整体依赖于RGB loss项。
+NeRF: 训练背景颜色
+SDFNetwork: 训练sdf
+SingleVarianceNetwork: 偏差
+RenderingNetwork: 训练rgb
+## PlenOctree 数据结构：稀疏八叉树
+## MVSNerf
+学习通用网络，取三个视觉图像训练，2DCNN提取图像特征得到cost volume，3DCNN进行encode，MLP学习Nerf。模型具有泛化性。
+
+# 附录2: 现有开源代码使用
+## IMMESH
+imu+激光重建网格，在r3live的基础上
+```c++
+Voxel_mapping::service_LiDAR_update
+  sync_packages　// 同步激光数据和imu积分
+  ImuProcess::Process2
+  map_incremental_grow　// 网格增长线程
+    start_mesh_threads
+      service_reconstruct_mesh // 对队列g_rec_mesh_data_package_list中的每帧数据调用incremental_mesh_reconstruction重建
+        incremental_mesh_reconstruction　// 每帧激光三角化
+          delaunay_triangulation
+          find_relative_triangulation_combination // 查找当前帧点云的邻近点(20个)
+          remove_triangle_list
+          insert_triangle
+service_refresh_and_synchronize_triangle
+```
+
 ## ffmpeg video2picture
-```bat
+```sh
 ffmpeg.exe -i "D:/dataset/lab/IMG_0080.MOV" -qscale:v 1 -qmin 1 -vf "fps=30.0" "D:/dataset/lab\images"/%04d.jpg
 
 ffmpeg.exe -i "D:/dataset/lab/IMG_0080.MOV" -vcodec libx264 -s 1920x1080 -crf 0 -acodec copy new.mp4
@@ -382,6 +419,7 @@ TOF, Structured Light
 Scene::ReconstructMesh Delaunay三角化，计算每条边的权重，graph-cut分割提取网格。
 
 ## colmap2nerf steps
+
 可能会生成多个mode1， 可使用model_merger合并，但不一定成功。只有当两个model间有相同图像时才能合并。
 ```sh
 # 输出稀疏重建model结果为txt格式
@@ -432,7 +470,7 @@ openMVG_main_openMVG2openMVS.exe -i D:\dataset\lab\Parking\openmvg\sfm_data.bin 
 * global 时间短，避免drift，错误匹配影响大，总体精度低
 5. format translation. 
 
-# 附录2: 编译遇到的问题
+# 附录3: 编译遇到的问题
 * 使用CGAL过程中转Debug编译，报
 ```
 fatal error C1128: number of sections exceeded object file format limit : compile with /bigobj
