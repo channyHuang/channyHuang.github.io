@@ -23,6 +23,13 @@ tags:
 
 PC 使用了Ubuntu，必需要x86_64，因为官方的SDK中只有x64的whl安装文件，aarch64的只能安装ToolkitLite
 
+官网代码：
+[airockchip](https://github.com/airockchip)
+[rockchip-linux](https://github.com/rockchip-linux)
+[rockchip-npu](https://github.com/Pelochus/linux-rockchip-npu-0.9.6/releases)
+[论坛](https://dev.t-firefly.com/portal.php?mod=topic&topicid=11)
+[ROC-RK3588S-PC](https://wiki.t-firefly.com/zh_CN/ROC-RK3588S-PC/index.html)
+
 # 代码清单
 1. pt模型转换成onnx模型： [pt2onnx](https://github.com/channyHuang/rk3588DeployNoteAndCode/blob/main/modelConvert/pt2onnx.py)
 1. PC上查看onnx模型的检测结果： [inferenceUsingOnnxInPC](https://github.com/channyHuang/rk3588DeployNoteAndCode/blob/main/modelConvert/inferenceUsingOnnxInPC.py)
