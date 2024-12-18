@@ -137,3 +137,9 @@ ERFNet（Efficient Residual Factorized Network）：
     优点：采用高效的残差分解卷积结构，在减少计算量和参数量的同时，能够保持较高的分割精度，计算效率较高，对资源受限的设备友好。
     缺点：在对复杂语义信息的理解和处理能力上可能相对较弱，特征表达能力可能不如一些更复杂的算法。
     适用场景：适用于资源受限的设备或需要快速处理的场景，如嵌入式设备、移动设备等。
+
+
+# Network Based Encode-Decode
+[Autoencoder-Image-Compression](https://github.com/RobinWenqian/Autoencoder-Image-Compression)
+
+[lossy-image-compression](https://github.com/abskj/lossy-image-compression)

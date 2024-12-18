@@ -491,3 +491,10 @@ cmake .. -DCMAKE_CUDA_COMPILER=/usr/local/cuda-12.5/bin/nvcc
 [glew](https://github.com/nigels-com/glew/releases/download/glew-2.2.0/glew-2.2.0.zip)
 [RGB-D重建](https://blog.51cto.com/u_14439393/5748486)
 [点云重建](https://github.com/PRBonn/puma)
+
+# 数据集
+[点云集](https://robotik.informatik.uni-wuerzburg.de/telematics/3dscans/)
+[kitti](https://www.cvlibs.net/datasets/kitti/)
+[EuRoC MAV / ASL Datasets](https://projects.asl.ethz.ch/datasets/doku.php?id=kmavvisualinertialdatasets)
+[M2DGR](https://github.com/SJTU-ViSYS/M2DGR)
+[M2DGR-plus](https://github.com/SJTU-ViSYS/M2DGR-plus?tab=readme-ov-file)
