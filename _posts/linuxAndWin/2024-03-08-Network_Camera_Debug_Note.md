@@ -108,6 +108,10 @@ build and install opencv with gstreamer from source
 # sudo ldconfig
 ```
 
+```sh
+git clone https://github.com/opencv/opencv.git
+```
+
 ### A: 尝试使用OpenCV+GStreamer播放本地视频
 ```python
 // check play local video 
@@ -142,4 +146,196 @@ WARNING: erroneous pipeline: no element "nvvidconv"
 不确定新机器的显卡是否支持DeepStream，只好先尝试把"nvv4l2decoder"和"nvvidconv"换成`avdec_h264`，然后能够正常获取摄像机的视频流。
 ```
 gst-launch-1.0 rtspsrc location='rtsp://192.168.1.88:554/user=admin&password=admin&xxx' ! rtph264depay ! h264parse ! avdec_h264 ! autovideosink
+```
+
+***
+***
+***
+<font color=red> RK3588下Python3、OpenCV、GStreamer、MPP</font>
+***
+***
+*** 
+
+# 0 安装前置依赖
+```sh
+# gstreamer-rockchip需要
+sudo apt install meson ninja-build 
+sudo apt install librga-dev
+sudo apt install libdrm-dev
+# opencv需要
+sudo apt install libeigen3-dev cmake-gui
+```
+
+# 1 GStreamer
+##  1.1 安装gstreamer
+```sh
+sudo apt-get install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio
+
+pkg-config --cflags --libs gstreamer-1.0
+```
+
+[gstreamer官网](https://gstreamer.freedesktop.org/documentation/installing/on-linux.html?gi-language=c)
+
+##  1.2 检查gstreamer是否（默认）带有mpp插件
+```sh
+firefly@firefly:~$ gst-inspect-1.0 | grep mpp
+```
+
+不支持mpp的输出
+```sh
+typefindfunctions: audio/x-musepack: mpc, mpp, mp+
+libav:  avdec_vp9_rkmpp: libav vp9 (rkmpp) decoder
+libav:  avdec_vp8_rkmpp: libav vp8 (rkmpp) decoder
+libav:  avdec_mpeg2_rkmpp: libav mpeg2 (rkmpp) decoder
+libav:  avdec_mpeg1_rkmpp: libav mpeg1 (rkmpp) decoder
+libav:  avdec_mpeg4_rkmpp: libav mpeg4 (rkmpp) decoder
+libav:  avdec_hevc_rkmpp: libav hevc (rkmpp) decoder
+libav:  avdec_h264_rkmpp: libav h264 (rkmpp) decoder
+libav:  avdec_h263_rkmpp: libav h263 (rkmpp) decoder
+```
+直接安装的默认不支持mpp
+
+## 1.3 安装gstreamer-rockchip
+[gstreamer-rockchip](https://github.com/JeffyCN/rockchip_mirrors.git)
+```sh
+git clone https://github.com/JeffyCN/rockchip_mirrors.git --branch gstreamer-rockchip
+
+cd rockchip_mirrors
+meson build
+cd build
+meson configure --prefix=/usr
+ninja build
+sudo ninja install
+```
+
+## 1.4 再次检查新安装的gstreamer是否带有mpp插件
+支持mpp的输出
+```sh
+firefly@firefly:~$ gst-inspect-1.0 --plugin | grep mpp
+rockchipmpp:  mppjpegdec: Rockchip's MPP JPEG image decoder
+rockchipmpp:  mppvideodec: Rockchip's MPP video decoder
+rockchipmpp:  mppjpegenc: Rockchip Mpp JPEG Encoder
+rockchipmpp:  mpph265enc: Rockchip Mpp H265 Encoder
+rockchipmpp:  mpph264enc: Rockchip Mpp H264 Encoder
+typefindfunctions: audio/x-musepack: mpc, mpp, mp+
+libav:  avdec_h263_rkmpp: libav h263 (rkmpp) decoder
+libav:  avdec_h264_rkmpp: libav h264 (rkmpp) decoder
+libav:  avdec_hevc_rkmpp: libav hevc (rkmpp) decoder
+libav:  avdec_mpeg4_rkmpp: libav mpeg4 (rkmpp) decoder
+libav:  avdec_mpeg1_rkmpp: libav mpeg1 (rkmpp) decoder
+libav:  avdec_mpeg2_rkmpp: libav mpeg2 (rkmpp) decoder
+libav:  avdec_vp8_rkmpp: libav vp8 (rkmpp) decoder
+libav:  avdec_vp9_rkmpp: libav vp9 (rkmpp) decoder
+```
+
+## 1.5 检查gstreamer是否正常使用mpp
+```sh
+```
+
+# 2 FFMPEG
+## 检查ffmpeg是否支持rkmpp解码器
+```sh
+firefly@firefly:~$ ffmpeg -decoders | grep "rkmpp"
+```
+支持的输出
+```sh
+ V..... h263_rkmpp           h263 (rkmpp) (codec h263)
+ V..... h264_rkmpp           h264 (rkmpp) (codec h264)
+ V..... hevc_rkmpp           hevc (rkmpp) (codec hevc)
+ V..... mpeg1_rkmpp          mpeg1 (rkmpp) (codec mpeg1video)
+ V..... mpeg2_rkmpp          mpeg2 (rkmpp) (codec mpeg2video)
+ V..... mpeg4_rkmpp          mpeg4 (rkmpp) (codec mpeg4)
+ V..... vp8_rkmpp            vp8 (rkmpp) (codec vp8)
+ V..... vp9_rkmpp            vp9 (rkmpp) (codec vp9)
+ ```
+
+# 3 OpenCV
+## 3.1 编译OpenCV
+```sh
+cd /home/firefly/rknn_installs/gstreamer_mpp/opencv-4.x
+mkdir build
+cd build
+cmake-gui ..
+```
+把GStreamer及其他需要选上，点`Configure`，检查编译配置输出是否满足：
+1. GUI中GTK+和VTK support至少支持一个，否则cv2.imshow会报错不能正常使用
+2. Media I/O中基本图像类型都支持，当打开某一类图像失败时可检查此项
+3. Video I/O中FFMPEG和GStreamer都支持，否则cv2.videoCapture不能正常使用GStreamer
+4. Python3有路径，否则不会编译Python接口
+
+```sh
+--   GUI:                           GTK3
+--     GTK+:                        YES (ver 3.24.23)
+--       GThread :                  YES (ver 2.64.6)
+--       GtkGlExt:                  NO
+--     VTK support:                 NO
+--
+--   Media I/O: 
+--     ZLib:                        /usr/lib/aarch64-linux-gnu/libz.so (ver 1.2.11)
+--     JPEG:                        /usr/lib/aarch64-linux-gnu/libjpeg.so (ver 80)
+--     WEBP:                        build (ver encoder: 0x020f)
+--     PNG:                         /usr/lib/aarch64-linux-gnu/libpng.so (ver 1.6.37)
+--     TIFF:                        /usr/lib/aarch64-linux-gnu/libtiff.so (ver 42 / 4.1.0)
+--     JPEG 2000:                   build (ver 2.5.0)
+--     OpenEXR:                     /usr/lib/aarch64-linux-gnu/libImath.so /usr/lib/aarch64-linux-gnu/libIlmImf.so /usr/lib/aarch64-linux-gnu/libIex.so /usr/lib/aarch64-linux-gnu/libHalf.so /usr/lib/aarch64-linux-gnu/libIlmThread.so (ver 2_3)
+......
+--   Video I/O:
+--     DC1394:                      YES (2.2.5)
+--     FFMPEG:                      YES
+--       avcodec:                   YES (58.54.100)
+--       avformat:                  YES (58.29.100)
+--       avutil:                    YES (56.31.100)
+--       swscale:                   YES (5.5.100)
+--       avresample:                YES (4.0.0)
+--     GStreamer:                   YES (1.16.3)
+--     v4l/v4l2:                    YES (linux/videodev2.h)
+......
+--   Python 3:
+--     Interpreter:                 /usr/bin/python3 (ver 3.8.10)
+--     Libraries:                   /usr/lib/aarch64-linux-gnu/libpython3.8.so (ver 3.8.10)
+--     Limited API:                 NO
+--     numpy:                       /usr/local/lib/python3.8/dist-packages/numpy/core/include (ver 1.24.4)
+--     install path:                lib/python3.8/site-packages/cv2/python-3.8
+```
+
+确认无误后编译，需要一定时间，预计40分钟左右，等待。。。
+```sh
+make -j8
+```
+
+编译完无报错后安装
+```sh
+sudo make install
+```
+
+## 3.2 把生成的`cv2.cpy*.so`复制到Python3对应路径
+
+## 3.3 验证OpenCV-Python支持GStreamer
+```sh
+firefly@firefly:~$ python3
+>>> import cv2
+>>> print(cv2.getBuildInformation())
+......
+  Video I/O:
+    DC1394:                      YES (2.2.5)
+    FFMPEG:                      YES
+      avcodec:                   YES (58.54.100)
+      avformat:                  YES (58.29.100)
+      avutil:                    YES (56.31.100)
+      swscale:                   YES (5.5.100)
+      avresample:                YES (4.0.0)
+    GStreamer:                   YES (1.16.3)
+    v4l/v4l2:                    YES (linux/videodev2.h)
+```
+
+# 附录：其他问题
+```sh
+sudo add-apt-repository ppa:george-coolpi/multimedia
+sudo: /etc/sudoers.d 可被任何人写
+sudo: 无法解析主机：firefly: 未知的名称或服务
+sudo: add-apt-repository：找不到命令
+```
+
+```
+sudo apt install software-properties-common
 ```
