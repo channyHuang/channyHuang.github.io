@@ -35,6 +35,20 @@ PC 使用了Ubuntu，必需要x86_64，因为官方的SDK中只有x64的whl安�
 1. PC上查看onnx模型的检测结果： [inferenceUsingOnnxInPC](https://github.com/channyHuang/rk3588DeployNoteAndCode/blob/main/modelConvert/inferenceUsingOnnxInPC.py)
 1. 在PC上转换成rknn模型并模拟检测： [inferenceSimulateInPC](https://github.com/channyHuang/rk3588DeployNoteAndCode/blob/main/modelConvert/inferenceSimulateInPC.py)
 
+# Step0: 安装rknnlite2
+## Q: Python.h：没有那个文件或目录
+```sh
+sudo apt install libpython3-dev
+```
+
+## Q: ruamel.yaml.clib
+```sh
+sudo apt install libyaml-dev
+
+pip3 install --upgrade setuptools wheel
+```
+可同时升级pip3
+
 # step1: pt模型转换成onnx模型
 一开始尝试的是使用Yolov8的官网代码进行模型转换。
 

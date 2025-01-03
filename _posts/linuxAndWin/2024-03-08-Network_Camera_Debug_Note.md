@@ -166,8 +166,23 @@ sudo apt install libdrm-dev
 sudo apt install libeigen3-dev cmake-gui
 ```
 
-# 1 GStreamer
-##  1.1 安装gstreamer
+# 1 mpp
+[mpp](https://github.com/rockchip-linux/mpp)
+
+```sh
+./make_Makefiles.bash
+make -j8
+sudo make install
+```
+
+```sh
+tail -f /var/log/syslog
+
+./mpp_info_test
+```
+
+# 2 GStreamer
+##  2.1 安装gstreamer
 ```sh
 sudo apt-get install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio
 
@@ -176,7 +191,7 @@ pkg-config --cflags --libs gstreamer-1.0
 
 [gstreamer官网](https://gstreamer.freedesktop.org/documentation/installing/on-linux.html?gi-language=c)
 
-##  1.2 检查gstreamer是否（默认）带有mpp插件
+##  2.2 检查gstreamer是否（默认）带有mpp插件
 ```sh
 firefly@firefly:~$ gst-inspect-1.0 | grep mpp
 ```
@@ -195,7 +210,7 @@ libav:  avdec_h263_rkmpp: libav h263 (rkmpp) decoder
 ```
 直接安装的默认不支持mpp
 
-## 1.3 安装gstreamer-rockchip
+## 2.3 安装gstreamer-rockchip
 [gstreamer-rockchip](https://github.com/JeffyCN/rockchip_mirrors.git)
 ```sh
 git clone https://github.com/JeffyCN/rockchip_mirrors.git --branch gstreamer-rockchip
@@ -208,7 +223,7 @@ ninja build
 sudo ninja install
 ```
 
-## 1.4 再次检查新安装的gstreamer是否带有mpp插件
+## 2.4 再次检查新安装的gstreamer是否带有mpp插件
 支持mpp的输出
 ```sh
 firefly@firefly:~$ gst-inspect-1.0 --plugin | grep mpp
@@ -228,12 +243,14 @@ libav:  avdec_vp8_rkmpp: libav vp8 (rkmpp) decoder
 libav:  avdec_vp9_rkmpp: libav vp9 (rkmpp) decoder
 ```
 
-## 1.5 检查gstreamer是否正常使用mpp
+## 2.5 查看直接使用gstreamer拉流效果
 ```sh
+gst-launch-1.0 rtspsrc location=rtsp://admin:@192.168.1.155:554 ! video/x-raw,width=2880,height=1616 ! rtph264depay ! h264parse ! mppvideodec ! videoconvert ! appsink
 ```
+开始拉流时有约3秒延迟，中间帧连续，除了延迟未发现其它问题。
 
-# 2 FFMPEG
-## 检查ffmpeg是否支持rkmpp解码器
+# 3 FFMPEG
+## 3.1 检查ffmpeg是否支持rkmpp解码器
 ```sh
 firefly@firefly:~$ ffmpeg -decoders | grep "rkmpp"
 ```
@@ -249,8 +266,10 @@ firefly@firefly:~$ ffmpeg -decoders | grep "rkmpp"
  V..... vp9_rkmpp            vp9 (rkmpp) (codec vp9)
  ```
 
-# 3 OpenCV
-## 3.1 编译OpenCV
+`sudo apt install ffmpeg`的默认安装已经支持mpp
+
+# 4 OpenCV
+## 4.1 编译OpenCV
 ```sh
 cd /home/firefly/rknn_installs/gstreamer_mpp/opencv-4.x
 mkdir build
@@ -308,9 +327,7 @@ make -j8
 sudo make install
 ```
 
-## 3.2 把生成的`cv2.cpy*.so`复制到Python3对应路径
-
-## 3.3 验证OpenCV-Python支持GStreamer
+## 4.2 验证OpenCV-Python支持GStreamer
 ```sh
 firefly@firefly:~$ python3
 >>> import cv2
@@ -327,6 +344,29 @@ firefly@firefly:~$ python3
     GStreamer:                   YES (1.16.3)
     v4l/v4l2:                    YES (linux/videodev2.h)
 ```
+
+## 4.3 使用OpenCV拉流
+```py
+import subprocess
+
+gst_elements = str(subprocess.check_output('gst-inspect-1.0'))
+gst_str = ('rtspsrc location={} latency=0 ! '
+            'rtph264depay ! h264parse ! mppvideodec ! '
+            'videoconvert ! appsink').format(uri)
+cv2.VideoCapture(gst_str, cv2.CAP_GSTREAMER)
+```
+延迟、卡顿，帧率只有2+。
+
+查看官方论坛多个帖子均有官方回复说gstreamer的appsink带有大量的copy会导致帧率低让改用ffmedia。故考虑改用ffmedia。
+
+# 5 ffmedia
+[ffmedia](https://gitlab.com/firefly-linux/ffmedia_release)
+
+```sh
+sudo python3 ./demo rtsp://admin:@192.168.1.155:554 -o 1280x768 -b BGR24 -c 1
+```
+
+几乎没延迟，帧率正常，达15（测试摄像机支持的最大帧率），内存2G，cpu两核25%以内、两核10%以内。可以确定是用上了mpp的。
 
 # 附录：其他问题
 ```sh

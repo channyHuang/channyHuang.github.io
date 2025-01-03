@@ -138,8 +138,3 @@ ERFNet（Efficient Residual Factorized Network）：
     缺点：在对复杂语义信息的理解和处理能力上可能相对较弱，特征表达能力可能不如一些更复杂的算法。
     适用场景：适用于资源受限的设备或需要快速处理的场景，如嵌入式设备、移动设备等。
 
-
-# Network Based Encode-Decode
-[Autoencoder-Image-Compression](https://github.com/RobinWenqian/Autoencoder-Image-Compression)
-
-[lossy-image-compression](https://github.com/abskj/lossy-image-compression)
