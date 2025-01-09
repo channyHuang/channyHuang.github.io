@@ -368,6 +368,11 @@ sudo python3 ./demo rtsp://admin:@192.168.1.155:554 -o 1280x768 -b BGR24 -c 1
 
 几乎没延迟，帧率正常，达15（测试摄像机支持的最大帧率），内存2G，cpu两核25%以内、两核10%以内。可以确定是用上了mpp的。
 
+mpp硬解码和opencv.VideoCapture软解码对比：
+
+![harddecode](./../../images/decodeHard.png)
+![softdecode](./../../images/decodeSoft.png)
+
 # 附录：其他问题
 ```sh
 sudo add-apt-repository ppa:george-coolpi/multimedia

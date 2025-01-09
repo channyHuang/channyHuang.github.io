@@ -145,6 +145,10 @@ YOLOv8n summary (fused): 168 layers, 3007208 parameters, 0 gradients, 8.1 GFLOPs
 ```sh
 sudo cat /sys/kernel/debug/rknpu/load
 ```
+## 查看vpu帧率
+```sh
+sudo watch -n 1 cat /proc/mpp_service/sessions-summary
+```
 ## 国内源
 ```
 阿里云： http://mirrors.aliyun.com/pypi/simple/
