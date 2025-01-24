@@ -135,6 +135,29 @@ ICNet：
 ERFNet（Efficient Residual Factorized Network）：
 
     优点：采用高效的残差分解卷积结构，在减少计算量和参数量的同时，能够保持较高的分割精度，计算效率较高，对资源受限的设备友好。
-    缺点：在对复杂语义信息的理解和处理能力上可能相对较弱，特征表达能力可能不如一些更复杂的算法。
+    缺点：在对复杂语义信息的理解和处理能力上可能相对较弱，Si特征表达能力可能不如一些更复杂的算法。
     适用场景：适用于资源受限的设备或需要快速处理的场景，如嵌入式设备、移动设备等。
 
+
+# 图像故障诊断
+1. AnomalyGPT
+多个预训练权重，国内网络可能无法访问（HuggingFace.io）
+1. Myriad
+依赖于minigpt4，训练集需要对应文字和图像
+1. RealNet
+3090单显卡依旧报显存不够。。。
+1. EfficientAD
+模型30+M，样例同时依赖MVTec和ImageNet数据集
+
+1. OpenOOD
+1. [SimpleNet](https://github.com/DonaldRR/SimpleNet.git)
+
+
+1. [VT-ADL](https://github.com/pankajmishra000/VT-ADL.git)
+模型100+M，自定义数据集效果一般
+* 
+1. [deviation-network-image](https://github.com/mala-lab/deviation-network-image.git)
+模型40+M，MVTec数据集效果一般
+* 特征提取网络使用alexnet/resnet18/resnet50
+* 金字塔采样n_scales=2
+* 前k个score的特征
