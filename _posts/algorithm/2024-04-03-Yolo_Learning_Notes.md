@@ -140,24 +140,47 @@ ERFNet（Efficient Residual Factorized Network）：
 
 
 # 图像故障诊断
+## 
 1. AnomalyGPT
 多个预训练权重，国内网络可能无法访问（HuggingFace.io）
 1. Myriad
 依赖于minigpt4，训练集需要对应文字和图像
-1. RealNet
+1. [RealNet](https://github.com/cnulab/RealNet.git)
 3090单显卡依旧报显存不够。。。
-1. EfficientAD
-模型30+M，样例同时依赖MVTec和ImageNet数据集
+1. [EfficientAD](https://github.com/rximg/EfficientAD.git)
+distillation_training报错太多。。。
+模型30+M
+1. [OpenOOD](https://github.com/Jingkang50/OpenOOD)
+集众多net于一身
 
-1. OpenOOD
 1. [SimpleNet](https://github.com/DonaldRR/SimpleNet.git)
+运行结束未有输出
 
+1. [DRA](https://github.com/Choubo/DRA)
+* 特征提取网络使用alexnet/resnet18
+* 多头训练：正常、可见异常、伪异常、潜在异常
+* 只分辨是否正常，不预测异常区域
 
-1. [VT-ADL](https://github.com/pankajmishra000/VT-ADL.git)
-模型100+M，自定义数据集效果一般
-* 
-1. [deviation-network-image](https://github.com/mala-lab/deviation-network-image.git)
+1. [DEVNet][deviation-network-image](https://github.com/mala-lab/deviation-network-image.git)
 模型40+M，MVTec数据集效果一般
 * 特征提取网络使用alexnet/resnet18/resnet50
 * 金字塔采样n_scales=2
 * 前k个score的特征
+
+1. [AHL](https://github.com/mala-lab/AHL)
+*　在[DRA]和[DEVNet]的基础上
+
+1. [DiffusionAD]
+
+1. [GLASS](https://github.com/cqylunlun/GLASS.git)
+
+## 
+1. [anomaly-detection-using-autoencoders](https://github.com/msminhas93/anomaly-detection-using-autoencoders.git)
+小模型6+M，自动编解码模型训练图像，设定阈值，根据预测图像和原图像的残差确定缺陷区域
+
+1. [VT-ADL](https://github.com/pankajmishra000/VT-ADL.git)
+模型100+M，自定义数据集效果一般
+* DigitCaps提取特征，Decoder重建原始图像，MDN分布重建得到`pi, mu, sigma`
+
+
+
