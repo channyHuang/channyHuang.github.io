@@ -181,6 +181,8 @@ tail -f /var/log/syslog
 ./mpp_info_test
 ```
 
+其它可能依赖：[rockchip-linux](https://github.com/orgs/rockchip-linux/repositories?type=all)
+
 # 2 GStreamer
 ##  2.1 安装gstreamer
 ```sh
@@ -222,6 +224,8 @@ meson configure --prefix=/usr
 ninja build
 sudo ninja install
 ```
+
+注：2025年2月再看该仓库已经被删除了
 
 ## 2.4 再次检查新安装的gstreamer是否带有mpp插件
 支持mpp的输出
