@@ -230,4 +230,28 @@ rviz::RenderSystem: error creating render window: OGRE EXCEPTION(3:RenderingAPIE
 Segmentation fault (core dumped)
 ```
 
+3. GLFW
+```sh
+No protocol specified
+Glfw Error 65544: X11: Failed to open display :0
+Glfw Error 65537: The GLFW library is not initialized
+Failed to initialize GLAD
+[laserMapping-1] process has died [pid 1149, exit code -11, cmd /home/IMMESH/devel/lib/ImMesh/ImMesh_mapping __name:=laserMapping __log:=/root/.ros/log/e70bca0a-effc-11ef-86c4-0242ac500002/laserMapping-1.log].
+log file: /root/.ros/log/e70bca0a-effc-11ef-86c4-0242ac500002/laserMapping-1*.log
+```
+
+分别查看主机和docker的显示号
+```sh
+$ echo $DISPLAY
+:0
+
+$ echo $DISPLAY
+:1
+```
+
+把docker设置成和主机相同的DISPLAY即可
+```sh
+$ export DISPLAY=:1
+```
+
 [back](./)
