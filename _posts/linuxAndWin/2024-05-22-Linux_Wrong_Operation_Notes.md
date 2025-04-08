@@ -101,3 +101,8 @@ sudo service nmbd restart
 ```sh
 gsettings set org.gnome.settings-daemon.plugins.media-keys max-screencast-length 0
 ```
+
+# ssh冲突
+```sh
+ssh-keygen -f "/home/channy/.ssh/known_hosts" -R "192.168.2.66"
+```

@@ -145,6 +145,8 @@ ret = acl.rt.memcpy(input_data[0]["buffer"], input_data[0]["size"], np_ptr, inpu
 atc --model=encodeModel.onnx --framework=5 --output=encodeModel --soc_version=Ascend310P3 --input_format=NCHW --input_fp16_nodes="input" --output_type=FP32 --out_nodes="output"
 ```
 
+也有可能是上一次内存没有正常释放，过一段时间或重启后能正常调用。
+
 ## 修改适配机载推理代码 
 把cuda改成npu，如`torch.cuda.is_available`改成`torch.npu.is_available`，`xxx.cuda()`改成`xxx.npu()`等。。。是不够的。。。
 
@@ -172,6 +174,132 @@ ValueError: could not convert string to int
 ret = acl.mdl.execute(model_id, load_input_dataset, load_output_dataset)
 ```
 如果CANN各软件版本不一致时，在ubuntu训练机上转换模型并不会报任何错误，可以转换成功。但在算力机上运行时会报推理错误，错误码507011。统一版本即可解决，包括训练机上的x86_64的toolkit、算力机上的aarch64的toolkit、算力机上的kernel、算力机上的nnrt共四样，最好版本都保持一致。
+
+# 优化
+## 动态shape
+```sh
+atc --model=encodeModel.onnx --framework=5 --output=encodeModel --soc_version=Ascend310P3 --input_format=ND --input_fp16_nodes="input" --output_type=FP32 --out_nodes="output" --input_shape="input:1,3,-1,-1" --dynamic_dims="3040,4064;1088,1952"
+
+atc --model=decodeModel.onnx --framework=5 --output=decodeModel --soc_version=Ascend310P3 --input_format=ND --input_fp16_nodes="input" --output_type=FP32 --out_nodes="output" --input_shape="input:1,256,-1,-1" --dynamic_dims="95,127;34,61"
+```
+
+## aipp
+aipp没有缩放，`The max padding size is 32`
+|操作|aipp|
+|:---:|:---:|:---:|
+| 缩放 | 无 | 无 |
+| RGB->BGR | 通道转换 | rbuv_swap_switch: true |
+| /255.0 np.astype("float16) | 归一化 | var_reci_chn_0: 0.00392156862745098 |
+| cv::copyMakeBorder | padding | padding: true |
+
+可见附录3 aipp配置
+
+## dvpp
+### 图像缩放
+dvpp并不一定支持所有jpg图像，见[图片格式不支持](https://www.hiascend.com/forum/thread-0259120740514768036-1-1.html)
+
+从`sample`中取出`AclLiteImage`、`AclLiteResource`和`AclLiteImageProc`，对图像做缩放，发现并不是所有缩放保存成jpg的图像都正常。如opencv的`/samples/data`下的`ela_original.jpg`和`orange.jpg`，暂未知两图像的区别。
+> 解码JPEG图片，只支持JPEG图片为huffman编码(colorspace: yuv, subsample: 444/440/422/420/400 )，不支持算术编码，不支持渐进编码，不支持jpeg2000格式。
+```py
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from acl_net.acllite_image import AclLiteImage
+from acl_net.acllite_resource import AclLiteResource
+from acl_net.acllite_imageproc import AclLiteImageProc
+
+import inspect
+import cv2
+
+class DvppCls(object):
+    def __init__(self):
+        self.dvpp = None
+
+    def init_resource(self):
+        self.acl_resource = AclLiteResource()
+        self.acl_resource.init()
+        self.dvpp = AclLiteImageProc(self.acl_resource)
+
+    def dvpp_resize(self, image_path, save_path = 'dvpp.jpg'):
+        image_acl = AclLiteImage(image_path)
+        image_dvpp = image_acl.copy_to_dvpp()
+        yuv_image = self.dvpp.jpegd(image_dvpp) 
+        image_resize = self.dvpp.resize(yuv_image, 640, 640)
+        print('line', inspect.stack()[0].lineno)
+
+        jpeg_image = self.dvpp.jpege(image_resize)
+        jpeg_image.save(save_path)
+
+    def dvpp_resize2(self, image_path, save_path = 'dvpp.jpg'):
+        image = cv2.imread(image_path)
+        ret, image_bytes = cv2.imencode('.jpg', image)
+
+        image_acl = AclLiteImage(image_bytes, image.shape[1], image.shape[0], size = image.size)
+        image_dvpp = image_acl.copy_to_dvpp()
+        yuv_image = self.dvpp.jpegd(image_dvpp) 
+        image_resize = self.dvpp.resize(yuv_image, 640, 640)
+        print('line', inspect.stack()[0].lineno)
+
+        jpeg_image = self.dvpp.jpege(image_resize)
+        jpeg_image.save(save_path)
+
+
+    def release_source(self):
+        self.dvpp.__del__()
+        self.acl_resource.__del__()
+        AclLiteResource.__del__ = lambda x:0
+        AclLiteImage.__del__ = lambda x:0
+        AclLiteImageProc.__del__ = lambda x:0
+
+if __name__ == '__main__':
+    cls = DvppCls()
+
+    cls.init_resource()
+
+    cls.dvpp_resize('/home/edge/HGInference/opencv/samples/data/ela_original.jpg', '1.jpg')
+    cls.dvpp_resize('/home/edge/HGInference/opencv/samples/data/orange.jpg', '2.jpg')
+
+    cls.dvpp_resize2('/home/edge/HGInference/opencv/samples/data/orange.jpg', '3.jpg')
+
+    cls.release_source()
+```
+### yuv查看
+```py
+def  image2yuv():
+    input_image = cv2.imread('./tmp.jpg')
+    input_image = cv2.resize(input_image, (640, 640))
+    yuv_cv = cv2.cvtColor(input_image, cv2.COLOR_RGB2YUV_I420)
+    h, w = input_image.shape[:2]
+    y = yuv_cv[:h, :w]
+    uv = yuv_cv[h:, :]
+    uv_interleaved = uv.reshape(-1, w)
+    image_cv = np.vstack((y, uv_interleaved))
+    image_cv.tofile('output.yuv')
+    return image_cv
+```
+使用ffmpeg转换成mp4后查看
+```sh
+ffmpeg -pixel_format yuv420p -s 640x640 -framerate 30 -i output.yuv -c:v libx264 output.mp4
+```
+
+# 其它模型 
+使用Yolov8n-seg的语义分割模型，发现不同的export导出onnx参数影响.om模型转换的成功率。
+
+.onnx模型导出代码
+```py
+# 直接导出，后面模型转换失败，报算子未注册 No parser is registered for Op 
+model.export(format = 'onnx', amp = False)
+# 隆低op_version，后面模型转换成功
+model.export(format = 'onnx', amp = False, dynamic=False, opset=9)
+```
+
+模型转换命令：
+```sh
+atc --model=yolov8n-seg.onnx     --framework=5     --output=yolov8n-seg     --input_format=NCHW     --input_fp16_nodes="images" --input_shape="images:1,3,640,640"     --log=error     --soc_version=Ascend310P3
+```
+
+貌似只能指定[1,100]个输入维度，未找到像pt或onnx那种可以任意维度输入的设置。。。
 
 ## 其它记录
 ### run_model是ACL_HOST
@@ -285,4 +413,57 @@ onnxruntime能够调用起华为盒子的CPU做推理，但速度巨慢，近10s
 [ERROR] GE(10686,msame):2025-03-19-15:09:46.649.904 [graph_loader.cc:231]10686 ExecuteModel: ErrorNo: 507011() [EXEC][DEFAULT][Execute][Model] failed, model_id:1.
 [ERROR] ASCENDCL(10686,msame):2025-03-19-15:09:46.649.914 [model.cpp:911]10686 ModelExecute: [EXEC][DEFAULT][Exec][Model]Execute model failed, ge result[507011], modelId[1]
 [ERROR] ASCENDCL(10686,msame):2025-03-19-15:09:46.649.947 [model.cpp:2115]10686 aclmdlExecute: [EXEC][DEFAULT][Exec][Model]modelId[1] execute failed, result[507011]
+```
+
+# 附录3: AIPP预处理配置
+```sh
+aipp_op {
+    aipp_mode: static
+    related_input_rank: 0
+    
+    input_format: RGB888_U8
+    src_image_size_w: 640
+    src_image_size_h: 640
+
+    crop: true
+    load_start_pos_w: 0
+    load_start_pos_h: 0
+    crop_size_w: 640
+    crop_size_h: 624
+
+    # RGB888_U8转BGR
+    csc_switch: false
+    rbuv_swap_switch: true
+
+    # int8->fp16
+    # 当uint8->fp16时，pixel_out_chx(i) = [pixel_in_chx(i) – mean_chn_i – min_chn_i] * var_reci_chn
+
+    # 每个通道的均值
+    # 类型：uint8
+    # 取值范围：[0, 255]
+    mean_chn_0: 0
+    mean_chn_1: 0
+    mean_chn_2: 0
+
+    # 每个通道的最小值
+    # 类型：float16
+    # 取值范围：[0, 255]
+    min_chn_0: 0.0
+    min_chn_1: 0.0
+    min_chn_2: 0.0
+
+    # 每个通道方差的倒数
+    # 类型：float16
+    # 取值范围：[-65504, 65504]
+    var_reci_chn_0: 0.00392156862745098
+    var_reci_chn_1: 0.00392156862745098
+    var_reci_chn_2: 0.00392156862745098
+
+    padding: true
+    left_padding_size: 0
+    right_padding_size: 0
+    top_padding_size: 0
+    bottom_padding_size: 16
+    padding_value: 0
+}
 ```
