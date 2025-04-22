@@ -302,6 +302,20 @@ atc --model=yolov8n-seg.onnx     --framework=5     --output=yolov8n-seg     --in
 貌似只能指定[1,100]个输入维度，未找到像pt或onnx那种可以任意维度输入的设置。。。
 
 ## 其它记录
+### 模型转换atc报错
+1. 
+```sh
+ATC run failed, Please check the detail log, Try 'atc --help' for more information
+EC0010: [PID: 5948] 2025-04-21-15:00:19.776.801 Failed to import Python module [ModuleNotFoundError: No module named 'tbe'.].
+
+ATC run failed, Please check the detail log, Try 'atc --help' for more information
+EC0010: [PID: 6039] 2025-04-21-15:01:07.931.973 Failed to import Python module [ModuleNotFoundError: No module named 'tbe.common'.].
+
+ATC run failed, Please check the detail log, Try 'atc --help' for more information
+EC0010: [PID: 7651] 2025-04-21-15:18:29.050.937 Failed to import Python module [AttributeError: `np.float_` was removed in the NumPy 2.0 release. Use `np.float64` instead..].
+```
+使用miniconda,自己pip安装的tbe依旧报错，需要把`Ascend/ascend-toolkit/8.0.0/python/site-packages`中的tbe复制到对应环境目录下`miniconda3/envs/segment/lib/python3.10/site-package`。numpy版本不能太高，否则会报np.float相关错误
+
 ### run_model是ACL_HOST
 `acl.rt.get_run_mode()`返回的是1即ACL_HOST，不管是样例还是自己的模型都是。
 ### 带无线网卡开机卡在开机画面
