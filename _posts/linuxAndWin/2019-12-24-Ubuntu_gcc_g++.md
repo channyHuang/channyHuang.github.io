@@ -72,4 +72,4 @@ iptables -t nat -A POSTROUTING -o wlp3s0 -j MASQUERADE
 
 2. 运行`sudo ./ipForward.sh`
 3. 设置上网机有线网络静态ip，记下ip地址
-4. 没网的机器设置静态网络，网关设为上网机的ip地址
+4. 没网的机器设置静态网络，网关设为上网机的ip地址，DNS可以设置为8.8.8.8也可以不设置
