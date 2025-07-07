@@ -127,6 +127,8 @@ hello-world   latest                d2c94e258dcb   15 months ago   13.3kB
 
 # 创建容器并进行文件映射
 $ docker run --name docker_ros_name -it --privileged -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/channy/Documents/thirdlibs/ros_workspace:/home osrf/ros:noetic-desktop-full
+
+--network=host
 # 查看已有容器的名称等信息
 $ docker ps -a
 CONTAINER ID   IMAGE                          COMMAND                  CREATED              STATUS          PORTS     NAMES

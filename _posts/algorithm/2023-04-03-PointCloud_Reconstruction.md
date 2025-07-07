@@ -239,6 +239,51 @@ ffmpeg.exe -i "D:/dataset/lab/IMG_0080.MOV" -vcodec libx264 -s 1920x1080 -crf 0 
 ```
 
 ## colmap
+### 编译
+1. 版本对应问题
+Ubuntu 20.04使用apt install默认安装的cuda-toolkit 10.1、Eigen 3.3.7和Ceres 1.14.0版本都相对较低。
+
+对NVIDIA 3090显卡来说，安装550驱动后最高支持cuda 12.4， 10.1不能充分利用3090
+
+安装了Eigen 3.4.0，glog 0.8.0，编译ceres-solver-2.2.0时报错。
+```sh
+CMake Error at /usr/local/lib/cmake/Ceres/CeresConfig.cmake:85 (message):
+  Failed to find Ceres - Found Eigen dependency, but the version of Eigen
+  found (3.4.0) does not exactly match the version of Eigen Ceres was
+  compiled with (3.3.7).  This can cause subtle bugs by triggering violations
+  of the One Definition Rule.  See the Wikipedia article
+  http://en.wikipedia.org/wiki/One_Definition_Rule for more details
+Call Stack (most recent call first):
+  /usr/local/lib/cmake/Ceres/CeresConfig.cmake:204 (ceres_report_not_found)
+  cmake/FindDependencies.cmake:41 (find_package)
+  CMakeLists.txt:116 (include)
+```
+确认是版本问题。
+```sh
+In file included from /home/channy/Documents/thirdlibs/ceres-solver-2.2.0/internal/ceres/levenberg_marquardt_strategy_test.cc:40:
+/home/channy/Documents/thirdlibs/ceres-solver-2.2.0/internal/ceres/gmock/mock-log.h:115:8: error: ‘void testing::ScopedMockLog::send(google::LogSeverity, const char*, const char*, int, const tm*, const char*, size_t)’ marked ‘override’, but does not override
+  115 |   void send(google::LogSeverity severity,
+      |        ^~~~
+/home/channy/Documents/thirdlibs/ceres-solver-2.2.0/internal/ceres/levenberg_marquardt_strategy_test.cc: In member function ‘virtual void ceres::internal::LevenbergMarquardtStrategy_CorrectDiagonalToLinearSolver_Test::TestBody()’:
+/home/channy/Documents/thirdlibs/ceres-solver-2.2.0/internal/ceres/levenberg_marquardt_strategy_test.cc:144:19: error: cannot declare variable ‘log’ to be of abstract type ‘testing::ScopedMockLog’
+  144 |     ScopedMockLog log;
+      |                   ^~~
+```
+glog的LogSink类send接口的参数之一类型由原来的`struct ::tm*`在2021年变成了`LogMessageTime`，而ceres-solver-2.2.0版本还保持着旧参数类型。2025年5月新拉ceres最新的代码，已经没有该文件了。编译报缺少abseil库，abseil可以依赖下面的GTest
+```sh
+CMake Error at CMakeLists.txt:173 (find_package):
+  By not providing "Findabsl.cmake" in CMAKE_MODULE_PATH this project has
+  asked CMake to find a package configuration file provided by "absl", but
+  CMake did not find one.
+```
+```sh
+CMake Error at /snap/cmake/1463/share/cmake-4.0/Modules/FindPackageHandleStandardArgs.cmake:227 (message):
+  Could NOT find GTest (missing: GTEST_LIBRARY GTEST_INCLUDE_DIR
+  GTEST_MAIN_LIBRARY) (Required is at least version "1.14.0")
+```
+使用apt install libgtest-dev 安装的版本是1.10.0
+
+
 ### 使用
 ```sh
 # 特征点检测，SIFT特征

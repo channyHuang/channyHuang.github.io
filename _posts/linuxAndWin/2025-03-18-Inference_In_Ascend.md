@@ -185,8 +185,8 @@ atc --model=decodeModel.onnx --framework=5 --output=decodeModel --soc_version=As
 
 ## aipp
 aipp没有缩放，`The max padding size is 32`
-|操作|aipp|
-|:---:|:---:|:---:|
+|操作|aipp||
+|:---:|:---:|:---:|  
 | 缩放 | 无 | 无 |
 | RGB->BGR | 通道转换 | rbuv_swap_switch: true |
 | /255.0 np.astype("float16) | 归一化 | var_reci_chn_0: 0.00392156862745098 |
@@ -336,8 +336,71 @@ scons
 ```sh
 Device with "GPU" name is not registedred in the OpenVINO Runtime
 ```
+
+```sh
+wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+echo "deb https://apt.repos.intel.com/openvino ubuntu20 main" | sudo tee /etc/apt/sources.list.d/intel-openvino.list
+sudo apt update
+apt-cache search openvino
+sudo apt install openvino-2025.1.0
+```
 ## onnxruntime
 onnxruntime能够调用起华为盒子的CPU做推理，但速度巨慢，近10s（对应于调用Intel的CPU用时2s，Intel的GPU用时0.5s）
+
+## mindie
+截止2025年7月7日，300ipro貌似依旧不支持mindie。  
+开始使用CANN 8.0.0 + mindie 1.0.0，运行官网样例代码报错
+```sh
+Create infer builder failed, please check MindIE-RT log.
+```
+
+以为是版本不匹配，修改成CANN 8.1.RC1 + mindie 2.0.RC1依旧有相同报错。后发现mindie对硬件加速卡有要求。
+
+```py
+    # 1.导入mindietorch框架
+    import torch
+    import mindietorch
+
+    # 2.模型导出
+    class SimpleNet(torch.nn.Module): # 定义模型SimpleNet
+        def __init__(self):
+            super().__init__()
+        def forward(self, x, y):
+            return torch.add(x, y)
+    traced_model = torch.jit.trace(SimpleNet().eval(), (torch.ones([5, 5]), torch.ones([5, 5]))) # 模型TorchScript模型导出
+
+    # 3.模型编译
+    mindietorch.set_device(0) # 设置使用device 0设备
+    compiled_model = mindietorch.compile(traced_model, inputs=[mindietorch.Input((5, 5)), mindietorch.Input((5, 5))], soc_version="Ascend310P3") # 静态模型编译
+
+    # 4.模型推理
+    x = torch.ones([5, 5])
+    y = torch.ones([5, 5])
+    result = compiled_model.forward(x.to("npu"), y.to("npu")) # 模型加速推理
+    print(result.to("cpu")) # 输出计算结果
+
+    # 5.资源释放
+    mindietorch.finalize()
+```
+## mindx
+使用pyACL需要把输入转换成tobytes()有拷贝比较耗时，可以使用mindx进行模型加载和推理。
+```py
+from mindx.sdk import Tensor
+from mindx.sdk import base
+
+# ...
+self.net = base.model(modelPath=model, deviceId=0)
+image_tensor = Tensor(image)
+outputs = self.net.infer([image_tensor])
+# ...
+```
+
+理论上加载模型前应该有`base.mx_init()`和`base.mx_deinit()`初始化和反初始化，但当业务需要同时加载多个模型时，有`base.mx_init()`会报错重复init。官网样例中的`AclLiteModel`也有同样的问题，不能同时加载多个模型，会报重复init。
+
+mindx和acl貌似不能同时使用，环境变量有冲突。
+
+
 
 # 附录1: 安装低版本CANN后加载模型报错500002
 使用python的`acl.mdl.load_from_file('xxx.om')`一直失败，错误码500002内部错误。
