@@ -40,6 +40,11 @@ source /home/channy/Ascend/ascend-toolkit/set_env.sh
 ```
 加入到`~/.bashrc`中
 
+只source没有`export LD_LIBRARY_PATH`atc转换会报错
+```sh
+/home/channy/Ascend/ascend-toolkit/8.0.0/x86_64-linux/bin/atc.bin: error while loading shared libraries: libascend_hal.so: cannot open shared object file: No such file or directory
+```
+
 3. 验证模型转换工具已正确安装　
 ```sh
 $ atc
@@ -47,6 +52,24 @@ ATC start working now, please wait for a moment.
 ...
 ATC run failed, Please check the detail log, Try 'atc --help' for more information
 E10007: [PID: 10490] 2025-03-18-09:02:18.501.341 [--framework] is required. The value must be [0(Caffe) or 1(MindSpore) or 3(TensorFlow) or 5(Onnx)].
+```
+
+4. 
+```sh
+ATC run failed, Please check the detail log, Try 'atc --help' for more information
+EC0010: [PID: 129520] 2025-07-08-10:25:28.680.962 Failed to import Python module [ModuleNotFoundError: No module named 'decorator'.].
+        Solution: Check that all required components are properly installed and the specified Python path matches the Python installation directory. (If the path does not match the directory, run set_env.sh in the installation package.)
+        TraceBack (most recent call last):
+        AOE Failed to call InitCannKB[FUNC:Initialize][FILE:python_adapter_manager.cc][LINE:47]
+        Failed to initialize TeConfigInfo.
+        [GraphOpt][InitializeInner][InitTbeFunc] Failed to init tbe.[FUNC:InitializeTeFusion][FILE:tbe_op_store_adapter.cc][LINE:1816]
+        [GraphOpt][InitializeInner][InitTeFusion]: Failed to initialize TeFusion.[FUNC:InitializeInner][FILE:tbe_op_store_adapter.cc][LINE:1783]
+        [SubGraphOpt][PreCompileOp][InitAdapter] InitializeAdapter adapter [tbe_op_adapter] failed! Ret [4294967295][FUNC:InitializeAdapter][FILE:op_store_adapter_manager.cc][LINE:79]
+        [SubGraphOpt][PreCompileOp][Init] Initialize op store adapter failed, OpsStoreName[tbe-custom].[FUNC:Initialize][FILE:op_store_adapter_manager.cc][LINE:120]
+        [FusionMngr][Init] Op store adapter manager init failed.[FUNC:Initialize][FILE:fusion_manager.cc][LINE:115]
+        PluginManager InvokeAll failed.[FUNC:Initialize][FILE:ops_kernel_manager.cc][LINE:82]
+        OpsManager initialize failed.[FUNC:InnerInitialize][FILE:gelib.cc][LINE:249]
+        GELib::InnerInitialize failed.[FUNC:Initialize][FILE:gelib.cc][LINE:177]
 ```
 
 ### 华为盒子即算力机上
@@ -174,6 +197,31 @@ ValueError: could not convert string to int
 ret = acl.mdl.execute(model_id, load_input_dataset, load_output_dataset)
 ```
 如果CANN各软件版本不一致时，在ubuntu训练机上转换模型并不会报任何错误，可以转换成功。但在算力机上运行时会报推理错误，错误码507011。统一版本即可解决，包括训练机上的x86_64的toolkit、算力机上的aarch64的toolkit、算力机上的kernel、算力机上的nnrt共四样，最好版本都保持一致。
+
+### acllite_logger和torch不能同时import，报_getframe错误 
+```sh
+acllite_logger.py", line 62, in log_info
+AttributeError: 'NoneType' object has no attribute '_getframe'
+```
+
+```py
+import cv2
+import numpy as np
+import os
+import sys
+import threading
+import time
+import torch # 注释掉或移到另一个文件作postprocess处理再在此处 from xxx.py import * 均可，直接import会在AclLiteResource析构时报错在sys._getframe()语句中
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../acl_net')))
+from acllite_model import AclLiteModel
+from acllite_resource import AclLiteResource
+
+if __name__ == '__main__':
+    acl_resource = AclLiteResource()
+    acl_resource.init()
+```
 
 # 优化
 ## 动态shape
@@ -315,6 +363,25 @@ ATC run failed, Please check the detail log, Try 'atc --help' for more informati
 EC0010: [PID: 7651] 2025-04-21-15:18:29.050.937 Failed to import Python module [AttributeError: `np.float_` was removed in the NumPy 2.0 release. Use `np.float64` instead..].
 ```
 使用miniconda,自己pip安装的tbe依旧报错，需要把`Ascend/ascend-toolkit/8.0.0/python/site-packages`中的tbe复制到对应环境目录下`miniconda3/envs/segment/lib/python3.10/site-package`。numpy版本不能太高，否则会报np.float相关错误
+
+2. 
+```sh
+ATC run failed, Please check the detail log, Try 'atc --help' for more information
+EC0010: [PID: 129520] 2025-07-08-10:25:28.680.962 Failed to import Python module [ModuleNotFoundError: No module named 'decorator'.].
+        Solution: Check that all required components are properly installed and the specified Python path matches the Python installation directory. (If the path does not match the directory, run set_env.sh in the installation package.)
+        TraceBack (most recent call last):
+        AOE Failed to call InitCannKB[FUNC:Initialize][FILE:python_adapter_manager.cc][LINE:47]
+        Failed to initialize TeConfigInfo.
+        [GraphOpt][InitializeInner][InitTbeFunc] Failed to init tbe.[FUNC:InitializeTeFusion][FILE:tbe_op_store_adapter.cc][LINE:1816]
+        [GraphOpt][InitializeInner][InitTeFusion]: Failed to initialize TeFusion.[FUNC:InitializeInner][FILE:tbe_op_store_adapter.cc][LINE:1783]
+        [SubGraphOpt][PreCompileOp][InitAdapter] InitializeAdapter adapter [tbe_op_adapter] failed! Ret [4294967295][FUNC:InitializeAdapter][FILE:op_store_adapter_manager.cc][LINE:79]
+        [SubGraphOpt][PreCompileOp][Init] Initialize op store adapter failed, OpsStoreName[tbe-custom].[FUNC:Initialize][FILE:op_store_adapter_manager.cc][LINE:120]
+        [FusionMngr][Init] Op store adapter manager init failed.[FUNC:Initialize][FILE:fusion_manager.cc][LINE:115]
+        PluginManager InvokeAll failed.[FUNC:Initialize][FILE:ops_kernel_manager.cc][LINE:82]
+        OpsManager initialize failed.[FUNC:InnerInitialize][FILE:gelib.cc][LINE:249]
+        GELib::InnerInitialize failed.[FUNC:Initialize][FILE:gelib.cc][LINE:177]
+```
+需要安装依赖库`pip3 install decorator sympy scipy psutil`
 
 ### run_model是ACL_HOST
 `acl.rt.get_run_mode()`返回的是1即ACL_HOST，不管是样例还是自己的模型都是。
