@@ -265,4 +265,7 @@ No 6.
 
 .off 三维模型格式 
 
+# 其它
+[host](https://blog.yoqi.me/lyq/16489.html)
+
 [back](./)

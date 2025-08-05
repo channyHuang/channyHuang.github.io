@@ -1,10 +1,10 @@
 ---
 layout: default
-title: MARL Learning Notes
+title: CTF Learning Notes
 categories:
-- Algorithm
+- Security
 tags:
-- Computer Vision
+- Security
 ---
 //Description: CTF学习入门笔记。记录学习过程中遇到的问题。
 
@@ -26,7 +26,7 @@ tags:
 4. [PHPStorm](https://www.jetbrains.com/phpstorm/) PHP的IDE
 5. [AntSword](https://github.com/AntSwordProject/antSword) [AntSword-Loader](https://github.com/AntSwordProject/AntSword-Loader)
 6. [Gopherus](https://github.com/tarunkant/Gopherus) [Gopherus3](https://github.com/Esonhugh/Gopherus3) Gopher协议
-
+7. [词频分析](http://quipqiup.com) 词频分析网站
 
 # 1 Web
 ## HTTP
@@ -445,4 +445,31 @@ while True:
 ### [Cipher](https://buuoj.cn/challenges#[AFCTF2018]Single)
 c++11起使用std::shuffle替代std::random_shuffle
 
+方法一：26个字母遍历排列解码看是否通顺，26!种组合方式太多了。。。
 
+方法二：投机取巧，最后的“mljrl{Xv_I_lxiny_er_neja_rDc}”明显是"afctf{}"形式，可以得到四个解码映射：m->a,l->f,j->c,r->t.　两个字母成单词的xl->if/of. xlran->ift??/oft??->often......
+
+方法三：通过词频分析网站。。。
+
+### [Vigenere](https://buuoj.cn/challenges#[AFCTF2018]Vigen%C3%A8re)
+
+[vigenere-solver](https://www.guballa.de/vigenere-solver)
+
+### [EBCDIC](https://buuoj.cn/challenges#[SWPU2019]%E4%BC%9F%E5%A4%A7%E7%9A%84%E4%BE%A6%E6%8E%A2)
+
+EBCDIC编码
+```sh
+iconv -f IBM-1047 -t UTF-8 '├▄┬ы.txt' -o output.txt
+
+J¾ô5¬ÜCüBÔwllm_is_the_best_team!
+óQóQóQóKòÜ¯GAôJ¾ô5¬ÜCüBÔ§D£\BÔAô©3¯K¬ÕóK]SK¨¾Ú~t
+```
+ubuntu 20.04下使用iconv解码依旧是乱码。。。
+```sh
+unzip -P "wllm_is_the_best_team!" attachment.zip
+```
+ubuntu 20.04下前面三张图打不开。。。
+
+### [RSA](https://buuoj.cn/challenges#[%E7%AC%AC%E5%85%AD%E7%AB%A0][6.1.6%20%E6%A1%88%E4%BE%8B%E8%A7%A3%E6%9E%90][SWPU2020]happy)
+
+> 对于整数分解，可以使用factordb、yafu、Sagemath等工具进行。
