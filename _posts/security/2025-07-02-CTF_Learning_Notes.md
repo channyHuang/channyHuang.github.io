@@ -473,3 +473,202 @@ ubuntu 20.04下前面三张图打不开。。。
 ### [RSA](https://buuoj.cn/challenges#[%E7%AC%AC%E5%85%AD%E7%AB%A0][6.1.6%20%E6%A1%88%E4%BE%8B%E8%A7%A3%E6%9E%90][SWPU2020]happy)
 
 > 对于整数分解，可以使用factordb、yafu、Sagemath等工具进行。
+
+$$ p^3 + 1 = (p + 1) * (p^2 - p + 1) $$
+
+```py
+'''
+('c=', '0x7a7e031f14f6b6c3292d11a41161d2491ce8bcdc67ef1baa9eL')
+('e=', '0x872a335')
+#q + q*p^3 =1285367317452089980789441829580397855321901891350429414413655782431779727560841427444135440068248152908241981758331600586
+#qp + q *p^2 = 1109691832903289208389283296592510864729403914873734836011311325874120780079555500202475594
+'''
+
+def extended_gcd(a, b):
+    if b == 0:
+        return (a, 1, 0)
+    else:
+        gcd, x, y = extended_gcd(b, a % b)
+        return (gcd, y, x - (a // b) * y)
+
+def modinv(a, m):
+    """计算模逆元"""
+    gcd, x, y = extended_gcd(a, m)
+    if gcd != 1:
+        return None  # 逆元不存在
+    else:
+        return x % m
+
+def solvePQ():
+    a = 1285367317452089980789441829580397855321901891350429414413655782431779727560841427444135440068248152908241981758331600586
+    b = 1109691832903289208389283296592510864729403914873734836011311325874120780079555500202475594
+    (res, _, _) = extended_gcd(a, b)
+
+    p = b // res
+    q = res // (p + 1)
+    return p, q
+
+def calc_keys(p, q):
+    n = p * q
+    phi = (p - 1) * (q - 1)
+    e = 0x872a335
+    d = modinv(e, phi)
+    return ((e, n), (d, n))
+
+def decrypt(ciphertext, private_key):
+    d, n = private_key
+    print(ciphertext)
+    message = pow(ciphertext, d, n)
+    return message.to_bytes((message.bit_length() + 7) // 8, 'big').decode()
+
+if __name__ == '__main__':
+    p, q = solvePQ()
+    public_key, private_key = calc_keys(p, q)
+    message = 0x7a7e031f14f6b6c3292d11a41161d2491ce8bcdc67ef1baa9e
+    res = decrypt(message, private_key)
+    print(res)
+```
+
+### [Random](https://buuoj.cn/challenges#[GKCTF%202021]Random)
+下载下来的rar文件，ubuntu 20.04下直接右键‘Extract Here’会解压出几十G的文件并且还在解压，但使用命令行`unrar x rar`又正常，原因未知。。。
+
+```py
+def initialize(seed):
+    MT = [0] * 624
+    MT[0] = seed
+    for i in range(1, 624):
+        MT[i] = (1812433253 * (MT[i-1] ^ (MT[i-1] >> 30)) + i) & 0xFFFFFFFF
+    return MT
+
+def twist(MT):
+    for i in range(624):
+        y = (MT[i] & 0x80000000) + (MT[(i+1)%624] & 0x7FFFFFFF)
+        MT[i] = MT[(i + 397) % 624] ^ (y >> 1)
+        if y % 2 != 0:
+            MT[i] ^= 0x9908B0DF
+
+def extract_number(MT, index):
+    if index == 0:
+        twist(MT)  # 每 624 次调用后重新扭转
+    y = MT[index]
+    y ^= (y >> 11)
+    y ^= ((y << 7) & 0x9D2C5680)
+    y ^= ((y << 15) & 0xEFC60000)
+    y ^= (y >> 18)
+    return y
+
+from hashlib import md5
+
+# y ^= (y >> bit)
+def restoreRight(y, rightmoven):
+    curbit = rightmoven
+    resulty = y
+    while curbit < 32:
+        moven = min(32 - curbit, rightmoven)
+        mid = resulty >> rightmoven
+        resulty = y ^ mid
+        curbit += moven
+    return resulty
+
+def restoreLeft(y, leftmoven, A):
+    curbit = leftmoven
+    resulty = y
+    while curbit < 32:
+        moven = min(32 - curbit, leftmoven)
+        mid = resulty << leftmoven
+        resulty = y ^ (mid & A)
+        curbit += moven
+    return resulty
+
+# 32bit     
+def restore_number(y):
+    # y ^= (y >> 18)
+    y = restoreRight(y, 18)
+    # y ^= ((y << 15) & 0xEFC60000)
+    y = restoreLeft(y, 15, 0xEFC60000)
+    # y ^= ((y << 7) & 0x9D2C5680)
+    y = restoreLeft(y, 7, 0x9D2C5680)
+    # y ^= (y >> 11)
+    y = restoreRight(y, 11)
+    return y
+
+def assert_number(y):
+    y ^= (y >> 11)
+    y ^= ((y << 7) & 0x9D2C5680)
+    y ^= ((y << 15) & 0xEFC60000)
+    y ^= (y >> 18)
+    return y
+
+def recalc():
+    MT = []
+    file = open("random.txt", "r")
+    for _ in range(104):
+        str32 = file.readline()
+        num = (int)(str32)
+        res = restore_number(num)
+        MT.append(res)
+
+        str64 = file.readline()
+        num = (int)(str64)
+        res = restore_number(num & ((1 << 32) - 1))
+        MT.append(res)
+        res = restore_number((num >> 32))
+        MT.append(res)
+
+        str96 = file.readline()
+        num = (int)(str96)
+        res = restore_number(num & ((1 << 32) - 1))
+        MT.append(res)
+        num >>= 32
+        res = restore_number(num & ((1 << 32) - 1))
+        MT.append(res)
+        res = restore_number((num >> 32))
+        MT.append(res)
+    res = extract_number(MT, 0)
+    flag = md5(str(res).encode()).hexdigest()
+    print(flag)
+
+if __name__ == '__main__':
+    recalc()
+```
+
+### [MD5](http://buuoj.cn/challenges#[De1CTF%202019]SSRF%20Me)
+md5(key + param + scan)
+
+则action=scan下param=flag.txtread获取到的sign就是action=readscan下param=flag.txt的sign
+```py
+def method1():
+    import requests
+    # param=flag.txtread -> sign
+    url = 'http://13f3662d-d04c-481d-aae0-44fcebb4e36a.node5.buuoj.cn:81/De1ta?param=flag.txt'
+    cookie = {
+        'sign': '2773787e4b7f1e4ea8cbd60bdaff5f3f',
+        'action': 'readscan'
+    }
+    responds = requests.get(url=url, cookies=cookie)
+    print(responds.text)
+
+def method2():
+    import hashpumpy
+    origin_hash = '129c0841cb12ef2e91a78a0676471f03'
+    key_len = 16
+    message = 'flag.txtscan'
+    append = 'read'
+    new_hash, new_message = hashpumpy.hashpump(origin_hash, message, append, key_len)
+    print(new_hash)
+    print(new_message)
+    from urllib.parse import quote
+    print(quote(new_message)[8:])
+
+    import requests
+    url = 'http://13f3662d-d04c-481d-aae0-44fcebb4e36a.node5.buuoj.cn:81/De1ta?param=flag.txt'
+    cookie = {
+        'sign': new_hash,
+        'action': quote(new_message)[8:]
+    }
+    responds = requests.get(url=url, cookies=cookie)
+    print(responds.text)
+```
+
+# 3 MISC
+### []()
