@@ -27,6 +27,12 @@ tags:
 5. [AntSword](https://github.com/AntSwordProject/antSword) [AntSword-Loader](https://github.com/AntSwordProject/AntSword-Loader)
 6. [Gopherus](https://github.com/tarunkant/Gopherus) [Gopherus3](https://github.com/Esonhugh/Gopherus3) Gopher协议
 7. [词频分析](http://quipqiup.com) 词频分析网站
+8. [010Editor](https://www.sweetscape.com/010editor/) [ImHex](https://github.com/WerWolv/ImHex)
+9. [Audacity](https://www.audacityteam.org)  音频工具
+10. [MP3stego](https://www.petitcolas.net/steganography/mp3stego/) 音频数据隐写工具
+11. [ffmpeg](https://ffmpeg.org/)
+12. [wbstego4open](http://www.bailer.at/wbstego/)
+13. [ARCHPR](https://us.elcomsoft.com/archpr.html) [ziperello] windows下压缩包破解工具
 
 # 1 Web
 ## HTTP
@@ -671,4 +677,78 @@ def method2():
 ```
 
 # 3 MISC
-### []()
+### [FILE](http://buuoj.cn/challenges#[%E7%AC%AC%E4%B8%83%E7%AB%A0][7.2.5%20%E6%A1%88%E4%BE%8B%E8%A7%A3%E6%9E%90][NISACTF%202022]huaji%EF%BC%9F)
+JPG文件头`FFD8FFE0`，文件尾`FFD9`。zip文件头`504B0304`。
+
+使用unzip解压失败，说是版本问题？改用`7z x sub.zip -p"ctf_NISA_2022"`才解压成功。
+
+### [Audio](https://buuoj.cn/challenges#[%E7%AC%AC%E4%B8%83%E7%AB%A0][7.3.5%20%E6%A1%88%E4%BE%8B%E8%A7%A3%E6%9E%90][SCTF%202021]in_the_vaporwaves)
+
+
+
+### [Video](https://buuoj.cn/challenges#[RoarCTF2019]%E9%BB%84%E9%87%916%E5%B9%B4)
+视频转换成图像帧
+```sh
+ffmpeg -i attachment.mp4 -qscale:v 1 -qmin 1 -vf "fps=30.0" "./%04d.jpg"
+```
+对每一帧识别二维码，但pyzbar和opencv都只能识别到唯一一帧`0246.jpg`的内容`key3:play`，其它几帧有二维码的都识别失败。直接用手机微信扫码是可以识别成功的，可能换成wechat的`cv2.wechat_qrcode_WeChatQRCode`可能能识别，未再尝试。
+```py
+from pyzbar.pyzbar import decode
+import cv2
+
+def scan_qr_code(frame, draw = False, show = False):
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    decoded_objects = decode(frame)
+    res = []    
+    if len(decoded_objects) <= 0:
+        return res
+    for obj in decoded_objects:
+        res.append(obj.data.decode('utf-8'))
+        print("QR Code Data:", obj.data.decode('utf-8'))
+        if draw:    
+            points = obj.polygon
+            if len(points) == 4:
+                pts = [(point.x, point.y) for point in points]
+                for i in range(4):
+                    cv2.line(frame, pts[i], pts[(i+1) % 4], (0, 255, 0), 3)
+    
+    if show:
+        cv2.imshow("QR Code Scanner", frame)
+        cv2.waitKey(10)
+        cv2.destroyAllWindows()
+
+    return res
+
+def scan_each_frame(video_path):
+    cap = cv2.VideoCapture(video_path)
+    frame_id = 0
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+        res = scan_qr_code(frame)
+
+        if len(res) > 0:
+            print(frame_id, res)
+        frame_id += 1
+ 
+if __name__ == '__main__':
+    scan_each_frame('./attachment.mp4')
+```
+文件后面的数据分析，根据第二部分密码学的内容`base64_dic = r'^[A-Za-z0-9/+=]*$'`判断是base64编码，转换后发现是rar文件，但解压有密码（即上面二维码识别到的内容）
+```py
+import base64
+a = 'UmFyIRoHAQAzkrXlCgEFBgAFAQGAgADh7ek5VQIDPLAABKEAIEvsUpGAAwAIZmxhZy50eHQwAQADDx43HyOdLMGWfCE9WEsBZprAJQoBSVlWkJNS9TP5du2kyJ275JzsNo29BnSZCgMC3h+UFV9p1QEfJkBPPR6MrYwXmsMCMz67DN/k5u1NYw9ga53a83/B/t2G9FkG/IITuR+9gIvr/LEdd1ZRAwUEAA=='
+res = base64.b64decode(a)
+# b'Rar!\x1a\x07\x01\x003\x92\xb5\xe5\n\x01\x05\x06\x00\x05\x01\x01\x80\x80\x00\xe1\xed\xe99U\x02\x03<\xb0\x00\x04\xa1\x00 K\xecR\x91\x80\x03\x00\x08flag.txt0\x01\x00\x03\x0f\x1e7\x1f#\x9d,\xc1\x96|!=XK\x01f\x9a\xc0%\n\x01IYV\x90\x93R\xf53\xf9v\xed\xa4\xc8\x9d\xbb\xe4\x9c\xec6\x8d\xbd\x06t\x99\n\x03\x02\xde\x1f\x94\x15_i\xd5\x01\x1f&@O=\x1e\x8c\xad\x8c\x17\x9a\xc3\x023>\xbb\x0c\xdf\xe4\xe6\xedMc\x0f`k\x9d\xda\xf3\x7f\xc1\xfe\xdd\x86\xf4Y\x06\xfc\x82\x13\xb9\x1f\xbd\x80\x8b\xeb\xfc\xb1\x1dwVQ\x03\x05\x04\x00'
+file = open("res.rar", "wb")
+file.write(res)
+file.close()
+```
+
+### [docx](https://buuoj.cn/challenges#[UTCTF2020]docx)
+docx文件实质上也是一种压缩包文件，可以修改其扩展名为zip并进行解压
+
+### [zips](https://buuoj.cn/challenges#[GUET-CTF2019]zips)
+zip文件头`504B0304`，数据头`504B0102`。
