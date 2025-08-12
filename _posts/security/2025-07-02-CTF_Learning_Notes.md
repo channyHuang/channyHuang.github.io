@@ -28,11 +28,17 @@ tags:
 6. [Gopherus](https://github.com/tarunkant/Gopherus) [Gopherus3](https://github.com/Esonhugh/Gopherus3) Gopher协议
 7. [词频分析](http://quipqiup.com) 词频分析网站
 8. [010Editor](https://www.sweetscape.com/010editor/) [ImHex](https://github.com/WerWolv/ImHex)
-9. [Audacity](https://www.audacityteam.org)  音频工具
+9. [Audacity](https://www.audacityteam.org) [[binary]](https://github.com/audacity/audacity/releases)  音频工具
 10. [MP3stego](https://www.petitcolas.net/steganography/mp3stego/) 音频数据隐写工具
 11. [ffmpeg](https://ffmpeg.org/)
 12. [wbstego4open](http://www.bailer.at/wbstego/)
 13. [ARCHPR](https://us.elcomsoft.com/archpr.html) [ziperello] windows下压缩包破解工具
+14. [Wireshark](https://www.wireshark.org/) [tshark](https://tshark.dev/setup/install/) 流量抓包工具
+15. [UsbKeyboardDataHacker](https://github.com/WangYihang/UsbKeyboardDataHacker)
+16. [diskgenius](https://www.diskgenius.com/download.php)　[ext3grep、extundelete]  磁盘取证分析
+17. [volatility](https://github.com/volatilityfoundation/volatility) 内存取证分析工具
+18. [IDA Pro / OllyDbg]() 逆向
+19. [dnSpy](https://github.com/dnSpy/dnSpy) [pyinstxtractor](https://github.com/countercept/python-exe-unpacker。) [IDAGolangHealper](https://github.com/sibears/IDAGolangHelper) .Net(c#)分析、python分析、go分析
 
 # 1 Web
 ## HTTP
@@ -684,7 +690,7 @@ JPG文件头`FFD8FFE0`，文件尾`FFD9`。zip文件头`504B0304`。
 
 ### [Audio](https://buuoj.cn/challenges#[%E7%AC%AC%E4%B8%83%E7%AB%A0][7.3.5%20%E6%A1%88%E4%BE%8B%E8%A7%A3%E6%9E%90][SCTF%202021]in_the_vaporwaves)
 
-
+用Audacity打开和书上的完全不一样。。。既看不出来左右声道反相也看不出来其它信息，暂时放弃。。。
 
 ### [Video](https://buuoj.cn/challenges#[RoarCTF2019]%E9%BB%84%E9%87%916%E5%B9%B4)
 视频转换成图像帧
@@ -752,3 +758,60 @@ docx文件实质上也是一种压缩包文件，可以修改其扩展名为zip�
 
 ### [zips](https://buuoj.cn/challenges#[GUET-CTF2019]zips)
 zip文件头`504B0304`，数据头`504B0102`。
+
+### [流量分析](https://buuoj.cn/challenges#[INSHack2019]Passthru)
+“分析一下发现了一些可疑流量，GET传入的参数中有个kcahsni参数”？？？　　
+容易证明？同理可证？很明显？显而易见？
+
+### [keyboard](https://buuoj.cn/challenges#[%E7%AC%AC%E4%B9%9D%E7%AB%A0][9.4.3%20%E6%A1%88%E4%BE%8B%E8%A7%A3%E6%9E%90][NISACTF%202022]%E7%A0%B4%E6%8D%9F%E7%9A%84flag)
+```sh
+tshark -r '/home/channy/Downloads/atta.NISACTF_2022flag' -T fields -e usb.capdata > usbdata.txt
+```
+
+```py
+#-*- coding: utf-8 -*-
+
+mappings = {
+    0x04:"A", 0x05:"B", 0x06:"C", 0x07:"D", 0x08:"E", 0x09:"F", 0x0a:"G", 
+    0x0b:"H", 0x0c:"I", 0x0d:"J", 0x0e:"K", 0x0f:"L", 0x10:"M", 0x11:"N", 
+    0x12:"O", 0x13:"P", 0x14:"Q", 0x15:"R", 0x16:"S", 0x17:"T", 0x18:"U", 
+    0x19:"V", 0x1a:"W", 0x1b:"X", 0x1c:"Y", 0x1d:"Z", 0x1e:"1", 0x1f:"@", 
+    0x20:"#", 0x21:"$", 0x22:"%", 0x23:"^", 0x24:"&", 0x25:"*", 0x26:"(", 
+    0x27:")", 0x28:"<RET>", 0x29:"<ESC>", 0x2a:"<DEL>", 0x2b:"\t", 0x2c:"<SPACE>", 
+    0x2d:"_", 0x2e:"+", 0x2f:"{", 0x30:"}", 0x31:"|", 0x32:"<NON>", 0x34:":", 
+    0x35:"<GA>", 0x36:"<", 0x37:">", 0x38:"?", 0x39:"<CAP>", 0x3a:"<F1>", 
+    0x3b:"<F2>", 0x3c:"<F3>", 0x3d:"<F4>", 0x3e:"<F5>", 0x3f:"<F6>", 0x40:"<F7>", 
+    0x41:"<F8>", 0x42:"<F9>", 0x43:"<F10>", 0x44:"<F11>", 0x45:"<F12>"
+}
+
+result = ""
+with open('usbdata.txt', 'r') as f:
+    for line in f.readlines():
+        line = line.strip()
+        # Process formats like "000012000000000" (16 chars)
+        if len(line) == 16:
+            s = int(line[4:6], 16)
+        # Process formats like "00:00:12:00:00:00:00:00" (24 chars)
+        elif len(line) == 24:
+            s = int(line[6:8], 16)
+        else:
+            continue
+        
+        if s != 0:
+            result += mappings.get(s, "<?>")  # Using get() with default for unmapped codes
+
+print(result)
+# UJKONJK<TFVBHYHJIPOKRDCVGRDCVGPOKQWSZTFVBHUJKOWAZXDQASEWSDRPOKXDFVIKLPNJKWSDRRFGYRDCVGUHNMKBHJMYHJI
+```
+
+### [Disk](https://buuoj.cn/challenges#[XMAN2018%E6%8E%92%E4%BD%8D%E8%B5%9B]file)
+```sh
+extundelete attachment.img --restore-all
+```
+
+flag{fugly_cats_need_luv_2}
+
+### [Storage Analyse](https://buuoj.cn/challenges#[%E7%AC%AC%E5%8D%81%E7%AB%A0][10.2.2%20%E6%A1%88%E4%BE%8B%E8%A7%A3%E6%9E%90][%E9%99%87%E5%89%91%E6%9D%AF%202021]wifi)
+
+# 4 Reverse
+后面的基本上都是理论知识没有实战了。
