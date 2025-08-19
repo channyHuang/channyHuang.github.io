@@ -22,7 +22,7 @@ tags:
 使用到的工具：
 1. [BurpSuite](https://portswigger.net/burp) 抓包工具
 2. [GitHacker](https://github.com/WangYihang/GitHacker) 
-3. [dirsearch](https://github.com/maurosoria/dirsearch) 扫描工具
+3. [dirsearch](https://github.com/maurosoria/dirsearch) 扫描工具，多线程有bug不显示全部文件，单线程可用
 4. [PHPStorm](https://www.jetbrains.com/phpstorm/) PHP的IDE
 5. [AntSword](https://github.com/AntSwordProject/antSword) [AntSword-Loader](https://github.com/AntSwordProject/AntSword-Loader)
 6. [Gopherus](https://github.com/tarunkant/Gopherus) [Gopherus3](https://github.com/Esonhugh/Gopherus3) Gopher协议
@@ -194,7 +194,7 @@ Skipped the target due to 429 status code
 
 最终使用命令和结果显示
 ```sh
-$ ./dirsearch.py -u http://16137a97-71f1-40c5-81a0-a51295133c93.node5.buuoj.cn:81 -e , --delay 0.1 -t 1 -i 200,403
+$ ./dirsearch.py -u http://16137a97-71f1-40c5-81a0-a51295133c93.node5.buuoj.cn:81 -e "*" --delay 0.1 -t 1 -i 200,403
 
   _|. _ _  _  _  _ _|_    v0.4.3
  (_||| _) (/_(_|| (_| )
