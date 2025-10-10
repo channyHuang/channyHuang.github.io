@@ -239,7 +239,12 @@ ffmpeg.exe -i "D:/dataset/lab/IMG_0080.MOV" -vcodec libx264 -s 1920x1080 -crf 0 
 ```
 
 ## colmap
+从图像到三维稠密点云
 ### 编译
+最终版本
+* glog: 0.8.0
+* ceres-solver: 2.3.0
+
 1. 版本对应问题
 Ubuntu 20.04使用apt install默认安装的cuda-toolkit 10.1、Eigen 3.3.7和Ceres 1.14.0版本都相对较低。
 
@@ -269,7 +274,22 @@ In file included from /home/channy/Documents/thirdlibs/ceres-solver-2.2.0/intern
   144 |     ScopedMockLog log;
       |                   ^~~
 ```
-glog的LogSink类send接口的参数之一类型由原来的`struct ::tm*`在2021年变成了`LogMessageTime`，而ceres-solver-2.2.0版本还保持着旧参数类型。2025年5月新拉ceres最新的代码，已经没有该文件了。编译报缺少abseil库，abseil可以依赖下面的GTest
+2. glog版本更新问题
+依赖于glog的LogSink类，而glog在2025年归档版本0.8.0中该类的send函数修改了输入参数类型（在2021年该类已变更），由const struct ::tm*变成const LogMessageTime&，需要对应修改colmap中重写该函数的类型
+```c++
+  virtual void send(LogSeverity severity, const char* full_filename,
+                    const char* base_filename, int line,
+                    const struct ::tm* tm_time,
+                    const char* message, size_t message_len) = 0;
+```
+```c++
+ virtual void send(LogSeverity severity, const char* full_filename,
+                    const char* base_filename, int line,
+                    const LogMessageTime& time, const char* message,
+                    size_t message_len) = 0;
+```
+3. ceres-solver版本更新问题
+glog的LogSink类send接口的参数之一类型由原来的`struct ::tm*`在2021年变成了`LogMessageTime`，而ceres-solver-2.2.0版本还保持着旧参数类型。2025年5月新拉ceres-2.3.0最新的代码，已经没有该文件了。编译报缺少abseil库，abseil可以依赖下面的GTest
 ```sh
 CMake Error at CMakeLists.txt:173 (find_package):
   By not providing "Findabsl.cmake" in CMAKE_MODULE_PATH this project has
@@ -282,8 +302,19 @@ CMake Error at /snap/cmake/1463/share/cmake-4.0/Modules/FindPackageHandleStandar
   GTEST_MAIN_LIBRARY) (Required is at least version "1.14.0")
 ```
 使用apt install libgtest-dev 安装的版本是1.10.0
+4. 
+```sh
+CMake Error at /usr/share/cmake-3.16/Modules/CMakeFindDependencyMacro.cmake:47 (find_package):
+  By not providing "FindCUDAToolkit.cmake" in CMAKE_MODULE_PATH this project
+  has asked CMake to find a package configuration file provided by
+  "CUDAToolkit", but CMake did not find one.
 
+  Could not find a package configuration file provided by "CUDAToolkit"
+  (requested version 12.8.93) with any of the following names:
 
+    CUDAToolkitConfig.cmake
+    cudatoolkit-config.cmake
+```
 ### 使用
 ```sh
 # 特征点检测，SIFT特征
@@ -368,6 +399,28 @@ IncrementalMapperController::Run
 ```
 
 ## OpenMVS
+位姿－>网格
+### 编译
+* nanoflann
+* libjxl
+```sh
+# Install dependencies
+sudo apt install git cmake build-essential pkg-config
+
+# Clone and build libjxl
+git clone https://github.com/libjxl/libjxl.git
+cd libjxl
+git submodule update --init --recursive
+```
+```sh
+openMVS/libs/Common/Config.h:235:44: error: missing binary operator before token "("
+  235 | #if defined(__has_builtin) && __has_builtin(__builtin_debugtrap)
+      |                                            ^
+make[2]: *** [libs/Common/CMakeFiles/Common.dir/build.make:80: libs/Common/CMakeFiles/Common.dir/cmake_pch.hxx.gch] Error 1
+make[1]: *** [CMakeFiles/Makefile2:525: libs/Common/CMakeFiles/Common.dir/all] Error 2
+make: *** [Makefile:146: all] Error 2
+```
+### 使用
 ```sh
 # 把colmap计算得到的摄像机参数转换成mvs的格式，有bug为-i不能直接接./，曲线运行-i ./../cur_folder/
 InterfaceCOLMAP.exe  -w D:\dataset\lab\Parking -i D:\dataset\lab\Parking

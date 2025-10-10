@@ -232,6 +232,18 @@ rviz::RenderSystem: error creating render window: OGRE EXCEPTION(3:RenderingAPIE
 Segmentation fault (core dumped)
 ```
 
+```sh
+Could not contact ROS master at [http://localhost:11311], retrying...
+```
+
+save image to folder
+```sh
+# bash1
+rosrun image_view extract_images _sec_per_frame:=1 image:=/cam0/image_raw
+# bash2
+rosbag play dataset-room1_512_16.bag
+```
+
 3. GLFW
 ```sh
 No protocol specified
