@@ -17,6 +17,26 @@ tags:
 # 刷 [BUUCTF](https://buuoj.cn/challenges)
 使用到的工具：
 1. [MD5](https://www.cmd5.com/)
+2. [Rabbit](https://www.sojson.com/encrypt_rabbit.html)
+
+# Linux(Ubuntu)下下载的文件乱码问题（Crypto中特别多）
+1. 查看文件编码
+```sh
+file -i xxx.txt
+
+text/plain; charset=iso-8859-1
+```
+iso-8859-1表示编码未知，改用enca工具查看
+```sh
+sudo apt install enca
+enca -L zh_CN xxx.txt
+
+Simplified Chinese National Standard; GB2312
+```
+说明编码是GB2312。使用iconv工具转换，即可以正常看到文件内容，可以开心地在Linux上刷题了。
+```sh
+iconv -f GBK -t UTF-8 乱码文件.txt -o 正常文件_utf8.txt
+```
 
 ## Basic
 
@@ -366,6 +386,7 @@ Hello, world
 
 ## Crypto
 ### [1 base64](https://buuoj.cn/challenges#%E4%B8%80%E7%9C%BC%E5%B0%B1%E8%A7%A3%E5%AF%86)
+使用BurpSuite工具中的Decode直接解码即可
 ```sh
 ZmxhZ3tUSEVfRkxBR19PRl9USElTX1NUUklOR30=
 ```
@@ -398,6 +419,7 @@ if __name__ == '__main__':
     trysimple()
 ```
 ### [3 URL](https://buuoj.cn/challenges#Url%E7%BC%96%E7%A0%81)
+使用BurpSuite工具中的Decode直接解码即可
 ```
 %66%6c%61%67%7b%61%6e%64%20%31%3d%31%7d
 ```
@@ -435,6 +457,12 @@ print(result)
 A: .-    B: -...    C: -.-.    D: -..    E: .    F: ..-.    G: --.    H: ....    I: ..    J: .---    K: -.-    L: .-..    M: --    N: -.    O: ---    P: .--.    Q: --.-    R: .-.    S: ...    T: -    U: ..-    V: ...-    W: .--    X: -..-    Y: -.--    Z: --..
 ```
 ### [6 password](https://buuoj.cn/challenges#password)
+```sh
+姓名：张三
+生日：19900315
+key格式为key{xxxxxxxxxx}
+```
+flag{zs19900315} 好无聊。。。
 ### [7 Modified Caesar Cipher 变异凯撒](https://buuoj.cn/challenges#%E5%8F%98%E5%BC%82%E5%87%AF%E6%92%92)
 Caesar: new = (old + offset) % mod  标准凯撒通常只处理字母  
 Modifier Caesar: 每个字母使用不同的offset或不同的原表等...
@@ -481,3 +509,177 @@ for idx, c in enumerate(encoded_text):
 print(pre + last)
 ```
 ### [10 Rabbit](https://buuoj.cn/challenges#Rabbit)
+使用在线解密网站即可。。。很好奇网站使用的算法是怎么样的为什么那么快。。。
+### [11 RSA](https://buuoj.cn/challenges#RSA)
+扩展欧几里得算法，对于任意整数 a 和 b，存在整数 x 和 y，使得 $$ a * x + b * y = gcd(a, b)$$ 
+已知p,q,e求d, d即为flag。则 $n = p * q$, $\phi(n) = (p - 1) * (q - 1)$, 公钥$(e, \phi(n))$有 $gcd(\phi(n), e) = 1$, 私钥(d, n)有 $(e * d) mod \phi = 1$
+```py
+p = 473398607161
+q = 4511491
+e = 17
+
+n = p * q
+phi = (p - 1) * (q - 1)
+print(f"e = {e}, n = {n}, phi = {phi}")
+
+# (e * d) mod phi = 1
+# ax + by = gcd(a, b)
+# x_n = 0, y_n = 1; x_i = y_{i+1}, y_i = x_{i + 1} - q_i * y_{i + 1}
+def calcaxby(a, b):
+    if a < b:
+        tmp = a
+        a = b
+        b = tmp
+    ql = []
+    ql.append(a // b)
+    r = a % b
+    while r != 0:
+        a = b
+        b = r
+        ql.append(a // b)
+        r = a % b
+
+    x = 0
+    y = 1
+    idx = len(ql) - 2
+    while idx >= 0:
+        xn = y
+        yn = x - ql[idx] * y
+        x = xn
+        y = yn
+        idx -= 1
+    return x, y
+
+_, d = calcaxby(e, phi)
+print(f"d = {d}")
+```
+### [12 Missing MD5](https://buuoj.cn/challenges#%E4%B8%A2%E5%A4%B1%E7%9A%84MD5)
+把python2的print res改成python3的print(des)即可运行，秒级时间出结果，得到的md5结果即为flag。一开始以为原文是，结果提交发现incorrect。没明白考点在哪。。。
+### [13 Alice and Bob](https://buuoj.cn/challenges#Alice%E4%B8%8EBob)
+```sh
+密码学历史中，有两位知名的杰出人物，Alice和Bob。他们的爱情经过置换和轮加密也难以混淆，即使是没有身份认证也可以知根知底。就像在数学王国中的素数一样，孤傲又热情。下面是一个大整数:98554799767,请分解为两个素数，分解后，小的放前面，大的放后面，合成一个新的数字，进行md5的32位小写哈希，提交答案。 注意：得到的 flag 请包上 flag{} 提交
+```
+```py
+import math
+import hashlib
+n = 98554799767
+
+def isprime(x):
+    if x == 2:
+        return True
+    if (x & 1) == 0:
+        return False
+    maxn = (int)(math.sqrt(x)) + 1
+    for i in range(3, maxn, 2):
+        if (x % i == 0):
+            return False
+    return True
+
+maxn = (int)(math.sqrt(n)) + 1
+num = 0
+for i in range(3, maxn, 2):
+    if isprime(i):
+        q = n // i
+        r = n % i
+        if r != 0:
+            continue
+        if isprime(q):
+            print(f"n {n} = i {i} * q {q}")
+            print(f"{i}{q}")
+            num = (str(i) + str(q))
+            break
+
+# num = 101999966233
+res = hashlib.md5(num.encode()).hexdigest()
+print(res)
+```
+### [14 ](https://buuoj.cn/challenges#%E5%A4%A7%E5%B8%9D%E7%9A%84%E5%AF%86%E7%A0%81%E6%AD%A6%E5%99%A8)
+```sh
+题目大意：
+以下密文被解开后可以获得一个有意义的单词：FRPHEVGLL
+用这个相同的加密向量加密ComeChina
+```
+标准的恺撤加密
+```py
+def calculateOffset():
+    text = 'FRPHEVGL'
+    for offset in range(1, 26):
+        ntext = ''
+        for c in text:
+            nc = ord(c) + offset
+            if nc > ord('Z'):
+                nc -= 26
+            if nc < ord('A'):
+                nc += 26
+            
+            ntext += chr(nc)
+        print(f"offset = {offset}, ntext = {ntext.lower()}")
+
+calculateOffset()
+# offset = 13, ntext = security
+
+def calculateEncode():
+    plaintext = 'ComeChina'
+    encodetext = ''
+    offset = 13
+    for c in plaintext:
+        nc = ord(c) + offset
+        if ord(c) >= ord('A') and ord(c) <= ord('Z'):
+            if nc > ord('Z'):
+                nc -= 26
+            if nc < ord('A'):
+                nc += 26
+        else:
+            if nc > ord('z'):
+                nc -= 26
+            if nc < ord('a'):
+                nc += 26
+        encodetext += chr(nc)
+    print(encodetext)
+
+calculateEncode()
+```
+### [15 rsarsa](https://buuoj.cn/challenges#rsarsa)
+最终解得的明文就是flag，不用转字符不用转16进制
+```py
+p =  9648423029010515676590551740010426534945737639235739800643989352039852507298491399561035009163427050370107570733633350911691280297777160200625281665378483
+q =  11874843837980297032092405848653656852760910154543380907650040190704283358909208578251063047732443992230647903887510065547947313543299303261986053486569407
+e =  65537
+c =  83208298995174604174773590298203639360540024871256126892889661345742403314929861939100492666605647316646576486526217457006376842280869728581726746401583705899941768214138742259689334840735633553053887641847651173776251820293087212885670180367406807406765923638973161375817392737747832762751690104423869019034
+
+def extended_gcd(a, b):
+    if b == 0:
+        return (a, 1, 0)
+    else:
+        gcd, x, y = extended_gcd(b, a % b)
+        return (gcd, y, x - (a // b) * y)
+
+def modinv(a, m):
+    """计算模逆元"""
+    gcd, x, y = extended_gcd(a, m)
+    if gcd != 1:
+        return None  # 逆元不存在
+    else:
+        return x % m
+
+def calc_keys(p, q, e):
+    n = p * q
+    phi = (p - 1) * (q - 1)
+    d = modinv(e, phi)
+    return ((e, n), (d, n))
+
+def decrypt(ciphertext, private_key):
+    d, n = private_key
+    print(ciphertext)
+    message = pow(ciphertext, d, n)
+    return message
+
+if __name__ == '__main__':
+    public_key, private_key = calc_keys(p, q, e)
+    message = decrypt(c, private_key)
+    print(message)
+```
+### [16 Windows System Password](https://buuoj.cn/challenges#Windows%E7%B3%BB%E7%BB%9F%E5%AF%86%E7%A0%81)
+```sh
+
+```
