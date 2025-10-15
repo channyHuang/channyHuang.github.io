@@ -18,6 +18,7 @@ tags:
 使用到的工具：
 1. [MD5](https://www.cmd5.com/)
 2. [Rabbit](https://www.sojson.com/encrypt_rabbit.html)
+3. [中文电码](http://code.mcdvisa.com/)
 
 # Linux(Ubuntu)下下载的文件乱码问题（Crypto中特别多）
 1. 查看文件编码
@@ -680,6 +681,129 @@ if __name__ == '__main__':
     print(message)
 ```
 ### [16 Windows System Password](https://buuoj.cn/challenges#Windows%E7%B3%BB%E7%BB%9F%E5%AF%86%E7%A0%81)
-```sh
+使用md5解密网站可以解得`good-luck`。看到网站上有说用数据库，感觉可能使用的是打表法？否则难以解释如此快的解密速度？  
+解密原理：
+```py
+import hashlib
+from Crypto.Cipher import DES
+import binascii
+'''
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+ctf:1002:06af9108f2e1fecf144e2e8adef09efd:a7fcb22a88038f35a8f39d503e7f0062:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+SUPPORT_388945a0:1001:aad3b435b51404eeaad3b435b51404ee:bef14eee40dffbc345eeb3f58e290d56:::
+'''
+def lm_hash(password = ""):
+    # Step 1: Convert to uppercase
+    password = password.upper()
+    
+    # Step 2: Pad to 14 bytes with null bytes
+    password = password.ljust(14, '\0')[:14]
+    
+    # Step 3: Split into two 7-byte halves
+    first_half = password[:7]
+    second_half = password[7:]
+    
+    # Step 4: Convert each half to DES key
+    def make_des_key(seven_bytes):
+        # Add parity bits to create 8-byte DES key
+        key = []
+        for byte in seven_bytes.encode('ascii'):
+            key.append(byte)
+            parity = 0
+            for i in range(7):
+                if byte & (1 << i):
+                    parity ^= 1
+            key[-1] = (key[-1] & 0xFE) | parity
+        while len(key) < 8:
+            key.append(0)
+        return bytes(key[:8])
+    
+    key1 = make_des_key(first_half)
+    key2 = make_des_key(second_half)
+    
+    # Step 5: DES encrypt magic string
+    magic_string = b'KGS!@#$%'
+    
+    cipher1 = DES.new(key1, DES.MODE_ECB)
+    encrypted1 = cipher1.encrypt(magic_string)
+    
+    cipher2 = DES.new(key2, DES.MODE_ECB)
+    encrypted2 = cipher2.encrypt(magic_string)
+    
+    # Step 6: Concatenate results
+    lm_hash = encrypted1 + encrypted2
+    
+    return binascii.hexlify(lm_hash).decode()
 
+def ntlm_hash(password = ""):
+    ntlm_hash = hashlib.new('md4', password.encode('utf-16le')).hexdigest()
+    return ntlm_hash
+
+# Guest password is empty
+print(lm_hash(password=""), ntlm_hash(password=""))
+```
+### [17 Information](https://buuoj.cn/challenges#%E4%BF%A1%E6%81%AF%E5%8C%96%E6%97%B6%E4%BB%A3%E7%9A%84%E6%AD%A5%E4%BC%90)
+试过多种编码没解出，使用[中文电码](http://code.mcdvisa.com/)网站在线查询可得"计算机要从娃娃抓起"。。。
+```py
+encodetext = 606046152623600817831216121621196386
+# not md5, cmd5 web not found
+# hex 0x74b861dd729887f92889fba8f32e62
+hextext = hex(encodetext)
+print(hextext)
+
+hextext = "74b861dd729887f92889fba8f32e62"
+text_bytes = bytes.fromhex(hextext)
+text_origin = text_bytes.decode('hz-gb-2312')
+print(text_origin)
+```
+中文电码（Chinese Telegraph Code），也称为中文电报码或标准电码，是一种将汉字转换为数字代码的系统，主要用于电报通信。每个汉字对应一个4位数字代码（0000-9999）中国国家标准 GB 8565.2-88
+### [18 Caesar](https://buuoj.cn/challenges#%E5%87%AF%E6%92%92%EF%BC%9F%E6%9B%BF%E6%8D%A2%EF%BC%9F%E5%91%B5%E5%91%B5!)
+简单分析了一下发现offset没有什么规律，使用[词频分析](http://quipqiup.com)网站。。。
+```py
+encodetext = "MTHJ{CUBCGXGUGXWREXIPOYAOEYFIGXWRXCHTKHFCOHCFDUCGTXZOHIXOEOWMEHZO}"
+
+print(ord('M') - ord('f'))
+print(ord('T') - ord('l'))
+print(ord('H') - ord('a'))
+print(ord('J') - ord('g'))
+# -25 -24 -25 -29
+
+# 65 90 97 122
+print(f"{ord('A')} {ord('Z')} {ord('a')} {ord('z')}")
+
+plaintext = ""
+offset = 24
+index = 0
+for c in encodetext:
+    if c > 'Z' or c < 'A':
+        plaintext += c
+        continue
+    if index & 1 == 0:
+        nc = ord(c) + 25
+        if nc < ord('a'):
+            nc += 26
+        if nc > ord('z'):
+            nc -= 26
+        plaintext += chr(nc)
+    else:
+        nc = ord(c) + offset
+        while nc < ord('a'):
+            nc += 26
+        while nc > ord('z'):
+            nc -= 26
+        plaintext += chr(nc)
+        offset += 5
+    index += 1
+print(plaintext)
+```
+### [19 pig](https://buuoj.cn/challenges#%E8%90%8C%E8%90%8C%E5%93%92%E7%9A%84%E5%85%AB%E6%88%92)
+unzip解压失败，查看文件头为Rar!...把后缀修改成.rar后解压得到图像。打开图像最下方有密文。   
+使用`apt install bless`的bless打开图像，头尾都正常，未发现其它。也未查到密文中的字符是什么字符。把它们替换成字母“abcdebcfghaideejcie”也解码失败。  
+
+猪圈密码（共济会密码）将 26 个英文字母排列在一个特定的网格中，然后用符号所在位置的“形状”或“点”来代表对应的字母。
+![猪圈密码](../../images/security/zhujuan.png)
+### [20 ](https://buuoj.cn/challenges#%E6%9D%83%E9%99%90%E8%8E%B7%E5%BE%97%E7%AC%AC%E4%B8%80%E6%AD%A5)
+```s
+Administrator:500:806EDC27AA52E314AAD3B435B51404EE:F4AD50F57683D4260DFD48AA351A17A8:::
 ```
