@@ -16,7 +16,7 @@ tags:
 
 # 刷 [BUUCTF](https://buuoj.cn/challenges)
 使用到的工具：
-1. [MD5](https://www.cmd5.com/)
+1. [MD5](https://www.cmd5.com/) 部分付费
 2. [Rabbit](https://www.sojson.com/encrypt_rabbit.html)
 3. [中文电码](http://code.mcdvisa.com/)
 
@@ -807,3 +807,139 @@ unzip解压失败，查看文件头为Rar!...把后缀修改成.rar后解压得�
 ```s
 Administrator:500:806EDC27AA52E314AAD3B435B51404EE:F4AD50F57683D4260DFD48AA351A17A8:::
 ```
+发现[MD5](https://www.cmd5.com/)查询网站上明确写明了通过穷举建立的数据库。。。
+```py
+# database.py
+import threading
+import sqlite3
+
+class DatabaseManager:
+    _instance_lock = threading.Lock()
+
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(DatabaseManager, "_instance"):
+            with DatabaseManager._instance_lock:
+                if not hasattr(DatabaseManager, "_instance"):
+                    DatabaseManager._instance = object.__new__(cls)
+        return DatabaseManager._instance
+
+    def __init__(self, sDBPath = "md5.db"):
+        self.sDBPath = sDBPath
+        self.lTables = []
+        self.bConnect = False
+        self.db = None
+        self.sTableName = "table_md5"
+
+    def connect(self):
+        if self.bConnect == True:
+            return
+        self.db = sqlite3.connect(self.sDBPath)
+        self.bConnect = True
+        self.cursor = self.db.cursor()
+
+    def disconnect(self):
+        if self.bConnect == False:
+            return
+        self.db.close() 
+        self.bConnect = False
+
+    def createTable(self, sTableName = "table_md5", lColumns = {"md5": "VARCHAR(80) PRIMARY KEY", "plain": "VARCHAR(50) NOT NULL"}):
+        if self.bConnect == False:
+            self.connect()
+
+        self.deleteTable(sTableName)
+
+        columns_def = ", ".join([f"{col_name} {data_type}" 
+                                   for col_name, data_type in lColumns.items()])
+        create_sql = f"CREATE TABLE IF NOT EXISTS {sTableName} ({columns_def})"
+        self.execute(create_sql)
+        
+    def deleteTable(self, sTableName = "table_md5"):
+        if self.bConnect == False:
+            self.connect()
+
+        self.cursor.execute(f"DROP TABLE IF EXISTS {sTableName}") 
+
+    def insertTable(self, sTableName = "table_md5", lData = {"md5": "", "plain": ""}):
+        if self.bConnect == False:
+            self.connect()
+
+        columns = ", ".join(lData.keys())
+        values = ', '.join([f"'{value}'" for value in lData.values()])
+        insert_sql = f"INSERT INTO {sTableName} ({columns}) VALUES ({values})"
+            
+        self.execute(insert_sql)
+
+    def commit(self):
+        self.db.commit()
+
+    def search(self, sTableName = "table_md5", lCondition = {"md5": "F4AD50F57683D4260DFD48AA351A17A8"}):
+        if self.bConnect == False:
+            self.connect()
+
+        search_cond = "".join([f"{col_name} = '{col_value}'" for col_name, col_value in lCondition.items()])
+        search_sql = f"SELECT plain FROM {sTableName} WHERE {search_cond}"
+        return self.execute(search_sql)
+        
+    def execute(self, execute_sql):
+        if self.bConnect == False:
+            self.connect()
+
+        print(f"execute {execute_sql}")
+        try:
+            self.cursor.execute(execute_sql)
+            result = self.cursor.fetchall()
+            return result
+        except sqlite3.Error as e:
+            print(f"Exception {e}")
+        return None
+    
+DBManager = DatabaseManager()
+```
+```py
+#ManageMd5DB.py
+import hashlib
+import string
+import itertools
+
+from database import DBManager
+
+def md5_hash(text = ""):
+    text_md5 = hashlib.md5(text.encode()).hexdigest().lower()
+    return text_md5
+
+def ntlm_hash(password = ""):
+    ntlm_hash = hashlib.new('md4', password.encode('utf-16le')).hexdigest().lower()
+    return ntlm_hash
+
+def createDB(minlen = 1, maxlen = 8):
+    DBManager.createTable()
+
+    # charset = string.printable
+    # charset = string.ascii_letters + string.digits + string.punctuation
+    charset = string.digits
+    for curlen in range(minlen, maxlen):
+        print(f"curlen = {curlen}")
+        for text in itertools.product(charset, repeat=curlen):
+            text = ''.join(text)
+            text_md5 = ntlm_hash(text).lower()
+
+            DBManager.insertTable(sTableName="table_md5", lData={"md5": text_md5, "plain": text})
+    DBManager.commit()
+    DBManager.disconnect()
+
+def searchDB():
+    text = "4"
+    text_md5 = ntlm_hash(text).lower()
+    result = DBManager.search(sTableName="table_md5", lCondition={"md5": text_md5})
+    print(result)
+
+    text_md5 = 'F4AD50F57683D4260DFD48AA351A17A8'.lower()
+    result = DBManager.search(sTableName="table_md5", lCondition={"md5": text_md5})
+    print(result)
+
+if __name__ == '__main__':
+    createDB()
+    searchDB()
+```
+### [21 RSA1](https://buuoj.cn/challenges#RSA1)
