@@ -943,3 +943,129 @@ if __name__ == '__main__':
     searchDB()
 ```
 ### [21 RSA1](https://buuoj.cn/challenges#RSA1)
+(p, q, dp, dq, c) -> m
+```py
+p = 8637633767257008567099653486541091171320491509433615447539162437911244175885667806398411790524083553445158113502227745206205327690939504032994699902053229 
+q = 12640674973996472769176047937170883420927050821480010581593137135372473880595613737337630629752577346147039284030082593490776630572584959954205336880228469 
+dp = 6500795702216834621109042351193261530650043841056252930930949663358625016881832840728066026150264693076109354874099841380454881716097778307268116910582929 
+dq = 783472263673553449019532580386470672380574033551303889137911760438881683674556098098256795673512201963002175438762767516968043599582527539160811120550041 
+c = 24722305403887382073567316467649080662631552905960229399079107995602154418176056335800638887527614164073530437657085079676157350205351945222989351316076486573599576041978339872265925062764318536089007310270278526159678937431903862892400747915525118983959970607934142974736675784325993445942031372107342103852
+
+def rsa_crt_decrypt(p, q, dp, dq, c):
+    """
+    RSA decryption using Chinese Remainder Theorem (CRT) optimization.
+    
+    Parameters:
+    p, q: prime factors of n
+    dp: d mod (p-1)
+    dq: d mod (q-1)
+    c: ciphertext
+    
+    Returns:
+    m: decrypted message
+    """
+    try:
+        # qinv = q^(-1) mod p
+        qinv = pow(q, -1, p)
+        # mp = c^dp mod p
+        mp = pow(c, dp, p)
+        # mq = c^dq mod q  
+        mq = pow(c, dq, q)
+        # h = qinv * (m1 - m2) mod p
+        h = (qinv * (mp - mq)) % p
+        # m = m2 + h * q
+        m = mq + h * q
+        return m
+    except Exception as e:
+        print(f"Error during decryption: {e}")
+        return None
+
+if __name__ == "__main__":
+    # print(f"Ciphertext: {c}")
+    message = rsa_crt_decrypt(p, q, dp, dq, c)
+    message_bytes = message.to_bytes((message.bit_length() + 7) // 8, 'big').decode()
+    print(message_bytes)
+```
+### [22 Classical cipher](https://buuoj.cn/challenges#%E4%BC%A0%E7%BB%9F%E7%9F%A5%E8%AF%86+%E5%8F%A4%E5%85%B8%E5%AF%86%E7%A0%81)
+```py
+cipher = '辛卯，癸巳，丙戌，辛未，庚辰，癸酉，己卯，癸巳'
+
+def xindex(c, x = '甲乙丙丁戊己庚辛壬癸'):
+    for i, xx in enumerate(x):
+        if c == xx:
+            return i
+    return -1
+        
+def yindex(c, y = '子丑寅卯辰巳午未申酉戌亥'):
+    for i, yy in enumerate(y):
+        if c == yy:
+            return i
+    return -1
+
+words = cipher.split('，')
+nums = []
+for w in words:
+    xi = xindex(w[0])
+    yi = yindex(w[1])
+    st = (yi - xi) % 12
+    offset = 0
+    if st != 0:
+        offset = 10 * (6 - st / 2)
+    num = offset + xi + 1
+    nums.append((int)(num + 60))
+print(nums)
+
+res = ''
+for num in nums:
+    c = chr(num) 
+    res += c
+print(res)
+# XZSDMFLZ
+
+def barrier(cipher = 'XZSDMFLZ'):
+    lens = len(cipher)
+    for key in range(2, lens // 2 + 1):
+        res_bar = ''
+        for row in range(key):
+            res_row = ''
+            idx = row
+            while idx < lens:
+                res_row += cipher[idx]
+                idx += key
+            res_bar += res_row
+        print('barrier ', key, res_bar)
+        caesar(res_bar)
+
+# import itertools
+# def iter(cipher = 'XZSDMFLZ'):
+#     charset = cipher
+#     for text in itertools.permutations(charset, len(cipher)):
+#         print('iter', text)
+#         caesar(text)
+
+def caesar(cipher = 'XZSDMFLZ'):
+    for key in range(-26, 26, 1):
+        res = ''
+        for c in cipher:
+            ncord = ord(c) + key
+            if ncord > ord('Z'):
+                ncord -= 26
+            if ncord < ord('A'):
+                ncord += 26
+            nc = chr(ncord) 
+            res += nc
+        print(key, res.lower())
+
+# iter(res)
+barrier(res)
+# SHUANGYU
+```
+### [23 ](https://buuoj.cn/challenges#%E4%B8%96%E4%B8%8A%E6%97%A0%E9%9A%BE%E4%BA%8B)
+```sh
+VIZZB IFIUOJBWO NVXAP OBC XZZ UKHVN IFIUOJBWO HB XVIXW XAW VXFI X QIXN VBD KQ IFIUOJBWO WBKAH NBWXO VBD XJBCN NKG QLKEIU DI XUI VIUI DKNV QNCWIANQ XN DXPIMKIZW VKHV QEVBBZ KA XUZKAHNBA FKUHKAKX XAW DI VXFI HBN QNCWIANQ NCAKAH KA MUBG XZZ XEUBQQ XGIUKEX MUBG PKAWIUHXUNIA NVUBCHV 12NV HUXWI XAW DI XUI SCQN QB HZXW NVXN XZZ EBCZW SBKA CQ NBWXO XAW DI DXAN NB NVXAP DXPIMKIZW MBU JIKAH QCEV XA BCNQNXAWKAH VBQN HKFI OBCUQIZFIQ X JKH UBCAW BM XLLZXCQI XAW NVI PIO KQ 640I11012805M211J0XJ24MM02X1IW09
+
+and the key is 640e11012805f211b0ab24ff02a1ed09
+```
+```py
+cipher = '640e11012805f211b0ab24ff02a1ed09'
+```
