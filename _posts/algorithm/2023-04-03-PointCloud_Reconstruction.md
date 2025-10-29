@@ -412,6 +412,11 @@ git clone https://github.com/libjxl/libjxl.git
 cd libjxl
 git submodule update --init --recursive
 ```
+* 设置vcg路径
+```CMakeLists.txt
+set(VCG_DIR "/home/channy/Documents/thirdlibs/vcglib")
+```
+* 
 ```sh
 openMVS/libs/Common/Config.h:235:44: error: missing binary operator before token "("
   235 | #if defined(__has_builtin) && __has_builtin(__builtin_debugtrap)
@@ -420,6 +425,24 @@ make[2]: *** [libs/Common/CMakeFiles/Common.dir/build.make:80: libs/Common/CMake
 make[1]: *** [CMakeFiles/Makefile2:525: libs/Common/CMakeFiles/Common.dir/all] Error 2
 make: *** [Makefile:146: all] Error 2
 ```
+* boost link error　
+boost编译默认不开启zstd和bzip2导致编译一直报错boost链接库。  
+拉了最新的CGAL代码，生成的cmake要求boost最低1.74.0，但ubuntu20.04使用apt安装的是1.71.0，于是源码编译boost。
+```sh
+/lib/libMVS.a(Scene.cpp.o): in function `boost::detail::sp_counted_impl_p<boost::iostreams::symmetric_filter<boost::iostreams::detail::zstd_decompressor_impl<std::allocator<char> >, std::allocator<char> >::impl>::dispose()':
+Scene.cpp:(.text._ZN5boost6detail17sp_counted_impl_pINS_9iostreams16symmetric_filterINS2_6detail22zstd_decompressor_implISaIcEEES6_E4implEE7disposeEv[_ZN5boost6detail17sp_counted_impl_pINS_9iostreams16symmetric_filterINS2_6detail22zstd_decompressor_implISaIcEEES6_E4implEE7disposeEv]+0x24): undefined reference to `boost::iostreams::detail::zstd_base::reset(bool, bool)'
+```
+OpenMVS使用到了boost的iostreams，源码编译就需要手动打开zstd和bzip2。
+```sh
+apt install libzstd-dev libbz2-dev
+```
+如果前面编译过boost没有打开，可以先清除生成文件如b2,bootstrap.log,bin.v2等。  
+运行bash时把需要用到的都加到--with-libraries中。然后运行b2时配置zstd和bzip2的路径，一般apt安装的默认应该在/usr/下，也有可能有例外的。
+```sh
+sh ./bootstrap.sh --with-libraries=iostreams,program_options,serialization,system,throw-exception
+./b2 --with-iostreams --with-program_options -s NO_ZSTD=0 -s ZSTD_INCLUDE=/usr/include/zstd -s ZSTD_LIBPATH=/usr/lib/x86_64-linux-gnu -s NO_BZIP2=0 -s BZIP2_include=/usr/include -s BZIP2_LIBPATH=/usr/lib/x86_64-linux-gnu
+```
+
 ### 使用
 ```sh
 # 把colmap计算得到的摄像机参数转换成mvs的格式，有bug为-i不能直接接./，曲线运行-i ./../cur_folder/
