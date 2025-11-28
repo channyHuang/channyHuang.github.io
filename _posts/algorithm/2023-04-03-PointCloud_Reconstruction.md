@@ -328,6 +328,7 @@ COLMAP.bat feature_extractor --ImageReader.camera_model PINHOLE --ImageReader.ca
 # * spatial_matcher
 # * vocab_tree_matcher
 COLMAP.bat sequential_matcher --SiftMatching.guided_matching=true --database_path colmap.db
+COLMAP.bat sequential_matcher --database_path colmap.db
 
 # 计算机摄像机参数进行稀疏重建
 COLMAP.bat mapper --database_path colmap.db --image_path "./images" --output_path ./colmap_sparse
@@ -346,6 +347,10 @@ COLMAP.bat patch_match_stereo --workspace_path ./dense --workspace_format COLMAP
 COLMAP.bat stereo_fusion --workspace_path ./dense --workspace_format COLMAP --input_type geometric --output_path ./dense/result.ply
 # 输出点云模型
 # colmap的mesh功能相对还有很大的改进空间
+
+// 自动重建计算摄像机参数
+./colmap automatic_reconstructor --image_path /home/channy/Documents/datasets/dataset_reconstruct/20250107_ZC/Capture --workspace_path /home/channy/Documents/datasets/dataset_reconstruct/20250107_ZC
+
 ```
 
 ### 基本步骤和原理
@@ -538,6 +543,82 @@ PatchMatch
 TOF, Structured Light
 
 Scene::ReconstructMesh Delaunay三角化，计算每条边的权重，graph-cut分割提取网格。
+
+### 异常记录
+2025年11月下旬新拉的develop分支的代码
+
+1. TextureMesh.cpp 
+```c++
+int main(int argc, LPCTSTR*argv)
+......
+	if (scene.mesh.IsEmpty()) {
+		VERBOSE("error: empty initial mesh");
+		return EXIT_FAILURE;
+	}
+	const String baseFileName(MAKE_PATH_SAFE(Util::getFileFullName(OPT::strOutputFileName)));
+	if (OPT::nOrthoMapResolution && !scene.mesh.HasTexture()) {
+		// the input mesh is already textured and an orthographic projection was requested
+		goto ProjectOrtho;
+	}
+......
+```
+其中`if (OPT::nOrthoMapResolution && !scene.mesh.HasTexture()) {`为什么是`!scene.mesh.HasTexture()`?这是没有纹理才进if里面吗？难道不是有纹理才进if里面？
+
+2. Mesh.cpp 
+```c++
+void Mesh::ProjectOrthoTopDown(unsigned resolution, Image8U3& image, Image8U& mask, Point3& center) const
+......
+  Camera camera;
+	camera.R.SetFromDirUp(Vec3(Point3(0,0,-1)), Vec3(Point3(0,1,0)));
+	camera.C = center;
+	camera.C.z += size.z;
+	camera.K = KMatrix::IDENTITY;
+  if (size.x > size.y) {
+		image.create(CEIL2INT(size.y*(resolution-1)/size.x), (int)resolution);
+		camera.K(0,0) = camera.K(1,1) = (resolution-1)/size.x;
+	} else {
+		image.create((int)resolution, CEIL2INT(size.x*(resolution-1)/size.y));
+		camera.K(0,0) = camera.K(1,1) = (resolution-1)/size.y;
+	}
+	camera.K(0,2) = (REAL)(image.width()-1)/2;
+	camera.K(1,2) = (REAL)(image.height()-1)/2;
+	// project mesh
+	DepthMap depthMap(image.size());
+		ProjectOrtho(camera, depthMap, image);
+......
+
+```
+其中`SetFromDirUp`写死了viewDir是z轴负方向，对于无人机拍摄的图像集重建来说viewDir应该是z轴正向，直接不改代码投影不出来想要的结果。
+
+其中`camera.C.z += size.z;`是把相机拉近到模型[zmin, zmax]的中点了？容易投影不全？
+
+其中`ProjectOrtho(camera, depthMap, image);`
+```c++
+void Mesh::ProjectOrtho(const Camera& camera, DepthMap& depthMap, Image8U3& image) const
+......
+		void Raster(const ImageRef& pt, const Triangle& t, const Point3f& bary) {
+			const Depth z(ComputeDepth(t, bary));
+			ASSERT(z > Depth(0));
+			Depth& depth = depthMap(pt);
+			if (depth == 0 || depth > z) {
+				depth = z;
+				xt  = mesh.faceTexcoords[idxFaceTex+0] * bary[0];
+				xt += mesh.faceTexcoords[idxFaceTex+1] * bary[1];
+				xt += mesh.faceTexcoords[idxFaceTex+2] * bary[2];
+				auto texIdx = mesh.faceTexindices[idxFaceTex / 3];
+				image(pt) = mesh.texturesDiffuse[texIdx].sampleSafe(xt);
+			}
+		}
+......
+```
+对应的`auto texIdx = mesh.faceTexindices[idxFaceTex / 3];`当texturesDiffuse长度为１时会崩，因为生成纹理时如果texturesDiffuse长度为１是没有faceTexindices的，可以改为`auto texIdx = mesh.GetFaceTextureIndex(idxFaceTex / 3);`
+```c++
+void MeshTexture::GenerateTexture(bool bGlobalSeamLeveling, bool bLocalSeamLeveling, unsigned nTextureSizeMultiple, unsigned nRectPackingHeuristic, Pixel8U colEmpty, float fSharpnessWeight, int maxTextureSize)
+......
+		if (texturesDiffuse.size() == 1)
+			faceTexindices.Release();
+......
+```
 
 ## colmap2nerf steps
 
