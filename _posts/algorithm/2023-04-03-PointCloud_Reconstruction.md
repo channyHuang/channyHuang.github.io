@@ -351,6 +351,7 @@ COLMAP.bat stereo_fusion --workspace_path ./dense --workspace_format COLMAP --in
 // 自动重建计算摄像机参数
 ./colmap automatic_reconstructor --image_path /home/channy/Documents/datasets/dataset_reconstruct/20250107_ZC/Capture --workspace_path /home/channy/Documents/datasets/dataset_reconstruct/20250107_ZC
 
+./colmap model_aligner --input_path ./sparse/0 --output_path ./CameraPos_GPS --alignment_type ecef --database_path ./database.db
 ```
 
 ### 基本步骤和原理
