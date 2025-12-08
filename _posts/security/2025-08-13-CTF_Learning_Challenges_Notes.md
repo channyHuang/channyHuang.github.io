@@ -19,6 +19,7 @@ tags:
 1. [MD5](https://www.cmd5.com/) 部分付费
 2. [Rabbit](https://www.sojson.com/encrypt_rabbit.html)
 3. [中文电码](http://code.mcdvisa.com/)
+4. [素数分解](https://factordb.com/)
 
 # Linux(Ubuntu)下下载的文件乱码问题（Crypto中特别多）
 1. 查看文件编码
@@ -1198,10 +1199,266 @@ int main() {
 // 61666374667B317327745F73305F333435797D -> ascii hex -> afctf{1s't_s0_345y}
 ```
 ### [27 RSA3](https://buuoj.cn/challenges#RSA3)
+RSA 相同模数攻击，两次加密使用相同的模数 n 和相同的明文 m, gcd(e1, e) = 1
+c1 = m^e1 (mod n) c2 = m^e2 (mod n)
+
+e1 s + e2 t = 1
+
+c1^s c2^t = m ^ {e1 s} m ^{e2 t} = m (mod n)
+
 ```py
 c1=22322035275663237041646893770451933509324701913484303338076210603542612758956262869640822486470121149424485571361007421293675516338822195280313794991136048140918842471219840263536338886250492682739436410013436651161720725855484866690084788721349555662019879081501113222996123305533009325964377798892703161521852805956811219563883312896330156298621674684353919547558127920925706842808914762199011054955816534977675267395009575347820387073483928425066536361482774892370969520740304287456555508933372782327506569010772537497541764311429052216291198932092617792645253901478910801592878203564861118912045464959832566051361
 n=22708078815885011462462049064339185898712439277226831073457888403129378547350292420267016551819052430779004755846649044001024141485283286483130702616057274698473611149508798869706347501931583117632710700787228016480127677393649929530416598686027354216422565934459015161927613607902831542857977859612596282353679327773303727004407262197231586324599181983572622404590354084541788062262164510140605868122410388090174420147752408554129789760902300898046273909007852818474030770699647647363015102118956737673941354217692696044969695308506436573142565573487583507037356944848039864382339216266670673567488871508925311154801
 e1=11187289
 c2=18702010045187015556548691642394982835669262147230212731309938675226458555210425972429418449273410535387985931036711854265623905066805665751803269106880746769003478900791099590239513925449748814075904017471585572848473556490565450062664706449128415834787961947266259789785962922238701134079720414228414066193071495304612341052987455615930023536823801499269773357186087452747500840640419365011554421183037505653461286732740983702740822671148045619497667184586123657285604061875653909567822328914065337797733444640351518775487649819978262363617265797982843179630888729407238496650987720428708217115257989007867331698397
 e2=9647291
+
+# 扩展欧几里得算法，对于任意整数 a 和 b，存在整数 x 和 y，使得 $$ a * x + b * y = gcd(a, b)$$
+def extended_gcd_iterative(a, b):
+    """迭代版本的扩展欧几里得算法"""
+    x0, x1, y0, y1 = 1, 0, 0, 1
+    
+    while b != 0:
+        q = a // b
+        a, b = b, a % b
+        x0, x1 = x1, x0 - q * x1
+        y0, y1 = y1, y0 - q * y1
+    
+    return a, x0, y0
+
+def modinv(a, m):
+    """使用扩展欧几里得算法求模逆"""
+    gcd, x, _ = extended_gcd_iterative(a, m)
+    if gcd != 1:
+        raise ValueError(f"模逆不存在，因为gcd({a}, {m}) = {gcd}")
+    return x % m
+
+def common_modulus_attack(c1, e1, c2, e2, n):
+    g, s, t = extended_gcd_iterative(e1, e2)
+    assert(g == 1)
+
+    if s < 0:
+        s = -s
+        c1 = modinv(c1, n)
+    if t < 0:
+        t = -t
+        c2 = modinv(c2, n)
+    
+    # 计算 m = (c1^s * c2^t) mod n
+    m1 = pow(c1, s, n)
+    m2 = pow(c2, t, n)
+    m = (m1 * m2) % n
+    
+    return m
+
+if __name__ == "__main__":
+    message = common_modulus_attack(c1, e1, c2, e2, n)
+    m_bytes = message.to_bytes((message.bit_length() + 7) // 8, 'big')
+    print(m_bytes)
 ```
+### [28 RSA2](https://buuoj.cn/challenges#RSA2)
+```py
+e = 65537
+n = 248254007851526241177721526698901802985832766176221609612258877371620580060433101538328030305219918697643619814200930679612109885533801335348445023751670478437073055544724280684733298051599167660303645183146161497485358633681492129668802402065797789905550489547645118787266601929429724133167768465309665906113
+dp = 905074498052346904643025132879518330691925174573054004621877253318682675055421970943552016695528560364834446303196939207056642927148093290374440210503657
+
+c = 140423670976252696807533673586209400575664282100684119784203527124521188996403826597436883766041879067494280957410201958935737360380801845453829293997433414188838725751796261702622028587211560353362847191060306578510511380965162133472698713063592621028959167072781482562673683090590521214218071160287665180751
+
+edp = e * dp - 1
+p = -1
+for r in range(1, e - 1):
+    p1 = edp // r
+    if (p1 * r != edp): 
+        continue
+    p = p1 + 1
+    if n % p != 0:
+        continue
+    break
+q = n // p
+assert (p * q == n)
+
+def extended_gcd_iterative(a, b):
+    """迭代版本的扩展欧几里得算法"""
+    x0, x1, y0, y1 = 1, 0, 0, 1
+    
+    while b != 0:
+        q = a // b
+        a, b = b, a % b
+        x0, x1 = x1, x0 - q * x1
+        y0, y1 = y1, y0 - q * y1
+    
+    return a, x0, y0
+
+def modinv(a, m):
+    """计算模逆元"""
+    gcd, x, y = extended_gcd_iterative(a, m)
+    if gcd != 1:
+        return None  # 逆元不存在
+    else:
+        return x % m
+
+def calc_keys(p, q, e):
+    # n = p * q
+    phi = (p - 1) * (q - 1)
+    d = modinv(e, phi)
+    return ((e, n), (d, n))
+
+def decrypt(ciphertext, private_key):
+    d, n = private_key
+    print(ciphertext)
+    message = pow(ciphertext, d, n)
+    return message
+
+if __name__ == '__main__':
+    public_key, private_key = calc_keys(p, q, e)
+    message = decrypt(c, private_key)
+    m_bytes = message.to_bytes((message.bit_length() + 7) // 8, 'big')
+    print(m_bytes)
+```
+### [29 find text by md5](https://buuoj.cn/challenges#%E8%BF%98%E5%8E%9F%E5%A4%A7%E5%B8%88)
+```py
+from hashlib import md5
+import string
+import itertools
+
+def calcmd5(text):
+    return md5(text.encode()).hexdigest().upper()
+
+text = "TASC?O3RJMV?WDJKX?ZM"
+text_list = list(text)
+text_md5 = "E903???4DAB????08?????51?80??8A?"
+index = []
+for i in range(len(text)):
+    if text[i] == '?':
+        index.append(i)
+
+charset = string.digits + string.ascii_uppercase
+for part in itertools.product(charset, repeat=len(index)):
+    for i, idx in enumerate(index):
+        part = ''.join(part)
+        text_list[idx] = part[i]
+    text = ''.join(text_list)
+    textMd5 = calcmd5(text)
+    found = True
+    for i in range(len(text_md5)):
+        if text_md5[i] == '?':
+            continue
+        if text_md5[i] != textMd5[i]:
+            found = False
+            break
+    # print(text, textMd5)
+    if found:
+        print(text, textMd5)
+        break
+```
+### [30 xor](https://buuoj.cn/challenges#%E5%BC%82%E6%80%A7%E7%9B%B8%E5%90%B8)
+```py
+if __name__ == '__main__':
+    key = "asadsasdasdasdasdasdasdasdasdasdqwesqf"
+
+    with open('./cipher.txt', 'rb') as f:
+        cipher_binary = f.read()
+        f.close()
+    cipher = cipher_binary.decode('utf-8')
+    # cipher = "UTXK\XJVSDRDXFTGVGWD]J"
+    message = ""
+    for i in range(len(cipher)):
+        p = (ord(cipher[i]) ^ ord(key[i])) 
+        message += chr(p)
+    print(message)
+```
+### [31 RSA](https://buuoj.cn/challenges#RSA)
+```sh
+openssl rsa -pubin -in pub.key -text -noout
+RSA Public-Key: (256 bit)
+Modulus:
+    00:c0:33:2c:5c:64:ae:47:18:2f:6c:1c:87:6d:42:
+    33:69:10:54:5a:58:f7:ee:fe:fc:0b:ca:af:5a:f3:
+    41:cc:dd
+Exponent: 65537 (0x10001)
+```
+
+```py
+n_hex = "00c0332c5c64ae47182f6c1c876d42336910545a58f7eefefc0bcaaf5af341ccdd"
+n = int(n_hex, 16)
+# n = 86934482296048119190666062003494800588905656017203025617216654058378322103517
+e = 65537
+
+with open('flag.enc', 'rb') as f:
+    enc = f.read()
+    f.close()
+c = int.from_bytes(enc, 'big')
+# c = 29666689760194689065394649908301285751747553295673979512822807815563732622178
+
+import math
+def prime(x):
+    if x == 2:
+        return True
+    if (x & 1) == 0:
+        return False
+    m = (int)(math.sqrt(x)) + 1
+    for i in range(3, m, 2):
+        if x % i == 0:
+            return False
+    return True
+
+def pq(n):
+    if (n & 1) == 0:
+        return 2, n // 2
+    m = (int)(math.sqrt(n)) + 1
+    for p in range(3, m, 2):
+        if not prime(p):
+            continue
+        if n % p != 0:
+            continue
+        q = n // p
+        if not prime(q):
+            continue
+        print(p, q)
+        break
+    return p, q
+
+def extended_gcd_iterative(a, b):
+    """迭代版本的扩展欧几里得算法"""
+    x0, x1, y0, y1 = 1, 0, 0, 1
+    
+    while b != 0:
+        q = a // b
+        a, b = b, a % b
+        x0, x1 = x1, x0 - q * x1
+        y0, y1 = y1, y0 - q * y1
+    
+    return a, x0, y0
+
+def modinv(a, m):
+    """计算模逆元"""
+    gcd, x, y = extended_gcd_iterative(a, m)
+    if gcd != 1:
+        return None  # 逆元不存在
+    else:
+        return x % m
+
+def calc_keys(p, q, e):
+    # n = p * q
+    phi = (p - 1) * (q - 1)
+    d = modinv(e, phi)
+    return ((e, n), (d, n))
+
+def decrypt(ciphertext, private_key):
+    d, n = private_key
+    print(ciphertext)
+    message = pow(ciphertext, d, n)
+    return message
+
+if __name__ == '__main__':
+    # p, q = pq(n)
+    p = 285960468890451637935629440372639283459
+    q = 304008741604601924494328155975272418463
+    assert(p * q == n)
+    public_key, private_key = calc_keys(p, q, e)
+    message = decrypt(c, private_key)
+    m_bytes = message.to_bytes((message.bit_length() + 7) // 8, 'big')
+    print(m_bytes)
+```
+### [32 RSAROLL](https://buuoj.cn/challenges#RSAROLL)
+
