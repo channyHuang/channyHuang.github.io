@@ -20,6 +20,7 @@ tags:
 2. [Rabbit](https://www.sojson.com/encrypt_rabbit.html)
 3. [中文电码](http://code.mcdvisa.com/)
 4. [素数分解](https://factordb.com/)
+5. [Playfair](https://rumkin.com/tools/cipher/playfair/)
 
 # Linux(Ubuntu)下下载的文件乱码问题（Crypto中特别多）
 1. 查看文件编码
@@ -41,7 +42,25 @@ iconv -f GBK -t UTF-8 乱码文件.txt -o 正常文件_utf8.txt
 ```
 
 ## Basic
+### [1 LFI COURSE 1](https://buuoj.cn/challenges#BUU%20LFI%20COURSE%201)
+```php
+highlight_file(__FILE__);
 
+if(isset($_GET['file'])) {
+    $str = $_GET['file'];
+
+    include $_GET['file'];
+}
+```
+直接在Get请求中加入file=flag参数即可
+```sh
+GET /?file=/flag HTTP/1.1
+```
+### [2 BRUTE 1](https://buuoj.cn/challenges#BUU%20BRUTE%201)
+用户名试出为admin，密码为四位数字。
+```sh
+GET /?username=admin&password=1 HTTP/1.1
+```
 ### [2019 Havefun](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]Havefun)
 请求参数`?cat=dog`
 ### [2019 Knife](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]Knife)
@@ -1461,4 +1480,258 @@ if __name__ == '__main__':
     print(m_bytes)
 ```
 ### [32 RSAROLL](https://buuoj.cn/challenges#RSAROLL)
+```py
+nums = []
+with open('data.txt', 'r') as f:
+    lines = f.readlines()
+    f.close()
 
+head = lines[0].strip()
+head = head.strip('{}')
+n_str, e_str = head.split(',')
+n = int(n_str)
+e = int(e_str)
+
+p = 18443
+q = 49891
+assert(p * q == n)
+
+for line in lines[1:]:
+    line = line.strip()
+    if line:
+        nums.append(int(line))
+
+def extended_gcd_iterative(a, b):
+    """迭代版本的扩展欧几里得算法"""
+    x0, x1, y0, y1 = 1, 0, 0, 1
+    
+    while b != 0:
+        q = a // b
+        a, b = b, a % b
+        x0, x1 = x1, x0 - q * x1
+        y0, y1 = y1, y0 - q * y1
+    
+    return a, x0, y0
+
+def modinv(a, m):
+    """计算模逆元"""
+    gcd, x, y = extended_gcd_iterative(a, m)
+    if gcd != 1:
+        return None  # 逆元不存在
+    else:
+        return x % m
+
+def calc_keys(p, q, e):
+    # n = p * q
+    phi = (p - 1) * (q - 1)
+    d = modinv(e, phi)
+    return ((e, n), (d, n))
+
+def decrypt(ciphertext, private_key):
+    d, n = private_key
+    message = pow(ciphertext, d, n)
+    return message
+
+public_key, private_key = calc_keys(p, q, e)
+res = ""
+for num in nums:
+    m = decrypt(num, private_key)
+    res += chr(m)
+print(res)
+```
+### [33 Dangerous RSA](https://buuoj.cn/challenges#Dangerous%20RSA)
+低加密指数攻击
+```py
+n =   0x52d483c27cd806550fbe0e37a61af2e7cf5e0efb723dfc81174c918a27627779b21fa3c851e9e94188eaee3d5cd6f752406a43fbecb53e80836ff1e185d3ccd7782ea846c2e91a7b0808986666e0bdadbfb7bdd65670a589a4d2478e9adcafe97c6ee23614bcb2ecc23580f4d2e3cc1ecfec25c50da4bc754dde6c8bfd8d1fc16956c74d8e9196046a01dc9f3024e11461c294f29d7421140732fedacac97b8fe50999117d27943c953f18c4ff4f8c258d839764078d4b6ef6e8591e0ff5563b31a39e6374d0d41c8c46921c25e5904a817ef8e39e5c9b71225a83269693e0b7e3218fc5e5a1e8412ba16e588b3d6ac536dce39fcdfce81eec79979ea6872793
+e =  0x3
+c = 0x10652cdfaa6b63f6d7bd1109da08181e500e5643f5b240a9024bfa84d5f2cac9310562978347bb232d63e7289283871efab83d84ff5a7b64a94a79d34cfbd4ef121723ba1f663e514f83f6f01492b4e13e1bb4296d96ea5a353d3bf2edd2f449c03c4a3e995237985a596908adc741f32365
+
+import gmpy2
+
+m_int, exact = gmpy2.iroot(c, e)
+if exact:
+    hex_m = hex(m_int)[2:]
+    bytes_m = bytes.fromhex(hex_m)
+    print("明文 (bytes):", bytes_m)
+else:
+    print("直接开立方失败，尝试小 k ...")
+    found = False
+    for k in range(1000):
+        m_try, exact = gmpy2.iroot(c + k * n, 3)
+        if exact:
+            print(f"k = {k} 时找到 m = {m_try}")
+            hex_m = hex(m_try)[2:]
+            bytes_m = bytes.fromhex(hex_m)
+            print("明文:", bytes_m)
+            found = True
+            break
+    if not found:
+        print("在 k < 1000 内未找到。")
+```
+### [34 basic rsa](https://buuoj.cn/challenges#[HDCTF2019]basic%20rsa)
+```py
+p = 262248800182277040650192055439906580479
+q = 262854994239322828547925595487519915551
+
+e = 65533
+n = p*q
+
+c = 27565231154623519221597938803435789010285480123476977081867877272451638645710
+
+def extended_gcd_iterative(a, b):
+    """迭代版本的扩展欧几里得算法"""
+    x0, x1, y0, y1 = 1, 0, 0, 1
+    
+    while b != 0:
+        q = a // b
+        a, b = b, a % b
+        x0, x1 = x1, x0 - q * x1
+        y0, y1 = y1, y0 - q * y1
+    
+    return a, x0, y0
+
+def modinv(a, m):
+    """计算模逆元"""
+    gcd, x, y = extended_gcd_iterative(a, m)
+    if gcd != 1:
+        return None  # 逆元不存在
+    else:
+        return x % m
+
+def calc_keys(p, q, e):
+    # n = p * q
+    phi = (p - 1) * (q - 1)
+    d = modinv(e, phi)
+    return ((e, n), (d, n))
+
+def decrypt(ciphertext, private_key):
+    d, n = private_key
+    message = pow(ciphertext, d, n)
+    return message
+
+if __name__ == '__main__':
+    public_key, private_key = calc_keys(p, q, e)
+    message = decrypt(c, private_key)
+    m_bytes = message.to_bytes((message.bit_length() + 7) // 8, 'big')
+    print(m_bytes)
+```
+### [35 CheckIn](https://buuoj.cn/challenges#[GXYCTF2019]CheckIn)
+base64 + rot47
+```py
+import base64
+text = "dikqTCpfRjA8fUBIMD5GNDkwMjNARkUwI0BFTg=="
+message = base64.b64decode(text)
+# print(message)
+# b'v)*L*_F0<}@H0>F49023@FE0#@EN'
+
+res = ""
+offset = ord('N') - ord('}')
+print(offset)
+for m in message:
+    om = m
+    m -= offset
+    res += chr(m)
+print(res)
+
+def rot47(message):
+    result = ""
+    for c in message:
+        if 33 <= c <= 126:
+            result += chr(33 + ((c - 33 + 47) % 94))
+        else:
+            result += c
+    return result
+
+print(rot47(message))
+```
+### [36 ascii](https://buuoj.cn/challenges#%E5%AF%86%E7%A0%81%E5%AD%A6%E7%9A%84%E5%BF%83%E5%A3%B0)
+```py
+nums = [11111, 4157, 16614, 5123, 14514, 3165, 16215, 1164, 17112, 6145, 16217, 1115, 16514, 3150]
+
+res = ""
+for num in nums:
+    res += f"{num}"
+num = 0
+flag = ""
+for i in range(0, len(res)):
+    num = (num << 3) + (ord(res[i]) - ord('0'))
+    if i % 3 == 2:
+        flag += chr(num)
+        num = 0
+print(flag)
+```
+### [37 Playfair](https://buuoj.cn/challenges#Cipher)
+Playfair加密算法
+### [38 Base](https://buuoj.cn/challenges#[BJDCTF2020]%E8%BF%99%E6%98%AFbase??)
+```py
+dict = {0: 'J', 1: 'K', 2: 'L', 3: 'M', 4: 'N', 5: 'O', 6: 'x', 7: 'y', 8: 'U', 9: 'V', 10: 'z', 11: 'A', 12: 'B', 13: 'C', 14: 'D', 15: 'E', 16: 'F', 17: 'G', 18: 'H', 19: '7', 20: '8', 21: '9', 22: 'P', 23: 'Q', 24: 'I', 25: 'a', 26: 'b', 27: 'c', 28: 'd', 29: 'e', 30: 'f', 31: 'g', 32: 'h', 33: 'i', 34: 'j', 35: 'k', 36: 'l', 37: 'm', 38: 'W', 39: 'X', 40: 'Y', 41: 'Z', 42: '0', 43: '1', 44: '2', 45: '3', 46: '4', 47: '5', 48: '6', 49: 'R', 50: 'S', 51: 'T', 52: 'n', 53: 'o', 54: 'p', 55: 'q', 56: 'r', 57: 's', 58: 't', 59: 'u', 60: 'v', 61: 'w', 62: '+', 63: '/', 64: '='}
+
+ciphertext = "FlZNfnF6Qol6e9w17WwQQoGYBQCgIkGTa9w3IQKw"
+
+import base64
+
+std_b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+padding = '='
+rev_dict = {v: k for k, v in dict.items()}
+
+nums = []
+for ch in ciphertext:
+    nums.append(rev_dict[ch])
+print("数字列表:", nums)
+
+std_str_list = []
+for n in nums:
+    if n == 64:
+        std_str_list.append('=')
+    else:
+        std_str_list.append(std_b64[n])
+
+std_str = ''.join(std_str_list)
+print("标准Base64串:", std_str)
+
+try:
+    decoded = base64.b64decode(std_str)
+    print("解密结果:", decoded.decode('utf-8'))
+except Exception as e:
+    print("解码错误:", e)
+```
+### [39 BabyRSA](https://buuoj.cn/challenges#[GUET-CTF2019]BabyRSA)
+RSA, (p+1)(q+1) = pq + (p+q) + 1 算得 n(=pq), e好像没用上。。。
+
+```py
+'''
+p+q : 0x1232fecb92adead91613e7d9ae5e36fe6bb765317d6ed38ad890b4073539a6231a6620584cea5730b5af83a3e80cf30141282c97be4400e33307573af6b25e2ea
+(p+1)(q+1) : 0x5248becef1d925d45705a7302700d6a0ffe5877fddf9451a9c1181c4d82365806085fd86fbaab08b6fc66a967b2566d743c626547203b34ea3fdb1bc06dd3bb765fd8b919e3bd2cb15bc175c9498f9d9a0e216c2dde64d81255fa4c05a1ee619fc1fc505285a239e7bc655ec6605d9693078b800ee80931a7a0c84f33c851740
+e : 0xe6b1bee47bd63f615c7d0a43c529d219
+d : 0x2dde7fbaed477f6d62838d55b0d0964868cf6efb2c282a5f13e6008ce7317a24cb57aec49ef0d738919f47cdcd9677cd52ac2293ec5938aa198f962678b5cd0da344453f521a69b2ac03647cdd8339f4e38cec452d54e60698833d67f9315c02ddaa4c79ebaa902c605d7bda32ce970541b2d9a17d62b52df813b2fb0c5ab1a5
+enc_flag : 0x50ae00623211ba6089ddfae21e204ab616f6c9d294e913550af3d66e85d0c0693ed53ed55c46d8cca1d7c2ad44839030df26b70f22a8567171a759b76fe5f07b3c5a6ec89117ed0a36c0950956b9cde880c575737f779143f921d745ac3bb0e379c05d9a3cc6bf0bea8aa91e4d5e752c7eb46b2e023edbc07d24a7c460a34a9a
+'''
+
+pAndq = 0x1232fecb92adead91613e7d9ae5e36fe6bb765317d6ed38ad890b4073539a6231a6620584cea5730b5af83a3e80cf30141282c97be4400e33307573af6b25e2ea
+p1Mulq1 = 0x5248becef1d925d45705a7302700d6a0ffe5877fddf9451a9c1181c4d82365806085fd86fbaab08b6fc66a967b2566d743c626547203b34ea3fdb1bc06dd3bb765fd8b919e3bd2cb15bc175c9498f9d9a0e216c2dde64d81255fa4c05a1ee619fc1fc505285a239e7bc655ec6605d9693078b800ee80931a7a0c84f33c851740
+e = 0xe6b1bee47bd63f615c7d0a43c529d219
+d = 0x2dde7fbaed477f6d62838d55b0d0964868cf6efb2c282a5f13e6008ce7317a24cb57aec49ef0d738919f47cdcd9677cd52ac2293ec5938aa198f962678b5cd0da344453f521a69b2ac03647cdd8339f4e38cec452d54e60698833d67f9315c02ddaa4c79ebaa902c605d7bda32ce970541b2d9a17d62b52df813b2fb0c5ab1a5
+c = 0x50ae00623211ba6089ddfae21e204ab616f6c9d294e913550af3d66e85d0c0693ed53ed55c46d8cca1d7c2ad44839030df26b70f22a8567171a759b76fe5f07b3c5a6ec89117ed0a36c0950956b9cde880c575737f779143f921d745ac3bb0e379c05d9a3cc6bf0bea8aa91e4d5e752c7eb46b2e023edbc07d24a7c460a34a9a
+
+n = p1Mulq1 - pAndq  - 1
+message = pow(c, d, n)
+m_bytes = message.to_bytes((message.bit_length() + 7) // 8, 'big')
+print(m_bytes)
+```
+### [40 rsa2](https://buuoj.cn/challenges#rsa2)
+Wiener连分数攻击
+[rsa-wiener-attack](https://github.com/pablocelayes/rsa-wiener-attack)
+```py
+N = 101991809777553253470276751399264740131157682329252673501792154507006158434432009141995367241962525705950046253400188884658262496534706438791515071885860897552736656899566915731297225817250639873643376310103992170646906557242832893914902053581087502512787303322747780420210884852166586717636559058152544979471
+e = 46731919563265721307105180410302518676676135509737992912625092976849075262192092549323082367518264378630543338219025744820916471913696072050291990620486581719410354385121760761374229374847695148230596005409978383369740305816082770283909611956355972181848077519920922059268376958811713365106925235218265173085
+
+import hashlib
+from RSAwienerHacker import hack_RSA
+
+d = hack_RSA(e, N)
+print("d = ", d)
+flag = "flag{" + hashlib.md5(hex(d).encode()).hexdigest() + "}"
+print(flag)
+```
+但输出的flag{8159e6c4abdd3b94ce461ed9a1a24017}提交显示InCorrect......
+### [41 RSA5](https://buuoj.cn/challenges#RSA5)

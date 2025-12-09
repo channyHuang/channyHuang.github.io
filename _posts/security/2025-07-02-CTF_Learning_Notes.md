@@ -27,7 +27,7 @@ tags:
 4. [PHPStorm](https://www.jetbrains.com/phpstorm/) PHP的IDE
 5. [AntSword](https://github.com/AntSwordProject/antSword) [AntSword-Loader](https://github.com/AntSwordProject/AntSword-Loader)
 6. [Gopherus](https://github.com/tarunkant/Gopherus) [Gopherus3](https://github.com/Esonhugh/Gopherus3) Gopher协议
-7. [词频分析](http://quipqiup.com) 词频分析网站
+7. [词频分析](http://quipqiup.com) 词频分析网站 [vigenere-solver](https://www.guballa.de/vigenere-solver) Vigenère
 8. [010Editor](https://www.sweetscape.com/010editor/) [ImHex](https://github.com/WerWolv/ImHex)
 9. [Audacity](https://www.audacityteam.org) [[binary]](https://github.com/audacity/audacity/releases)  音频工具
 10. [MP3stego](https://www.petitcolas.net/steganography/mp3stego/) 音频数据隐写工具
