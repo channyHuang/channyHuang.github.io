@@ -302,7 +302,7 @@ CMake Error at /snap/cmake/1463/share/cmake-4.0/Modules/FindPackageHandleStandar
   GTEST_MAIN_LIBRARY) (Required is at least version "1.14.0")
 ```
 使用apt install libgtest-dev 安装的版本是1.10.0
-4. 
+4. 稠密重建需要cuda
 ```sh
 CMake Error at /usr/share/cmake-3.16/Modules/CMakeFindDependencyMacro.cmake:47 (find_package):
   By not providing "FindCUDAToolkit.cmake" in CMAKE_MODULE_PATH this project
@@ -317,7 +317,7 @@ CMake Error at /usr/share/cmake-3.16/Modules/CMakeFindDependencyMacro.cmake:47 (
 ```
 ### 使用
 ```sh
-# 特征点检测，SIFT特征
+# 特征点检测，SIFT特征，OpenMVS只接收camera_model=PINHOLE
 COLMAP.bat feature_extractor --ImageReader.camera_model OPENCV --ImageReader.camera_params "" --SiftExtraction.estimate_affine_shape=true --SiftExtraction.domain_size_pooling=true --ImageReader.single_camera 1 --database_path colmap.db --image_path "./images"
 
 COLMAP.bat feature_extractor --ImageReader.camera_model PINHOLE --ImageReader.camera_params "" --SiftExtraction.estimate_affine_shape=true --SiftExtraction.domain_size_pooling=true --ImageReader.single_camera 1 --database_path colmap.db --image_path "./images"
@@ -348,10 +348,11 @@ COLMAP.bat stereo_fusion --workspace_path ./dense --workspace_format COLMAP --in
 # 输出点云模型
 # colmap的mesh功能相对还有很大的改进空间
 
-// 自动重建计算摄像机参数
+# 自动重建计算摄像机参数
 ./colmap automatic_reconstructor --image_path /home/channy/Documents/datasets/dataset_reconstruct/20250107_ZC/Capture --workspace_path /home/channy/Documents/datasets/dataset_reconstruct/20250107_ZC
 
-./colmap model_aligner --input_path ./sparse/0 --output_path ./CameraPos_GPS --alignment_type ecef --database_path ./database.db
+# 坐标系对齐，可用于把局部坐标系转换成enu坐标系并对齐到原点，以生成osgb/3dtiles等模型文件
+./colmap model_aligner --input_path ./sparse/0 --output_path ./CameraPos_GPS --alignment_type enu --database_path ./database.db
 ```
 
 ### 基本步骤和原理
@@ -405,7 +406,7 @@ IncrementalMapperController::Run
 ```
 
 ## OpenMVS
-位姿－>网格
+位姿－>网格模型
 ### 编译
 * nanoflann
 * libjxl

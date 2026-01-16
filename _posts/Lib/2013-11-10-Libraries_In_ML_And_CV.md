@@ -13,6 +13,47 @@ tags:
 //Author: channy
 
 [toc]
+# 基础库
+## c++基础
+* [Abseil](https://github.com/abseil/abseil-cpp.git) C++ 基础库集合
+* [cpp-base64](https://github.com/ReneNyffenegger/cpp-base64) base64，可用于minio浏览器地址解析等
+* [googletest](https://github.com/google/googletest.git) 单元测试库
+## 模拟
+* [AirSim](https://github.com/Microsoft/AirSim.git)
+## 几何模型库
+* [Assimp](https://github.com/assimp/assimp) 模型格式转换库
+* [cgal](https://github.com/CGAL/cgal)
+* [draco](https://github.com/google/draco.git) 压缩gltf/glb模型，但cesium不支持
+* [tinygltf](https://github.com/syoyo/tinygltf.git) 读写gltf/glb模型
+* [meshoptimizer](git@github.com:zeux/meshoptimizer.git) 压缩gltf/glb模型，主要是顶点去重、量化等，压缩有限
+* [OpenSceneGraph](git@github.com:channyHuang/OpenSceneGraph.git) [OpenSceneGraph-Data](https://github.com/openscenegraph/OpenSceneGraph-Data) osg/osgb模型
+## 网络
+* [cpp-httplib](https://github.com/yhirose/cpp-httplib.git) 启动http服务
+* [minio-cpp](https://github.com/minio/minio-cpp) 在minio上上传/下载数据
+## 音视频
+* [ffmpeg](https://git.ffmpeg.org/ffmpeg.git) 音视频处理
+## 数据库
+* [hiredis](https://github.com/redis/hiredis)  redis读写
+* [redis-plus-plus](https://github.com/sewenew/redis-plus-plus) redis读写
+## 界面
+* [imgui](https://github.com/ocornut/imgui) 界面ui
+## json
+* [nlohmann](https://github.com/nlohmann/json) 易上手，但速度和内存占用都一般
+* [rapidjson](https://github.com/Tencent/rapidjson/) 快速的json写入库
+* [simdjson](https://github.com/simdjson/simdjson) 快速的json解析库
+
+# 重建过程中使用到的功能
+## 视频去模糊
+* [BasicSR](https://github.com/XPixelGroup/BasicSR.git)
+* [BasicVSR_PlusPlus](https://github.com/ckkelvinchan/BasicVSR_PlusPlus.git)
+* [DeepDeblur-PyTorch](https://github.com/SeungjunNah/DeepDeblur-PyTorch)
+## 去雾
+* [DehazeFormer](https://github.com/IDKiro/DehazeFormer.git) 多只能去除均匀分布的雾
+* [FFA-Net](https://github.com/zhilin007/FFA-Net.git) 泛化一般
+* [GridDehazeNet](https://github.com/proteus1991/GridDehazeNet.git) 
+## 光照均衡
+
+
 
 # ​机器学习库
 参考资料：[mloss | All entries](http://mloss.org/software/jmlr/)

