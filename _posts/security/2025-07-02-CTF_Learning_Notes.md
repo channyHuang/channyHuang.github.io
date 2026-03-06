@@ -6,7 +6,7 @@ categories:
 tags:
 - Security
 ---
-//Description: CTF学习入门笔记。记录学习过程中遇到的问题。
+//Description: CTF学习入门笔记。记录入门学习过程中遇到的问题。
 
 //Create Date: 2025-07-02 10:31:39
 
@@ -1056,4 +1056,3 @@ func=file_get_contents&p=/tmp/flagoefiu4r93
 1. [scrabble](https://github.com/denny0223/scrabble) [GitHacker](https://github.com/WangYihang/GitHacker)
 2. [dvcs-ripper](https://github.com/kost/dvcs-ripper) [Seay-svn]
 3. [dirsearch](https://github.com/maurosoria/dirsearch) [Wappalyzer]
-## 1 

