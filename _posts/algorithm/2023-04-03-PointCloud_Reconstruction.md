@@ -621,6 +621,52 @@ void MeshTexture::GenerateTexture(bool bGlobalSeamLeveling, bool bLocalSeamLevel
 			faceTexindices.Release();
 ......
 ```
+3. Mesh.Clean对不同的模型也只能单线程串行
+因为`QHelper`类中有static静态变量
+```c++
+class QHelper
+{
+public:
+	QHelper() {}
+	static void Init() {}
+	static vcg::math::Quadric<double> &Qd(Vertex &v) { return TD()[v]; }
+	static vcg::math::Quadric<double> &Qd(Vertex *v) { return TD()[*v]; }
+	static Vertex::ScalarType W(Vertex * /*v*/) { return 1.0; }
+	static Vertex::ScalarType W(Vertex & /*v*/) { return 1.0; }
+	static void Merge(Vertex & /*v_dest*/, Vertex const & /*v_del*/) {}
+	static QuadricTemp* &TDp() { static QuadricTemp *td; return td; }
+	static QuadricTemp &TD() { return *TDp(); }
+};
+```
+如需要对不同的mesh多线程操作，c++11及以上可以使用thread_local改写
+```c++
+class QHelper
+{
+public:
+	QHelper() {}
+	static void Init() {}
+	static vcg::math::Quadric<double> &Qd(Vertex &v) { return TD()[v]; }
+	static vcg::math::Quadric<double> &Qd(Vertex *v) { return TD()[*v]; }
+	static Vertex::ScalarType W(Vertex * /*v*/) { return 1.0; }
+	static Vertex::ScalarType W(Vertex & /*v*/) { return 1.0; }
+	static void Merge(Vertex & /*v_dest*/, Vertex const & /*v_del*/) {}
+	// static QuadricTemp* &TDp() { static QuadricTemp *td; return td; }
+	// static QuadricTemp &TD() { return *TDp(); }
+
+	static QuadricTemp* &TDp() { 
+        static thread_local QuadricTemp *td = nullptr;
+        return td; 
+    }
+    
+    static QuadricTemp &TD() { 
+        auto& p = TDp();
+        if (!p) {
+            throw std::runtime_error("TD not initialized for this thread");
+        }
+        return *p; 
+    }
+};
+```
 
 ## colmap2nerf steps
 
