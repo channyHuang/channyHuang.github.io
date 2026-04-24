@@ -1813,3 +1813,32 @@ Cookie: username=admin
 id=4&price=%E2%86%81
 ```
 ### [朴实无华](https://buuoj.cn/challenges#[WUSTCTF2020]%E6%9C%B4%E5%AE%9E%E6%97%A0%E5%8D%8E)
+```sh
+./dirsearch.py -u http://2343d9fa-4c03-4b27-bd2f-3e1d4d0c64f5.node5.buuoj.cn:81/ -e "*" --delay 0.1 -t 1 -i 200,403
+
+[19:00:44] Scanning: 
+[19:07:06] 200 -    14B - /404.html
+[19:30:21] 200 -   227B - /index.php
+[19:30:28] 200 -   227B - /index.php/login/
+[19:40:38] 200 -    46B - /robots.txt
+[19:41:24] 403 -   339B - /server-status
+[19:41:24] 403 -   340B - /server-status/
+
+User-agent: * 
+Disallow: /static/secretkey.txt
+
+you-will-never-guess
+```
+```index.php
+Hack me
+Warning: Cannot modify header information - headers already sent by (output started at /var/www/html/index.php:3) in /var/www/html/index.php on line 4
+```
+试过Cookie: secretkey=you-will-never-guess和 username=admin&password=you-will-never-guess等都失败，没思路，暂置。
+### [EasySearch](https://buuoj.cn/challenges#[BJDCTF2020]EasySearch)
+
+
+### [FlaskApp](https://buuoj.cn/challenges#[GYCTF2020]FlaskApp)
+base64缟解码，但发现解码system/flag/Base64-encode的编码返回"no no no !!"，可能过滤了部分关键词
+```
+php://filter/read=convert.Base64-encode/resource=decode
+```

@@ -401,8 +401,15 @@ IncrementalMapperController::Run
       InitializeReconstruction
         IncrementalMapper::FindInitialImagePair
           FindFirstInitialImage // 初始化，对图像按能找到匹配点的数量排序，选择初始重建图像
-          EstimateInitialTwoViewGeometry // 得到初始的三维点云和[R,t]
+          EstimateInitialTwoViewGeometry // 得到初始的[R,t]
+            EstimateCalibratedTwoViewGeometry
+            EstimateTwoViewGeometryPose
+        IncrementalMapper::RegisterInitialImagePair
+        IncrementalMapper::TriangulateImage
+          IncrementalTriangulator::Create // 三维点
+        IncrementalMapper::FilterPoints // 剔除误差大的三维点
       FindNextImages // 根据可恢复的三维点数量选择后续图像
+    Reconstruction::UpdatePoint3DErrors
 ```
 
 ## OpenMVS
@@ -448,6 +455,7 @@ apt install libzstd-dev libbz2-dev
 ```sh
 sh ./bootstrap.sh --with-libraries=iostreams,program_options,serialization,system,throw-exception
 ./b2 --with-iostreams --with-program_options -s NO_ZSTD=0 -s ZSTD_INCLUDE=/usr/include/zstd -s ZSTD_LIBPATH=/usr/lib/x86_64-linux-gnu -s NO_BZIP2=0 -s BZIP2_include=/usr/include -s BZIP2_LIBPATH=/usr/lib/x86_64-linux-gnu
+./b2 install
 ```
 
 ### 使用

