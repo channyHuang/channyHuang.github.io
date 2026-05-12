@@ -743,6 +743,25 @@ cmake .. -DCMAKE_CUDA_COMPILER=/usr/local/cuda-12.5/bin/nvcc
 # 附录3: 重建参考GroundTruth
 轿车长宽高：4.8m * 1.8m * 1.5m
 
+# ODM
+ODM使用OpenSFM + OpenMVS + FPCFilter等工具组成流水线，其中OpenMVS用到了DensifyPointCloud和ReconstructMesh。
+```py
+opensfm_path = os.path.join(superbuild_bin_path, "opensfm")
+
+poisson_recon_path = os.path.join(superbuild_bin_path, 'PoissonRecon')
+dem2mesh_path = os.path.join(superbuild_bin_path, 'dem2mesh')
+dem2points_path = os.path.join(superbuild_bin_path, 'dem2points')
+
+# define mvstex path
+mvstex_path = os.path.join(superbuild_bin_path, "texrecon")
+
+# openmvs paths
+omvs_densify_path = os.path.join(superbuild_bin_path, "OpenMVS", "DensifyPointCloud")
+omvs_reconstructmesh_path = os.path.join(superbuild_bin_path, "OpenMVS", "ReconstructMesh")
+
+fpcfilter_path = os.path.join(superbuild_bin_path, "FPCFilter")
+```
+
 # 参考库
 [cgal](https://github.com/CGAL/cgal.git)  
 [glfw](https://github.com/glfw/glfw)  
@@ -756,3 +775,4 @@ cmake .. -DCMAKE_CUDA_COMPILER=/usr/local/cuda-12.5/bin/nvcc
 [EuRoC MAV / ASL Datasets](https://projects.asl.ethz.ch/datasets/doku.php?id=kmavvisualinertialdatasets)
 [M2DGR](https://github.com/SJTU-ViSYS/M2DGR)
 [M2DGR-plus](https://github.com/SJTU-ViSYS/M2DGR-plus?tab=readme-ov-file)
+FPCFilter

