@@ -241,6 +241,9 @@ ffmpeg.exe -i "D:/dataset/lab/IMG_0080.MOV" -vcodec libx264 -s 1920x1080 -crf 0 
 ## colmap
 从图像到三维稠密点云
 ### 编译
+```sh
+sudo apt-get install libsqlite3-dev libsuitesparse-dev
+```
 最终版本
 * glog: 0.8.0
 * ceres-solver: 2.3.0
@@ -250,7 +253,7 @@ Ubuntu 20.04使用apt install默认安装的cuda-toolkit 10.1、Eigen 3.3.7和Ce
 
 对NVIDIA 3090显卡来说，安装550驱动后最高支持cuda 12.4， 10.1不能充分利用3090
 
-安装了Eigen 3.4.0，glog 0.8.0，编译ceres-solver-2.2.0时报错。
+安装了Eigen 3.4.0，glog 0.8.0，编译[ceres-solver-2.2.0](https://ceres-solver.googlesource.com/ceres-solver)时报错。
 ```sh
 CMake Error at /usr/local/lib/cmake/Ceres/CeresConfig.cmake:85 (message):
   Failed to find Ceres - Found Eigen dependency, but the version of Eigen
@@ -274,7 +277,7 @@ In file included from /home/channy/Documents/thirdlibs/ceres-solver-2.2.0/intern
   144 |     ScopedMockLog log;
       |                   ^~~
 ```
-2. glog版本更新问题
+1. glog版本更新问题
 依赖于glog的LogSink类，而glog在2025年归档版本0.8.0中该类的send函数修改了输入参数类型（在2021年该类已变更），由const struct ::tm*变成const LogMessageTime&，需要对应修改colmap中重写该函数的类型
 ```c++
   virtual void send(LogSeverity severity, const char* full_filename,
@@ -288,7 +291,7 @@ In file included from /home/channy/Documents/thirdlibs/ceres-solver-2.2.0/intern
                     const LogMessageTime& time, const char* message,
                     size_t message_len) = 0;
 ```
-3. ceres-solver版本更新问题
+1. ceres-solver版本更新问题
 glog的LogSink类send接口的参数之一类型由原来的`struct ::tm*`在2021年变成了`LogMessageTime`，而ceres-solver-2.2.0版本还保持着旧参数类型。2025年5月新拉ceres-2.3.0最新的代码，已经没有该文件了。编译报缺少abseil库，abseil可以依赖下面的GTest
 ```sh
 CMake Error at CMakeLists.txt:173 (find_package):
@@ -302,7 +305,7 @@ CMake Error at /snap/cmake/1463/share/cmake-4.0/Modules/FindPackageHandleStandar
   GTEST_MAIN_LIBRARY) (Required is at least version "1.14.0")
 ```
 使用apt install libgtest-dev 安装的版本是1.10.0
-4. 稠密重建需要cuda
+1. 稠密重建需要cuda
 ```sh
 CMake Error at /usr/share/cmake-3.16/Modules/CMakeFindDependencyMacro.cmake:47 (find_package):
   By not providing "FindCUDAToolkit.cmake" in CMAKE_MODULE_PATH this project
@@ -453,8 +456,8 @@ apt install libzstd-dev libbz2-dev
 如果前面编译过boost没有打开，可以先清除生成文件如b2,bootstrap.log,bin.v2等。  
 运行bash时把需要用到的都加到--with-libraries中。然后运行b2时配置zstd和bzip2的路径，一般apt安装的默认应该在/usr/下，也有可能有例外的。
 ```sh
-sh ./bootstrap.sh --with-libraries=iostreams,program_options,serialization,system,throw-exception
-./b2 --with-iostreams --with-program_options -s NO_ZSTD=0 -s ZSTD_INCLUDE=/usr/include/zstd -s ZSTD_LIBPATH=/usr/lib/x86_64-linux-gnu -s NO_BZIP2=0 -s BZIP2_include=/usr/include -s BZIP2_LIBPATH=/usr/lib/x86_64-linux-gnu
+sh ./bootstrap.sh --with-libraries=iostreams,program_options,serialization,system,filesystem,throw-exception
+./b2 --with-iostreams --with-program_options --with-graph --with-filesystem -s NO_ZSTD=0 -s ZSTD_INCLUDE=/usr/include/zstd -s ZSTD_LIBPATH=/usr/lib/x86_64-linux-gnu -s NO_BZIP2=0 -s BZIP2_include=/usr/include -s BZIP2_LIBPATH=/usr/lib/x86_64-linux-gnu
 ./b2 install
 ```
 
