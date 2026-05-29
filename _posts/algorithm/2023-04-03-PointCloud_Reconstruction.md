@@ -355,7 +355,7 @@ COLMAP.bat stereo_fusion --workspace_path ./dense --workspace_format COLMAP --in
 ./colmap automatic_reconstructor --image_path /home/channy/Documents/datasets/dataset_reconstruct/20250107_ZC/Capture --workspace_path /home/channy/Documents/datasets/dataset_reconstruct/20250107_ZC
 
 # 坐标系对齐，可用于把局部坐标系转换成enu坐标系并对齐到原点，以生成osgb/3dtiles等模型文件
-./colmap model_aligner --input_path ./sparse/0 --output_path ./CameraPos_GPS --alignment_type enu --database_path ./database.db
+./colmap model_aligner --input_path ./colmap_sparse/0 --output_path ./colmap_gps --alignment_type enu-plane --database_path ./database.db
 ```
 
 ### 基本步骤和原理

