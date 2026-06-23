@@ -2,7 +2,7 @@
 layout: default
 title: Kalman_Filter
 categories:
-- Computer Vision
+- Algorithm
 tags:
 - Computer Vision
 - Filter

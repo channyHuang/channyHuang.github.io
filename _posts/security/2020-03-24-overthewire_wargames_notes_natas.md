@@ -2,9 +2,9 @@
 layout: default
 title: overthewire_wargames_notes_natas
 categories:
-- C++
+- Security
 tags:
-- C++
+- Security
 ---
 //Description: overthewire 上的练习，学习web-security
 

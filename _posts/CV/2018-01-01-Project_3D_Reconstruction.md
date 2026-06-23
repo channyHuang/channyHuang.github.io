@@ -2,7 +2,8 @@
 layout: default
 title: Project - 3D Reconstruction
 categories:
-- Computer Vision
+- Algorithm
+- Lib
 tags:
 - Computer Vision
 - Project
@@ -263,5 +264,8 @@ http://www.songho.ca/opengl/gl_matrix.html
 No 6.
 
 .off 三维模型格式 
+
+# 其它
+[host](https://blog.yoqi.me/lyq/16489.html)
 
 [back](./)

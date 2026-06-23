@@ -2,7 +2,7 @@
 layout: default
 title: Roblox_Physice_Solver.md
 categories:
-- Game
+- Algorithm
 tags:
 - Game
 ---

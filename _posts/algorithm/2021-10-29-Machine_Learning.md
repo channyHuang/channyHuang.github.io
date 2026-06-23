@@ -2,9 +2,9 @@
 layout: default
 title: Machine_Learning.md
 categories:
-- Game
+- Algorithm
 tags:
-- Game
+- ML
 ---
 //Description: 机器学习笔记
 

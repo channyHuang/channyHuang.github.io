@@ -1,3 +1,18 @@
+---
+layout: default
+title: Programming Terrain Mesh Generation
+categories:
+- Algorithm
+- Lib
+tags:
+- Game
+---
+//Description: Programming Terrain Mesh Generation
+
+//Create Date: 2022-07-25 18:17:39
+
+//Author: channy
+
 # 概述 
 ## 地形数据生成
 1. 把地形区域按整数划分成单位立方体，使得每个单位立方体的顶点的三维坐标都是整数

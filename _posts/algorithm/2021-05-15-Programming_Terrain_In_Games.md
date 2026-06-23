@@ -2,7 +2,7 @@
 layout: default
 title: Noise_Terrain_Generation.md
 categories:
-- Game
+- Algorithm
 tags:
 - Game
 ---

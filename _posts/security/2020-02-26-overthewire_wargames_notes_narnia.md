@@ -2,9 +2,9 @@
 layout: default
 title: overthewire_wargames_notes_narnia
 categories:
-- C++
+- Security
 tags:
-- C++
+- Security
 ---
 //Description: 通过wargame的narnia学习linux反编译的一些笔记, shellcode
 

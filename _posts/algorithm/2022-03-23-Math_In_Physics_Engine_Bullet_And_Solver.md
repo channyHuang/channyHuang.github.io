@@ -19,7 +19,7 @@
 layout: default
 title: Math In Physics Engine Bullet And Solver
 categories:
-- Game
+- Algorithm
 tags:
 - Game
 ---

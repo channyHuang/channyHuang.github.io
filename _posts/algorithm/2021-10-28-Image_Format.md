@@ -2,9 +2,9 @@
 layout: default
 title: Image_Format.md
 categories:
-- Game
+- Algorithm
 tags:
-- Game
+- Image
 ---
 //Description: 图片格式总结
 

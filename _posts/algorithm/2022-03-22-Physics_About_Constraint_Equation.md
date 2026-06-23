@@ -19,7 +19,7 @@
 layout: default
 title: Physics_About_Constraint_Equation
 categories:
-- Game
+- Algorithm
 tags:
 - Game
 ---

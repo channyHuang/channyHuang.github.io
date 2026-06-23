@@ -2,9 +2,10 @@
 layout: default
 title: Water_Rendering.md
 categories:
-- Game
+- Algorithm
 tags:
 - Game
+- Render
 ---
 //Description: 水体渲染
 

@@ -2,9 +2,9 @@
 layout: default
 title: overthewire_wargames_notes_behemoth
 categories:
-- C++
+- Security
 tags:
-- C++
+- Security
 ---
 //Description: linux下的反编译，通过wargames学习的笔记
 

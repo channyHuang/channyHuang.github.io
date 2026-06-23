@@ -2,9 +2,9 @@
 layout: default
 title: Generate_Head_Using_Shell
 categories:
-- Shell
+- Tools
 tags:
-- Shell
+- Tools
 ---
 //Description: Generate File Head Using Shell
 

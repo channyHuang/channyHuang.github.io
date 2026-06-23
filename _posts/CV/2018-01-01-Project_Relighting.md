@@ -2,7 +2,7 @@
 layout: default
 title: Project Relighting
 categories:
-- Computer Vision
+- Algorithm
 tags:
 - Computer Vision
 - Project

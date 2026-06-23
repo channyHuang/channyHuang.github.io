@@ -2,7 +2,7 @@
 layout: default
 title: Simple_ACGAN.md
 categories:
-- Game
+- Algorithm
 tags:
 - Game
 ---

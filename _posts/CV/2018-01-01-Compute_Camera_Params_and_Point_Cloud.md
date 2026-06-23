@@ -2,7 +2,7 @@
 layout: default
 title: Compute Camera Params and Point Cloud
 categories:
-- Computer Vision
+- Lib
 tags:
 - Computer Vision
 - 3D Reconstruction

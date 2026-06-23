@@ -2,7 +2,7 @@
 layout: default
 title: Programming_AI_Terrain.md
 categories:
-- Game
+- Algorithm
 tags:
 - Game
 ---

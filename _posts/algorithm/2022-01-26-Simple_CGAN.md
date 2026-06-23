@@ -2,7 +2,7 @@
 layout: default
 title: Simple_CGAN.md
 categories:
-- Game
+- Algorithm
 tags:
 - Game
 ---

@@ -2,9 +2,9 @@
 layout: default
 title: overthewire_wargames_notes_utumno
 categories:
-- C++
+- Security
 tags:
-- C++
+- Security
 ---
 //Description: 通过wargame的utumno学习linux反编译笔记
 

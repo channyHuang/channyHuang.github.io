@@ -2,9 +2,9 @@
 layout: default
 title: overthewire_wargames_notes_bandit
 categories:
-- C++
+- Security
 tags:
-- C++
+- Security
 ---
 //Description:
 

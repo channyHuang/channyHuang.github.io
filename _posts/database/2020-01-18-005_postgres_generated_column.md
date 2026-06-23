@@ -2,9 +2,9 @@
 layout: default
 title: 005_postgres_generated_column
 categories:
-- C++
+- Database
 tags:
-- C++
+- Database
 ---
 //Description:
 

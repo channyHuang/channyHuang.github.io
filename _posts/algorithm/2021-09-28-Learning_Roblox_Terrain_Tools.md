@@ -2,7 +2,7 @@
 layout: default
 title: Learning Roblox Terrain Tools.md
 categories:
-- Game
+- Algorithm
 tags:
 - Game
 ---
