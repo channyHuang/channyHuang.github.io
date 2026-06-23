@@ -241,6 +241,7 @@ ffmpeg.exe -i "D:/dataset/lab/IMG_0080.MOV" -vcodec libx264 -s 1920x1080 -crf 0 
 ## colmap
 从图像到三维稠密点云
 ### 编译
+[libspatialite](https://www.gaia-gis.it/fossil/libspatialite/index)
 ```sh
 sudo apt-get install libsqlite3-dev libsuitesparse-dev
 ```
@@ -772,10 +773,3 @@ fpcfilter_path = os.path.join(superbuild_bin_path, "FPCFilter")
 [RGB-D重建](https://blog.51cto.com/u_14439393/5748486)
 [点云重建](https://github.com/PRBonn/puma)
 
-# 数据集
-[点云集](https://robotik.informatik.uni-wuerzburg.de/telematics/3dscans/)
-[kitti](https://www.cvlibs.net/datasets/kitti/)
-[EuRoC MAV / ASL Datasets](https://projects.asl.ethz.ch/datasets/doku.php?id=kmavvisualinertialdatasets)
-[M2DGR](https://github.com/SJTU-ViSYS/M2DGR)
-[M2DGR-plus](https://github.com/SJTU-ViSYS/M2DGR-plus?tab=readme-ov-file)
-FPCFilter
