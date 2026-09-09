@@ -91,6 +91,31 @@ iOS支持
 [global]
    vfs objects = acl_xattr catia fruit streams_xattr
 ```
+
+无效后，修改成
+```sh
+[global]
+    security = user
+    map to guest = Bad User
+    guest ok = no
+
+  vfs objects = fruit streams_xattr
+  fruit:metadata = stream
+  fruit:model = MacSamba
+  server min protocol = SMB2
+
+[sambafolder]
+    comment=sharefiles
+    path=/home/channy/Downloads/sambafolder
+    browseable = yes
+    read only = no
+    guest ok = no
+    valid users = smbuser
+    force user = smbuser
+    create mask = 0644
+    directory mask = 0755
+```
+
 6. 重启服务
 ```sh
 sudo service smbd restart

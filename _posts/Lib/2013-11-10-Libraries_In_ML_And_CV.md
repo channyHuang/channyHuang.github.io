@@ -176,6 +176,9 @@ http://cs2.swfc.edu.cn/~zyl/?p=860
 * DevIL:
 * [ImageMagick](http://www.imagemagick.org/script/index.php)
 * [FFMPEG](http://www.ffmpeg.org/)
+    ## ffmpeg
+    ../configure --prefix=$PWD/install --disable-x86asm --enable-static --enable-shared
+
 * [VideoInput](http://www.muonics.net/school/spring05/videoInput/)
 * portVideo:
 * [BoostGIL](http://www.boost.org/)  

@@ -44,13 +44,25 @@ tags:
 ***
 
 # ffmpeg
-1. 视频格式转换，如Linux下的录屏文件转换成mp4
+## video2picture
+```sh
+ffmpeg.exe -i "D:/dataset/lab/IMG_0080.MOV" -qscale:v 1 -qmin 1 -vf "fps=30.0" "D:/dataset/lab\images"/%04d.jpg
+
+ffmpeg.exe -i "D:/dataset/lab/IMG_0080.MOV" -vcodec libx264 -s 1920x1080 -crf 0 -acodec copy new.mp4
+```
+## picture2video
+```sh
+ffmpeg -framerate 30 -i %d.jpg -c:v libx264 -pix_fmt yuv420p output.mp4
+# 无损
+ffmpeg -framerate 30 -i %d.jpg -c:v libx264 -qp 0 -pix_fmt yuv420p output.mp4
+```
+## 视频格式转换，如Linux下的录屏文件转换成mp4
 ```sh
 ffmpeg -i input.webm output.mp4
 ```
 带`-c copy`的转换后肉眼看起来质量会变，不带`-c copy`的重新编码可以保持原质量
 
-1. 裁剪部分视频
+## 裁剪部分视频
 `-ss`开始时间，`-to`结束时间，但裁剪后的视频时间可能会出现偏差，原因暂未知
 ```sh
 ffmpeg -i input.mp4 -ss 00:00:12 output.mp4
@@ -58,7 +70,7 @@ ffmpeg -i input.mp4 -ss 00:00:12 output.mp4
 ffmpeg -i input.webm -ss 00:00:00 -to 00:00:30 output.webm
 ```
 
-1. 合并多个视频
+## 合并多个视频
 ```filelist.txt
 file 'n_calc_height.mp4'
 file 'n_calc_dist.mp4'
@@ -69,10 +81,15 @@ file 'n_area.mp4'
 ffmpeg -f concat -i filelist.txt output.mp4
 ```
 
-1. 编码格式转换
+## 编码格式转换
 ```sh
 ffmpeg -i input.mp4 -vcodec libx265 output_h265.mp4
 ffmpeg -i input.mp4 -vcodec libx264 output_h264.mp4
+```
+## video to rtsp
+```sh
+ffmpeg -re -i input.mp4 -c:v libx264 -c:copy -f rtsp rtsp://localhost:554/stream_name
+ffplay -rtsp_transport tcp -i rtsp://admin:@192.168.1.155
 ```
 
 # 附录:OpenCV写视频

@@ -130,6 +130,11 @@ $ docker run --name docker_ros_name -it --privileged -e DISPLAY=$DISPLAY -v /tmp
 
 --network=host
 # 查看已有容器的名称等信息
+--gpus all
+# --gpus all 也可以换成 --gpus '"device=0"' 来指定特定的GPU
+
+$ docker run --name crowdcounting -it --gpus all --privileged -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/channy/Documents/thirdlibs/ros_workspace:/home osrf/ros:noetic-desktop-full
+
 $ docker ps -a
 CONTAINER ID   IMAGE                          COMMAND                  CREATED              STATUS          PORTS     NAMES
 fb01ef7b2b1f   osrf/ros:noetic-desktop-full   "/ros_entrypoint.sh …"   About a minute ago   Up 23 seconds             docker_ros_name

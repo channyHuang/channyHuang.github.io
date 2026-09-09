@@ -74,8 +74,6 @@ meshlab中使用vcg求解点云法向量，比CGAL效果好。
 整数非线性规划求解器
 
 # 其它
-## ffmpeg
-音视频库
 ## jpeg/libpng  
 ## magic_enum
 只头文件。枚举类型和string的相互转化，c++17以上

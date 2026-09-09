@@ -214,5 +214,3 @@ print(ort_session.get_providers())
 GPU
 ['CPUExecutionProvider']
 ```
-# ffmpeg
-../configure --prefix=$PWD/install --disable-x86asm --enable-static --enable-shared

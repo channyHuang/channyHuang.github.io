@@ -231,13 +231,6 @@ Voxel_mapping::service_LiDAR_update
 service_refresh_and_synchronize_triangle
 ```
 
-## ffmpeg video2picture
-```sh
-ffmpeg.exe -i "D:/dataset/lab/IMG_0080.MOV" -qscale:v 1 -qmin 1 -vf "fps=30.0" "D:/dataset/lab\images"/%04d.jpg
-
-ffmpeg.exe -i "D:/dataset/lab/IMG_0080.MOV" -vcodec libx264 -s 1920x1080 -crf 0 -acodec copy new.mp4
-```
-
 ## colmap
 从图像到三维稠密点云
 ### 编译
