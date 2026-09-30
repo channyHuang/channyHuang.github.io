@@ -1,9 +1,8 @@
 ---
 layout: default
-title: 性能分析之Nsight Systems
+title: Program Analyse Nsight Systems
 categories:
 - Algorithm
-- Lib
 tags:
 - ML
 ---

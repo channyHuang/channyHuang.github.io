@@ -148,6 +148,58 @@ WARNING: erroneous pipeline: no element "nvvidconv"
 gst-launch-1.0 rtspsrc location='rtsp://192.168.1.88:554/user=admin&password=admin&xxx' ! rtph264depay ! h264parse ! avdec_h264 ! autovideosink
 ```
 
+但是`avdec_h264`始终是软解码,在ubuntu x86 + cuda上想要使用硬解码,除安装DeepStream外,还可以使用`nvdec`,需要重新编译`gst-plugins-bad`.　
+
+以NVIDIA RTX 3090　+　ubuntu 20.04 + cuda 12.8 为例,　系统apt install安装gstreamer会安装1.16版本的
+```sh
+# 1. 系统依赖
+sudo apt install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+  gstreamer1.0-tools gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
+  gstreamer1.0-plugins-bad meson ninja-build
+
+# 2. Video Codec SDK 头文件
+#    从 NVIDIA 官网下载 Video_Codec_SDK（解压后 Interface/ 下有 nvcuvid.h/cuviddec.h）
+export Video_Codec_SDK=/path/to/Video_Codec_SDK_x.x.x
+
+# 3. 编译安装 gst-plugins-bad（启用 nvdec）
+wget https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-1.16.3.tar.xz
+
+meson setup build --prefix=/usr \
+  -Dnvdec=enabled -Dnvcodec=disabled \
+  -Dc_args="-I$Video_Codec_SDK/Interface" \
+  -Dcpp_args="-I$Video_Codec_SDK/Interface"
+ninja -C build
+sudo ninja -C build install
+
+# 4. 确认元素存在
+meson configure build | grep -iE "nvdec|nvcodec"
+gst-inspect-1.0 | grep -i nv    # 应出现 nvdec / nvenc 插件
+gst-inspect-1.0  nvdec
+
+  SRC template: 'src'
+    Availability: Always
+    Capabilities:
+      video/x-raw(memory:GLMemory)
+                 format: NV12
+                  width: [ 1, 2147483647 ]
+                 height: [ 1, 2147483647 ]
+              framerate: [ 0/1, 2147483647/1 ]
+         texture-target: 2D
+
+```
+编译完后发现老版本输出是`GLMemory`...
+```c++
+sStream << "rtspsrc location=" << sCameraAddr
+        << " latency=0 ! "
+        << "rtph264depay ! "
+        << "h264parse config-interval=-1 ! "
+        << "nvdec ! "                    // NVDEC 硬解（输出 GLMemory NV12）
+        << "gldownload ! "               // GL 纹理 -> 系统内存 NV12
+        << "videoconvert ! "             // NV12 -> BGR
+        << "video/x-raw,format=BGR ! "
+        << "appsink name=sink max-buffers=1 drop=true sync=false";
+``` 
+
 ***
 ***
 ***

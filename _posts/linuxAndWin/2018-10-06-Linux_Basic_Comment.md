@@ -126,14 +126,16 @@ osrf/ros      noetic-desktop-full   5a2576cc4b0d   4 weeks ago     3.44GB
 hello-world   latest                d2c94e258dcb   15 months ago   13.3kB
 
 # 创建容器并进行文件映射
-$ docker run --name docker_ros_name -it --privileged -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/channy/Documents/thirdlibs/ros_workspace:/home osrf/ros:noetic-desktop-full
+$ docker run --name docker_ros_name -it --privileged -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/channy/Documents/thirdlibs/ros_workspace:/home -v /dev:/dev osrf/ros:noetic-desktop-full
 
 --network=host
 # 查看已有容器的名称等信息
 --gpus all
 # --gpus all 也可以换成 --gpus '"device=0"' 来指定特定的GPU
 
-$ docker run --name crowdcounting -it --gpus all --privileged -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/channy/Documents/thirdlibs/ros_workspace:/home osrf/ros:noetic-desktop-full
+$ docker run --name crowdcounting -it --gpus all --privileged -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/channy/Documents/thirdlibs/ros_workspace:/home -v /dev:/dev osrf/ros:noetic-desktop-full
+$ sudo docker run --name hg_humble -it --gpus all --privileged -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/channy/Documents/ros_workspace:/root/ros_workspace -v /dev:/dev -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/channy/Documents/datasets:/root/datasets:ro -v /home/channy/Documents/thirdlibs:/root/thirdlibs osrf/ros:humble-desktop-full
+
 
 $ docker ps -a
 CONTAINER ID   IMAGE                          COMMAND                  CREATED              STATUS          PORTS     NAMES
